@@ -1,0 +1,72 @@
+/* Light Theme */
+:root {
+  /* Base Colors - Modern, sophisticated palette */
+  --background: 0 0% 100%;
+  --foreground: 225 9% 9%;
+
+  /* Surface Colors */
+  --card: 0 0% 100%;
+  --card-foreground: 225 9% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 225 9% 9%;
+
+  /* Brand Colors */
+  --brand-from: #{$brand-from};
+  --brand-to: #{$brand-to};
+  --primary: 39 100% 50%;
+  --primary-foreground: 0 0% 100%;
+  --primary-hover: 39 100% 45%;
+  --primary-light: 39 100% 85%;
+
+  /* Secondary Colors - Warm accent */
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 84% 22%;
+  --secondary-hover: 210 40% 92%;
+
+  /* Neutral Colors */
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 84% 22%;
+
+  /* Status Colors */
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 9%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+
+  /* Interactive Elements */
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 222 84% 22%;
+  --radius: #{$radius};
+
+  /* Gradients */
+  --gradient-primary: #{$gradient-primary};
+  --gradient-secondary: #{$gradient-secondary};
+  --gradient-hero: #{$gradient-hero};
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 hsl(222 84% 22% / 0.05);
+  --shadow-md: #{create-shadow()};
+  --shadow-lg: 0 10px 15px -3px hsl(222 84% 22% / 0.1), 0 4px 6px -2px hsl(222 84% 22% / 0.05);
+  --shadow-xl: 0 20px 25px -5px hsl(222 84% 22% / 0.1), 0 10px 10px -5px hsl(222 84% 22% / 0.04);
+  --shadow-glow: #{create-glow()};
+
+  /* Typography */
+  --font-heading: #{$font-heading};
+  --font-body: #{$font-body};
+  --font-mono: #{$font-mono};
+
+  /* Sidebar */
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+}

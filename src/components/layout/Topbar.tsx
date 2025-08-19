@@ -1,5 +1,6 @@
 import { BaseInput } from "@/components/base/BaseInput";
 import { BaseButton } from "@/components/base/BaseButton";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
 export interface TopbarProps {
@@ -24,6 +25,8 @@ export function Topbar({ className }: TopbarProps) {
 
         {/* Right side - Actions */}
         <div className="flex items-center gap-3">
+          <ThemeToggle />
+          
           <BaseButton variant="ghost" size="sm">
             Help
           </BaseButton>

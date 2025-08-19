@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// Import theme files
+@import './themes/variables';
+@import './themes/light-theme';
+@import './themes/dark-theme';
+@import './components/utilities';
+@import './components/animations';

@@ -1,0 +1,49 @@
+/* Dark Theme */
+.dark {
+  /* Dark theme - Elegant and modern */
+  --background: 222 47% 6%;
+  --foreground: 210 40% 98%;
+
+  --card: 222 47% 8%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 8%;
+  --popover-foreground: 210 40% 98%;
+
+  --primary: 222 84% 65%;
+  --primary-foreground: 222 47% 6%;
+  --primary-hover: 222 84% 70%;
+  --primary-light: 222 84% 15%;
+
+  --secondary: 222 47% 12%;
+  --secondary-foreground: 210 40% 98%;
+  --secondary-hover: 222 47% 16%;
+
+  --muted: 222 47% 12%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 222 47% 12%;
+  --accent-foreground: 210 40% 98%;
+
+  --success: 142 76% 36%;
+  --success-foreground: 210 40% 98%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 9%;
+  --destructive: 0 63% 50%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 222 47% 15%;
+  --input: 222 47% 15%;
+  --ring: 222 84% 65%;
+
+  /* Dark theme shadows with adjusted opacity */
+  --shadow-glow: #{create-glow(222 84% 65%, 0.4)};
+
+  /* Sidebar Dark Theme */
+  --sidebar-background: 240 5.9% 10%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  --sidebar-primary: 224.3 76.3% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 3.7% 15.9%;
+  --sidebar-accent-foreground: 240 4.8% 95.9%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+}
