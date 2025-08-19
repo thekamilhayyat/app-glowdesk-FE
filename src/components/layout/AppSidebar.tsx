@@ -49,13 +49,10 @@ export function AppSidebar() {
   const isCollapsed = sidebarState === "collapsed"
 
   return (
-    <Sidebar 
-      className={isCollapsed ? "w-[var(--sidebar-width-icon)]" : "w-[var(--sidebar-width)]"} 
-      collapsible="icon"
-    >
+    <Sidebar className={isCollapsed ? "w-14" : "w-64"} collapsible="icon">
       <SidebarContent>
         {/* Logo Section */}
-        <div className="p-4 border-b border-sidebar-border">
+        <div className="p-4 border-b border-border">
           <div className="flex items-center justify-center">
             {isCollapsed ? (
               <Logo variant="icon" size="sm" />
@@ -66,7 +63,7 @@ export function AppSidebar() {
         </div>
 
         <SidebarGroup>
-          <SidebarGroupLabel className={`${isCollapsed ? "sr-only" : ""} text-sidebar-foreground`}>
+          <SidebarGroupLabel className={isCollapsed ? "sr-only" : ""}>
             Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -80,10 +77,11 @@ export function AppSidebar() {
                   >
                     <NavLink to={item.url}>
                       <item.icon 
-                        className="h-5 w-5 flex-shrink-0" 
+                        className={`h-6 w-6 flex-shrink-0 ${isCollapsed ? "" : "mr-0"}`} 
+                        size={24}
                         stroke={1.5}
                       />
-                      {!isCollapsed && <span className="font-medium">{item.title}</span>}
+                      {!isCollapsed && <span className="font-medium text-base">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -54,7 +54,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpiData.map((kpi, index) => (
           <BaseCard key={index} variant="elevated" hover="lift">
-            <CardContent className="p-6">
+            <CardContent >
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">{kpi.title}</p>
                 <div className="flex items-center justify-between">
@@ -78,7 +78,7 @@ export function Dashboard() {
         <div className="lg:col-span-2 space-y-6">
           {/* Today's Schedule */}
           <BaseCard>
-            <CardHeader className="p-6 pb-4">
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-heading font-semibold">Today's Schedule</h2>
                 <BaseButton variant="secondary" size="sm">
@@ -120,7 +120,7 @@ export function Dashboard() {
 
           {/* Recent Sales */}
           <BaseCard>
-            <CardHeader className="p-6 pb-4">
+            <CardHeader className="pb-4">
               <h2 className="text-xl font-heading font-semibold">Recent Sales</h2>
             </CardHeader>
             <CardContent className="p-0">
@@ -154,10 +154,10 @@ export function Dashboard() {
         <div className="space-y-6">
           {/* Low Stock */}
           <BaseCard>
-            <CardHeader className="p-6 pb-4">
+            <CardHeader className=" pb-4">
               <h2 className="text-xl font-heading font-semibold">Low Stock</h2>
             </CardHeader>
-            <CardContent className="p-6 pt-0 space-y-4">
+            <CardContent className=" pt-0 space-y-4">
               <div className="space-y-2">
                 {lowStockItems.map((item, index) => (
                   <BaseBadge key={index} variant="warning" className="mr-2 mb-2">
@@ -173,10 +173,10 @@ export function Dashboard() {
 
           {/* Tasks - Placeholder */}
           <BaseCard>
-            <CardHeader className="p-6 pb-4">
+            <CardHeader className="pb-4">
               <h2 className="text-xl font-heading font-semibold">Tasks</h2>
             </CardHeader>
-            <CardContent className="p-6 pt-0">
+            <CardContent className="pt-0">
               <div className="space-y-3 text-sm text-muted-foreground">
                 <div className="flex items-center justify-between">
                   <span>Order supplies</span>
