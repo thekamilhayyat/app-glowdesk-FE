@@ -48,7 +48,7 @@ export function Topbar({ className }: TopbarProps) {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <BaseButton variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
+              <BaseButton variant="ghost" size="sm" className="relative h-8 w-8 rounded-full p-0">
                 <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-sm font-medium text-white">
                   {user?.firstName?.charAt(0) || 'U'}
                 </div>

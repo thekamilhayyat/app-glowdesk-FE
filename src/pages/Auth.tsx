@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { BaseCard, CardHeader, CardContent } from "@/components/base/BaseCard";
 import { BaseButton } from "@/components/base/BaseButton";
 import { BaseInput } from "@/components/base/BaseInput";
@@ -14,13 +15,21 @@ export function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: "admin@glowdesk.com",
+    password: "admin123",
     firstName: "",
     lastName: "",
   });
 
-  const { login, signup } = useAuth();
+  const { login, signup, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,6 +55,10 @@ export function Auth() {
         
         if (success) {
           toast.success("Account created successfully!");
+          // Redirect to dashboard after successful signup
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 1000); // Wait 1 second for the toast to show
         } else {
           toast.error("User already exists with this email");
         }
@@ -54,6 +67,10 @@ export function Auth() {
         
         if (success) {
           toast.success("Welcome back!");
+          // Redirect to dashboard after successful login
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 1000); // Wait 1 second for the toast to show
         } else {
           toast.error("Invalid email or password");
         }
@@ -68,8 +85,8 @@ export function Auth() {
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setFormData({
-      email: "",
-      password: "",
+      email: isSignUp ? "admin@glowdesk.com" : "",
+      password: isSignUp ? "admin123" : "",
       firstName: "",
       lastName: "",
     });
