@@ -19,11 +19,11 @@ $gradient-primary: linear-gradient(135deg, hsl(39 100% 50%), hsl(195 100% 50%));
 $gradient-secondary: linear-gradient(135deg, hsl(210 40% 96%), hsl(210 40% 92%));
 $gradient-hero: linear-gradient(135deg, hsl(39 100% 50%) 0%, hsl(195 100% 50%) 100%);
 
-// Shadow functions
-@function create-shadow($color: 222 84% 22%, $opacity: 0.1) {
-  @return 0 4px 6px -1px hsl(#{$color} / #{$opacity}), 0 2px 4px -1px hsl(#{$color} / #{$opacity * 0.6});
+// Shadow utilities - fix HSL syntax
+@function create-shadow($hue: 222, $saturation: 84%, $lightness: 22%, $opacity: 0.1) {
+  @return 0 4px 6px -1px hsl(#{$hue} #{$saturation} #{$lightness} / #{$opacity}), 0 2px 4px -1px hsl(#{$hue} #{$saturation} #{$lightness} / #{$opacity * 0.6});
 }
 
-@function create-glow($color: 222 84% 22%, $opacity: 0.3) {
-  @return 0 0 30px hsl(#{$color} / #{$opacity});
+@function create-glow($hue: 222, $saturation: 84%, $lightness: 22%, $opacity: 0.3) {
+  @return 0 0 30px hsl(#{$hue} #{$saturation} #{$lightness} / #{$opacity});
 }

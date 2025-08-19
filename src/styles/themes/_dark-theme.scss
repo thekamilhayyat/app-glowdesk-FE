@@ -35,7 +35,7 @@
   --ring: 222 84% 65%;
 
   /* Dark theme shadows with adjusted opacity */
-  --shadow-glow: #{create-glow(222 84% 65%, 0.4)};
+  --shadow-glow: 0 0 30px hsl(222 84% 65% / 0.4);
 
   /* Sidebar Dark Theme */
   --sidebar-background: 240 5.9% 10%;

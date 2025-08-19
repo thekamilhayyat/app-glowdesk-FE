@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-// Import theme files
-@import './themes/variables';
-@import './themes/light-theme';
-@import './themes/dark-theme';
-@import './components/utilities';
-@import './components/animations';
+// Import theme files using modern @use syntax
+@use './themes/variables';
+@use './themes/light-theme';
+@use './themes/dark-theme';
+@use './components/utilities';
+@use './components/animations';
