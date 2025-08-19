@@ -18,15 +18,18 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
     if (variant === "icon") {
       return (
         <div
-          ref={ref}
-          className={cn("flex items-center", className)}
-          {...props}
-        >
-          <div className={cn(
-            "w-8 aspect-square rounded-full bg-gradient-primary",
-            sizeClasses[size]
-          )} />
+        ref={ref}
+        className={cn("flex items-center gap-3", className)}
+        {...props}
+      >
+        <div className={cn(
+          "rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold",
+          sizeClasses[size],
+          "aspect-square"
+        )}>
+          🦋
         </div>
+      </div>
       );
     }
 

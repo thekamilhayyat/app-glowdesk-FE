@@ -47,7 +47,7 @@ export function Dashboard() {
     <Container className="py-6 space-y-6">
       {/* Page Title */}
       <div>
-        <h1 className="text-3xl font-heading font-semibold text-foreground">Dashboard new</h1>
+        <h1 className="text-3xl font-heading font-semibold text-foreground">Dashboard</h1>
       </div>
 
       {/* KPI Cards */}

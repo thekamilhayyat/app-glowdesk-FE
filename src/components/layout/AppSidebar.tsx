@@ -49,13 +49,13 @@ export function AppSidebar() {
   const isCollapsed = sidebarState === "collapsed"
 
   return (
-    <Sidebar className={isCollapsed ? "w-14" : "w-64"} collapsible="icon">
+    <Sidebar className={isCollapsed ? "w-16" : "w-64"} collapsible="icon">
       <SidebarContent>
         {/* Logo Section */}
-        <div className="p-4 border-b border-border">
+        <div className="p-5 border-b border-border">
           <div className="flex items-center justify-center">
             {isCollapsed ? (
-              <Logo variant="icon" size="sm" />
+              <Logo variant="icon" size="md" />
             ) : (
               <Logo variant="full" size="md" />
             )}
