@@ -1,6 +1,7 @@
 import { BaseInput } from "@/components/base/BaseInput";
 import { BaseButton } from "@/components/base/BaseButton";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
 export interface TopbarProps {
@@ -14,8 +15,9 @@ export function Topbar({ className }: TopbarProps) {
       className
     )}>
       <div className="flex items-center justify-between">
-        {/* Left side - Search */}
+        {/* Left side - Sidebar Toggle & Search */}
         <div className="flex items-center gap-4 flex-1 max-w-md">
+          <SidebarTrigger className="h-9 w-9" />
           <BaseInput
             placeholder="Search..."
             className="flex-1"
