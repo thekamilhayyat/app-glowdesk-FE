@@ -49,10 +49,13 @@ export function AppSidebar() {
   const isCollapsed = sidebarState === "collapsed"
 
   return (
-    <Sidebar className={isCollapsed ? "w-14" : "w-64"} collapsible="icon">
+    <Sidebar 
+      className={isCollapsed ? "w-[var(--sidebar-width-icon)]" : "w-[var(--sidebar-width)]"} 
+      collapsible="icon"
+    >
       <SidebarContent>
         {/* Logo Section */}
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center justify-center">
             {isCollapsed ? (
               <Logo variant="icon" size="sm" />
@@ -63,26 +66,21 @@ export function AppSidebar() {
         </div>
 
         <SidebarGroup>
-          <SidebarGroupLabel className={isCollapsed ? "sr-only" : ""}>
+          <SidebarGroupLabel className={`${isCollapsed ? "sr-only" : ""} text-sidebar-foreground`}>
             Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                          isActive 
-                            ? "bg-primary text-primary-foreground" 
-                            : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
-                        } ${isCollapsed ? "justify-center" : ""}`
-                      }
-                    >
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={isActive(item.url)}
+                    tooltip={isCollapsed ? item.title : undefined}
+                  >
+                    <NavLink to={item.url}>
                       <item.icon 
-                        className={`h-5 w-5 flex-shrink-0 ${isCollapsed ? "" : "mr-0"}`} 
+                        className="h-5 w-5 flex-shrink-0" 
                         stroke={1.5}
                       />
                       {!isCollapsed && <span className="font-medium">{item.title}</span>}

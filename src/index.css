@@ -1,0 +1,325 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design System - Beautiful, consistent styling foundation
+All colors MUST be HSL for consistency.
+*/
+
+@layer base {
+  :root {
+    /* Base Colors - Modern, sophisticated palette */
+    --background: 0 0% 100%;
+    --foreground: 225 9% 9%;
+
+    /* Surface Colors */
+    --card: 0 0% 100%;
+    --card-foreground: 225 9% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 225 9% 9%;
+
+    /* Brand Colors */
+    --brand-from: 39 100% 50%; /* #FFA500 */
+    --brand-to: 195 100% 50%; /* #00BFFF */
+    --primary: 39 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 39 100% 45%;
+    --primary-light: 39 100% 85%;
+
+    /* Secondary Colors - Warm accent */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 84% 22%;
+    --secondary-hover: 210 40% 92%;
+
+    /* Neutral Colors */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 84% 22%;
+
+    /* Status Colors */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 9%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Interactive Elements */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 222 84% 22%;
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(39 100% 50%), hsl(195 100% 50%));
+    --gradient-secondary: linear-gradient(135deg, hsl(210 40% 96%), hsl(210 40% 92%));
+    --gradient-hero: linear-gradient(135deg, hsl(39 100% 50%) 0%, hsl(195 100% 50%) 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(222 84% 22% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(222 84% 22% / 0.1), 0 2px 4px -1px hsl(222 84% 22% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(222 84% 22% / 0.1), 0 4px 6px -2px hsl(222 84% 22% / 0.05);
+    --shadow-xl: 0 20px 25px -5px hsl(222 84% 22% / 0.1), 0 10px 10px -5px hsl(222 84% 22% / 0.04);
+    --shadow-glow: 0 0 30px hsl(222 84% 22% / 0.3);
+
+    /* Typography */
+    --font-heading: 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Sidebar Dimensions */
+    --sidebar-width: 16rem;
+    --sidebar-width-icon: 3rem;
+    --sidebar-width-mobile: 18rem;
+  }
+
+  .dark {
+    /* Dark theme - Elegant and modern */
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 222 84% 65%;
+    --primary-foreground: 222 47% 6%;
+    --primary-hover: 222 84% 70%;
+    --primary-light: 222 84% 15%;
+
+    --secondary: 222 47% 12%;
+    --secondary-foreground: 210 40% 98%;
+    --secondary-hover: 222 47% 16%;
+
+    --muted: 222 47% 12%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 222 47% 12%;
+    --accent-foreground: 210 40% 98%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 9%;
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 222 47% 15%;
+    --input: 222 47% 15%;
+    --ring: 222 84% 65%;
+
+    /* Dark theme shadows with adjusted opacity */
+    --shadow-glow: 0 0 30px hsl(222 84% 65% / 0.4);
+
+    /* Sidebar Dark Theme */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Sidebar Dimensions (same for both themes) */
+    --sidebar-width: 16rem;
+    --sidebar-width-icon: 3rem;
+    --sidebar-width-mobile: 18rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  /* Component utilities for consistent styling */
+  .btn-gradient {
+    background: var(--gradient-primary);
+    @apply text-primary-foreground border-0;
+
+    &:hover {
+      background: var(--gradient-hero);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+    }
+  }
+
+  /* Force sidebar theming */
+  [data-sidebar="sidebar"] {
+    background-color: hsl(var(--sidebar-background)) !important;
+    color: hsl(var(--sidebar-foreground)) !important;
+  }
+
+  [data-sidebar="sidebar"] * {
+    color: hsl(var(--sidebar-foreground)) !important;
+  }
+
+  /* Ensure sidebar menu buttons use proper colors */
+  [data-sidebar="menu-button"] {
+    background-color: transparent !important;
+    color: hsl(var(--sidebar-foreground)) !important;
+  }
+
+  [data-sidebar="menu-button"]:hover {
+    background-color: hsl(var(--sidebar-accent)) !important;
+    color: hsl(var(--sidebar-accent-foreground)) !important;
+  }
+
+  [data-sidebar="menu-button"][data-active="true"] {
+    background-color: hsl(var(--sidebar-primary)) !important;
+    color: hsl(var(--sidebar-primary-foreground)) !important;
+  }
+
+  /* Sidebar borders and separators */
+  [data-sidebar="sidebar"] .border-sidebar-border {
+    border-color: hsl(var(--sidebar-border)) !important;
+  }
+
+  /* Logo section border */
+  [data-sidebar="sidebar"] .border-b {
+    border-color: hsl(var(--sidebar-border)) !important;
+  }
+
+  /* Navigation label */
+  [data-sidebar="group-label"] {
+    color: hsl(var(--sidebar-foreground)) !important;
+  }
+
+  /* Force all sidebar-related elements to use proper colors */
+  .bg-sidebar {
+    background-color: hsl(var(--sidebar-background)) !important;
+  }
+
+  .text-sidebar-foreground {
+    color: hsl(var(--sidebar-foreground)) !important;
+  }
+
+  .border-sidebar-border {
+    border-color: hsl(var(--sidebar-border)) !important;
+  }
+
+  .bg-sidebar-accent {
+    background-color: hsl(var(--sidebar-accent)) !important;
+  }
+
+  .text-sidebar-accent-foreground {
+    color: hsl(var(--sidebar-accent-foreground)) !important;
+  }
+
+  .bg-sidebar-primary {
+    background-color: hsl(var(--sidebar-primary)) !important;
+  }
+
+  .text-sidebar-primary-foreground {
+    color: hsl(var(--sidebar-primary-foreground)) !important;
+  }
+
+
+
+  .card-elevated {
+    box-shadow: var(--shadow-lg);
+    @apply border-0 bg-card;
+
+    &:hover {
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-2px);
+    }
+  }
+
+  .text-gradient {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-effect {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.8s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.4s ease-out;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  /* Custom animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: var(--shadow-glow);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(222 84% 22% / 0.5);
+    }
+  }
+} 
