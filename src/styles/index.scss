@@ -1,10 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-// Import theme files using modern @use syntax
+// Import theme files using modern @use syntax - must be first
 @use './themes/variables';
 @use './themes/light-theme';
 @use './themes/dark-theme';
 @use './components/utilities';
 @use './components/animations';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
