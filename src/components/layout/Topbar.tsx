@@ -2,6 +2,7 @@ import { BaseInput } from "@/components/base/BaseInput";
 import { BaseButton } from "@/components/base/BaseButton";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
@@ -41,9 +42,13 @@ export function Topbar({ className }: TopbarProps) {
         <div className="flex items-center gap-3">
           <ThemeToggle />
           
+          <Separator orientation="vertical" className="h-6" />
+          
           <BaseButton variant="ghost" size="sm">
             Help
           </BaseButton>
+          
+          <Separator orientation="vertical" className="h-6" />
           
           {/* User Menu */}
           <DropdownMenu>

@@ -7,7 +7,7 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        default: "focus-visible:ring-offset-2",
+        default: "",
         filled: "bg-muted border-transparent focus-visible:bg-background focus-visible:border-input",
         outline: "border-2 focus-visible:border-primary",
         ghost: "border-transparent bg-transparent focus-visible:bg-muted",
