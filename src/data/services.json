@@ -1,0 +1,60 @@
+{
+  "services": [
+    {
+      "id": "1",
+      "name": "Haircut",
+      "category": "Hair",
+      "basePrice": 50,
+      "baseDuration": 45
+    },
+    {
+      "id": "2", 
+      "name": "Hair Color",
+      "category": "Hair",
+      "basePrice": 120,
+      "baseDuration": 90
+    },
+    {
+      "id": "3",
+      "name": "Highlights",
+      "category": "Hair", 
+      "basePrice": 150,
+      "baseDuration": 120
+    },
+    {
+      "id": "4",
+      "name": "Manicure",
+      "category": "Nails",
+      "basePrice": 30,
+      "baseDuration": 30
+    },
+    {
+      "id": "5",
+      "name": "Pedicure", 
+      "category": "Nails",
+      "basePrice": 45,
+      "baseDuration": 45
+    },
+    {
+      "id": "6",
+      "name": "Facial",
+      "category": "Skincare",
+      "basePrice": 80,
+      "baseDuration": 60
+    },
+    {
+      "id": "7",
+      "name": "Eyebrow Wax",
+      "category": "Skincare",
+      "basePrice": 25,
+      "baseDuration": 15
+    },
+    {
+      "id": "8",
+      "name": "Massage",
+      "category": "Wellness",
+      "basePrice": 100,
+      "baseDuration": 60
+    }
+  ]
+}

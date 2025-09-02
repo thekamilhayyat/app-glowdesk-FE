@@ -301,6 +301,7 @@ export function Staff() {
     toast.success("Staff information updated successfully!");
   };
 
+  // Initial empty state
   if (staff.length === 0) {
     return (
       <AppLayout>
@@ -313,6 +314,22 @@ export function Staff() {
                     title="No Staff Members"
                     description="Get started by adding your first staff member"
                     actionLabel="Add Staff"
+                    icon={
+                      <svg
+                        className="w-24 h-24 text-muted-foreground"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1}
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                    }
                   />
                 </div>
               </DialogTrigger>
@@ -400,6 +417,7 @@ export function Staff() {
   return (
     <AppLayout>
       <Container className="py-6">
+        {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-heading font-semibold text-foreground">Staff Management</h1>
@@ -490,6 +508,7 @@ export function Staff() {
           </Dialog>
         </div>
 
+        {/* Two Panel Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Panel - Staff List */}
           <div className="lg:col-span-1">
