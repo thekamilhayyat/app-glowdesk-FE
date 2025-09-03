@@ -6,7 +6,7 @@ import { BaseButton } from "@/components/base/BaseButton";
 import { BaseInput } from "@/components/base/BaseInput";
 import { BaseLabel } from "@/components/base/BaseLabel";
 import { BaseBadge } from "@/components/base/BaseBadge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { BaseDrawer } from "@/components/base/BaseDrawer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EmptyState } from "@/components/EmptyState";
 import { Plus, Edit2, Trash2, Clock, DollarSign } from "lucide-react";
@@ -307,8 +307,11 @@ export function Staff() {
       <AppLayout>
         <Container className="py-6">
           <div className="flex items-center justify-center min-h-[60vh]">
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
+            <BaseDrawer
+              open={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
+              title="Add New Staff Member"
+              trigger={
                 <div>
                   <EmptyState
                     title="No Staff Members"
@@ -332,109 +335,23 @@ export function Staff() {
                     }
                   />
                 </div>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Add New Staff Member</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <BaseLabel htmlFor="name">Name *</BaseLabel>
-                    <BaseInput
-                      id="name"
-                      name="name"
-                      placeholder="Enter staff name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <BaseLabel htmlFor="email">Email *</BaseLabel>
-                    <BaseInput
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="Enter email address"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <BaseLabel htmlFor="phone">Phone Number *</BaseLabel>
-                    <PhoneInput
-                      international
-                      countryCallingCodeEditable={false}
-                      defaultCountry="US"
-                      value={formData.phone}
-                      onChange={handlePhoneChange}
-                      className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_input]:bg-transparent"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <BaseLabel htmlFor="role">Role *</BaseLabel>
-                    <Select value={formData.role} onValueChange={handleRoleSelect}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem key={role.role_id} value={role.role_id}>
-                            {role.role_name}
-                          </SelectItem>
-                        ))}
-                        <SelectItem value="add_new">+ Add New Role</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
-                    <BaseButton type="submit" variant="gradient" className="flex-1">
-                      Add Staff
-                    </BaseButton>
-                    <BaseButton 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setIsDialogOpen(false)}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </BaseButton>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </Container>
-      </AppLayout>
-    );
-  }
-
-  return (
-    <AppLayout>
-      <Container className="py-6">
-        {/* Page Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-heading font-semibold text-foreground">Staff Management</h1>
-            <p className="text-muted-foreground">Manage your team members and their schedules</p>
-          </div>
-          
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <BaseButton variant="gradient" className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Staff
-              </BaseButton>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Add New Staff Member</DialogTitle>
-              </DialogHeader>
+              }
+              footer={
+                <div className="flex gap-3 w-full">
+                  <BaseButton 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsDialogOpen(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </BaseButton>
+                  <BaseButton type="submit" variant="gradient" className="flex-1">
+                    Add Staff
+                  </BaseButton>
+                </div>
+              }
+            >
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <BaseLabel htmlFor="name">Name *</BaseLabel>
@@ -489,23 +406,106 @@ export function Staff() {
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div className="flex gap-3 pt-4">
-                  <BaseButton type="submit" variant="gradient" className="flex-1">
-                    Add Staff
-                  </BaseButton>
-                  <BaseButton 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setIsDialogOpen(false)}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </BaseButton>
-                </div>
               </form>
-            </DialogContent>
-          </Dialog>
+            </BaseDrawer>
+          </div>
+        </Container>
+      </AppLayout>
+    );
+  }
+
+  return (
+    <AppLayout>
+      <Container className="py-6">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-heading font-semibold text-foreground">Staff Management</h1>
+            <p className="text-muted-foreground">Manage your team members and their schedules</p>
+          </div>
+          
+          <BaseDrawer
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            title="Add New Staff Member"
+            trigger={
+              <BaseButton variant="gradient" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add Staff
+              </BaseButton>
+            }
+            footer={
+              <div className="flex gap-3 w-full">
+                <BaseButton 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </BaseButton>
+                <BaseButton type="submit" variant="gradient" className="flex-1">
+                  Add Staff
+                </BaseButton>
+              </div>
+            }
+          >
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <BaseLabel htmlFor="name">Name *</BaseLabel>
+                <BaseInput
+                  id="name"
+                  name="name"
+                  placeholder="Enter staff name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <BaseLabel htmlFor="email">Email *</BaseLabel>
+                <BaseInput
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter email address"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <BaseLabel htmlFor="phone">Phone Number *</BaseLabel>
+                <PhoneInput
+                  international
+                  countryCallingCodeEditable={false}
+                  defaultCountry="US"
+                  value={formData.phone}
+                  onChange={handlePhoneChange}
+                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_input]:bg-transparent"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <BaseLabel htmlFor="role">Role *</BaseLabel>
+                <Select value={formData.role} onValueChange={handleRoleSelect}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role.role_id} value={role.role_id}>
+                        {role.role_name}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="add_new">+ Add New Role</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </form>
+          </BaseDrawer>
         </div>
 
         {/* Two Panel Layout */}

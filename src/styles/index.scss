@@ -195,6 +195,23 @@ All colors MUST be HSL for consistency.
   .animate-pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
   }
+
+  /* Drawer animations */
+  .slide-in-from-right {
+    animation: slideInFromRight 0.3s ease-out;
+  }
+
+  .slide-out-to-right {
+    animation: slideOutToRight 0.3s ease-in;
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-slide-out-right {
+    animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 @layer utilities {
@@ -238,6 +255,42 @@ All colors MUST be HSL for consistency.
     }
     50% {
       box-shadow: 0 0 40px hsl(222 84% 22% / 0.5);
+    }
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideOutToRight {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
     }
   }
 }

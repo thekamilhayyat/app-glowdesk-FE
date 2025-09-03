@@ -6,7 +6,7 @@ import { BaseButton } from "@/components/base/BaseButton";
 import { BaseInput } from "@/components/base/BaseInput";
 import { BaseBadge } from "@/components/base/BaseBadge";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { BaseDrawer } from "@/components/base/BaseDrawer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BaseLabel } from "@/components/base/BaseLabel";
 import { Plus, Search, Filter, Phone, Mail, Calendar, DollarSign } from "lucide-react";
@@ -163,71 +163,71 @@ export function Clients() {
             <p className="text-muted-foreground">Manage your client database</p>
           </div>
           
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
+          <BaseDrawer
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            title="Add New Client"
+            trigger={
               <BaseButton variant="gradient" className="gap-2">
                 <Plus className="h-4 w-4" />
                 Add Client
               </BaseButton>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Add New Client</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <BaseLabel htmlFor="name">Name *</BaseLabel>
-                  <BaseInput
-                    id="name"
-                    name="name"
-                    placeholder="Enter client name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
+            }
+            footer={
+              <div className="flex gap-3 w-full">
+                <BaseButton 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </BaseButton>
+                <BaseButton type="submit" variant="gradient" className="flex-1">
+                  Add Client
+                </BaseButton>
+              </div>
+            }
+          >
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <BaseLabel htmlFor="name">Name *</BaseLabel>
+                <BaseInput
+                  id="name"
+                  name="name"
+                  placeholder="Enter client name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <BaseLabel htmlFor="email">Email *</BaseLabel>
-                  <BaseInput
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter email address"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <BaseLabel htmlFor="email">Email *</BaseLabel>
+                <BaseInput
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter email address"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <BaseLabel htmlFor="phone">Phone Number *</BaseLabel>
-                  <PhoneInput
-                    international
-                    countryCallingCodeEditable={false}
-                    defaultCountry="US"
-                    value={formData.phone}
-                    onChange={handlePhoneChange}
-                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_input]:bg-transparent"
-                  />
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <BaseButton type="submit" variant="gradient" className="flex-1">
-                    Add Client
-                  </BaseButton>
-                  <BaseButton 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setIsDialogOpen(false)}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </BaseButton>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+              <div className="space-y-2">
+                <BaseLabel htmlFor="phone">Phone Number *</BaseLabel>
+                <PhoneInput
+                  international
+                  countryCallingCodeEditable={false}
+                  defaultCountry="US"
+                  value={formData.phone}
+                  onChange={handlePhoneChange}
+                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_input]:bg-transparent"
+                />
+              </div>
+            </form>
+          </BaseDrawer>
         </div>
 
         {/* Search and Filters */}
