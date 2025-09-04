@@ -101,4 +101,52 @@ export const firstTimeServiceFormSchema = z.object({
 export type CategoryFormData = z.infer<typeof categoryFormSchema>;
 export type ServiceFormInputData = z.infer<typeof serviceFormInputSchema>;
 export type ServiceFormData = z.infer<typeof serviceFormSchema>;
-export type FirstTimeServiceFormData = z.infer<typeof firstTimeServiceFormSchema>; 
+export type FirstTimeServiceFormData = z.infer<typeof firstTimeServiceFormSchema>;
+
+// Inventory validation schemas
+export const inventoryFormInputSchema = z.object({
+  type: z.string().min(1, 'Type is required'),
+  manufacturer: z.string().min(1, 'Manufacturer is required'),
+  manufacturer_id: z.string().min(1, 'Manufacturer ID is required'),
+  name: z.string().min(1, 'Name is required'),
+  sku: z.string().min(1, 'SKU is required'),
+  cost_price: z.string().min(1, 'Cost price is required'),
+  retail_price: z.string().optional(),
+  serial_number: z.string().min(1, 'Serial number is required'),
+  notes: z.string().optional()
+});
+
+export const inventoryFormSchema = z.object({
+  type: z.string().min(1, 'Type is required'),
+  manufacturer: z.string().min(1, 'Manufacturer is required'),
+  manufacturer_id: z.string().min(1, 'Manufacturer ID is required'),
+  name: z.string().min(1, 'Name is required'),
+  sku: z.string().min(1, 'SKU is required'),
+  cost_price: z.string().min(1, 'Cost price is required').transform((val) => parseFloat(val)),
+  retail_price: z.string().optional().transform((val) => val ? parseFloat(val) : null),
+  serial_number: z.string().min(1, 'Serial number is required'),
+  notes: z.string().optional()
+});
+
+export const typeFormSchema = z.object({
+  name: z.string().min(1, 'Type name is required')
+});
+
+export const manufacturerFormSchema = z.object({
+  name: z.string().min(1, 'Manufacturer name is required')
+});
+
+export type InventoryFormInputData = z.infer<typeof inventoryFormInputSchema>;
+export type InventoryFormData = z.infer<typeof inventoryFormSchema>;
+export type TypeFormData = z.infer<typeof typeFormSchema>;
+export type ManufacturerFormData = z.infer<typeof manufacturerFormSchema>;
+
+// Staff validation schemas
+export const staffFormSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  phone: phoneSchema,
+  role: z.string().min(1, "Role is required"),
+});
+
+export type StaffFormData = z.infer<typeof staffFormSchema>; 

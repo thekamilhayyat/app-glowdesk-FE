@@ -1,4 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
+import React from "react";
+import { FormProvider } from "react-hook-form";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Container } from "@/components/ui/Container";
 import { BaseCard, CardHeader, CardContent } from "@/components/base/BaseCard";
@@ -15,6 +17,9 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import staffData from '@/data/staff.json';
 import servicesData from '@/data/services.json';
+import { BaseFormField, BaseFormSelectField, BaseFormSelectItem } from "@/components/base/BaseFormField";
+import { useFormValidation } from "@/hooks/useFormValidation";
+import { staffFormSchema, type StaffFormData } from "@/lib/validations";
 
 interface Role {
   role_id: string;
@@ -97,39 +102,41 @@ export function Staff() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [roles, setRoles] = useState<Role[]>(defaultRoles);
   const [services, setServices] = useState(servicesData.services);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    role: ""
-  });
+  const staffFormRef = useRef<HTMLFormElement>(null);
+  
+  // Form state using react-hook-form
+  const staffForm = useFormValidation(staffFormSchema);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // Set default values for staff form
+  React.useEffect(() => {
+    staffForm.reset({
+      name: "",
+      email: "",
+      phone: "",
+      role: ""
+    });
+  }, []);
 
-  const handlePhoneChange = (value: string | undefined) => {
-    setFormData(prev => ({
-      ...prev,
-      phone: value || ""
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.phone || !formData.role) {
-      toast.error("Please fill in all required fields");
+    console.log("Staff form submission triggered");
+    
+    const isValid = await staffForm.trigger();
+    console.log("Staff validation result:", isValid);
+    console.log("Staff form errors:", staffForm.formState.errors);
+    
+    if (!isValid) {
+      toast.error("Please fill in all required fields correctly");
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
+    const formData = staffForm.getValues();
+    console.log("Staff form data:", formData);
+
+    // Additional validation check
+    if (!formData.name || !formData.email || !formData.phone || !formData.role) {
+      toast.error("Please fill in all required fields correctly");
       return;
     }
 
@@ -164,7 +171,7 @@ export function Staff() {
 
     setStaff(prev => [...prev, newStaff]);
     setSelectedStaff(newStaff);
-    setFormData({ name: "", email: "", phone: "", role: "" });
+    staffForm.reset();
     setIsDialogOpen(false);
     toast.success("Staff member added successfully!");
   };
@@ -178,10 +185,10 @@ export function Staff() {
           role_name: newRoleName.trim()
         };
         setRoles(prev => [...prev, newRole]);
-        setFormData(prev => ({ ...prev, role: newRole.role_id }));
+        staffForm.setValue('role', newRole.role_id);
       }
     } else {
-      setFormData(prev => ({ ...prev, role: value }));
+      staffForm.setValue('role', value);
     }
   };
 
@@ -280,7 +287,7 @@ export function Staff() {
         updatedStaff.service_list[index].category = service.category;
       }
     } else {
-      updatedStaff.service_list[index][field] = value;
+      (updatedStaff.service_list[index] as any)[field] = value;
     }
     
     setSelectedStaff(updatedStaff);
@@ -307,7 +314,7 @@ export function Staff() {
       <AppLayout>
         <Container className="py-6">
           <div className="flex items-center justify-center min-h-[60vh]">
-            <BaseDrawer
+                        <BaseDrawer
               open={isDialogOpen}
               onOpenChange={setIsDialogOpen}
               title="Add New Staff Member"
@@ -346,66 +353,75 @@ export function Staff() {
                   >
                     Cancel
                   </BaseButton>
-                  <BaseButton type="submit" variant="gradient" className="flex-1">
+                  <BaseButton 
+                    type="submit" 
+                    variant="gradient" 
+                    className="flex-1"
+                    onClick={() => {
+                      const form = document.querySelector('form[data-staff-form-empty]') as HTMLFormElement;
+                      if (form) {
+                        form.requestSubmit();
+                      }
+                    }}
+                  >
                     Add Staff
                   </BaseButton>
                 </div>
               }
             >
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <BaseLabel htmlFor="name">Name *</BaseLabel>
-                  <BaseInput
-                    id="name"
+              <form onSubmit={handleSubmit} className="space-y-4" data-staff-form-empty>
+                <FormProvider {...staffForm}>
+                  <BaseFormField
                     name="name"
+                    label="Name"
                     placeholder="Enter staff name"
-                    value={formData.name}
-                    onChange={handleInputChange}
                     required
                   />
-                </div>
 
-                <div className="space-y-2">
-                  <BaseLabel htmlFor="email">Email *</BaseLabel>
-                  <BaseInput
-                    id="email"
+                  <BaseFormField
                     name="email"
-                    type="email"
+                    label="Email"
                     placeholder="Enter email address"
-                    value={formData.email}
-                    onChange={handleInputChange}
+                    type="email"
                     required
                   />
-                </div>
 
-                <div className="space-y-2">
-                  <BaseLabel htmlFor="phone">Phone Number *</BaseLabel>
-                  <PhoneInput
-                    international
-                    countryCallingCodeEditable={false}
-                    defaultCountry="US"
-                    value={formData.phone}
-                    onChange={handlePhoneChange}
-                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_input]:bg-transparent"
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <BaseLabel htmlFor="phone" className="after:content-['*'] after:ml-0.5 after:text-destructive">
+                      Phone Number
+                    </BaseLabel>
+                    <PhoneInput
+                      international
+                      countryCallingCodeEditable={false}
+                      defaultCountry="US"
+                      value={staffForm.watch('phone')}
+                      onChange={(value) => staffForm.setValue('phone', value || '')}
+                      className={`flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_input]:bg-transparent ${
+                        staffForm.formState.errors.phone ? 'border-destructive focus-visible:ring-destructive' : ''
+                      }`}
+                    />
+                    {staffForm.formState.errors.phone && (
+                      <p className="text-sm text-destructive">
+                        {staffForm.formState.errors.phone.message}
+                      </p>
+                    )}
+                  </div>
 
-                <div className="space-y-2">
-                  <BaseLabel htmlFor="role">Role *</BaseLabel>
-                  <Select value={formData.role} onValueChange={handleRoleSelect}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {roles.map((role) => (
-                        <SelectItem key={role.role_id} value={role.role_id}>
-                          {role.role_name}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="add_new">+ Add New Role</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <BaseFormSelectField
+                    name="role"
+                    label="Role"
+                    placeholder="Select a role"
+                    required
+                    onValueChange={handleRoleSelect}
+                  >
+                    {roles.map((role) => (
+                      <BaseFormSelectItem key={role.role_id} value={role.role_id}>
+                        {role.role_name}
+                      </BaseFormSelectItem>
+                    ))}
+                    <BaseFormSelectItem value="add_new">+ Add New Role</BaseFormSelectItem>
+                  </BaseFormSelectField>
+                </FormProvider>
               </form>
             </BaseDrawer>
           </div>
@@ -444,66 +460,75 @@ export function Staff() {
                 >
                   Cancel
                 </BaseButton>
-                <BaseButton type="submit" variant="gradient" className="flex-1">
+                <BaseButton 
+                  type="submit" 
+                  variant="gradient" 
+                  className="flex-1"
+                  onClick={() => {
+                    const form = document.querySelector('form[data-staff-form]') as HTMLFormElement;
+                    if (form) {
+                      form.requestSubmit();
+                    }
+                  }}
+                >
                   Add Staff
                 </BaseButton>
               </div>
             }
           >
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <BaseLabel htmlFor="name">Name *</BaseLabel>
-                <BaseInput
-                  id="name"
+            <form onSubmit={handleSubmit} className="space-y-4" data-staff-form>
+              <FormProvider {...staffForm}>
+                <BaseFormField
                   name="name"
+                  label="Name"
                   placeholder="Enter staff name"
-                  value={formData.name}
-                  onChange={handleInputChange}
                   required
                 />
-              </div>
 
-              <div className="space-y-2">
-                <BaseLabel htmlFor="email">Email *</BaseLabel>
-                <BaseInput
-                  id="email"
+                <BaseFormField
                   name="email"
-                  type="email"
+                  label="Email"
                   placeholder="Enter email address"
-                  value={formData.email}
-                  onChange={handleInputChange}
+                  type="email"
                   required
                 />
-              </div>
 
-              <div className="space-y-2">
-                <BaseLabel htmlFor="phone">Phone Number *</BaseLabel>
-                <PhoneInput
-                  international
-                  countryCallingCodeEditable={false}
-                  defaultCountry="US"
-                  value={formData.phone}
-                  onChange={handlePhoneChange}
-                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_input]:bg-transparent"
-                />
-              </div>
+                <div className="space-y-2">
+                  <BaseLabel htmlFor="phone" className="after:content-['*'] after:ml-0.5 after:text-destructive">
+                    Phone Number
+                  </BaseLabel>
+                  <PhoneInput
+                    international
+                    countryCallingCodeEditable={false}
+                    defaultCountry="US"
+                    value={staffForm.watch('phone')}
+                    onChange={(value) => staffForm.setValue('phone', value || '')}
+                    className={`flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&_input]:bg-transparent ${
+                      staffForm.formState.errors.phone ? 'border-destructive focus-visible:ring-destructive' : ''
+                    }`}
+                  />
+                  {staffForm.formState.errors.phone && (
+                    <p className="text-sm text-destructive">
+                      {staffForm.formState.errors.phone.message}
+                    </p>
+                  )}
+                </div>
 
-              <div className="space-y-2">
-                <BaseLabel htmlFor="role">Role *</BaseLabel>
-                <Select value={formData.role} onValueChange={handleRoleSelect}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role.role_id} value={role.role_id}>
-                        {role.role_name}
-                      </SelectItem>
-                    ))}
-                    <SelectItem value="add_new">+ Add New Role</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <BaseFormSelectField
+                  name="role"
+                  label="Role"
+                  placeholder="Select a role"
+                  required
+                  onValueChange={handleRoleSelect}
+                >
+                  {roles.map((role) => (
+                    <BaseFormSelectItem key={role.role_id} value={role.role_id}>
+                      {role.role_name}
+                    </BaseFormSelectItem>
+                  ))}
+                  <BaseFormSelectItem value="add_new">+ Add New Role</BaseFormSelectItem>
+                </BaseFormSelectField>
+              </FormProvider>
             </form>
           </BaseDrawer>
         </div>
@@ -630,16 +655,25 @@ export function Staff() {
                       </div>
                     ))}
 
-                    <div className="pt-4 border-t">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="font-medium">Time Off / Exceptions</h4>
-                        <BaseButton variant="outline" size="sm" onClick={addTimeOff}>
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Time Off
-                        </BaseButton>
-                      </div>
-                      
-                      {selectedStaff.time_off.map((timeOff, index) => (
+                                          <div className="pt-4 border-t">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="font-medium">Time Off / Exceptions</h4>
+                          <BaseButton variant="outline" size="sm" onClick={addTimeOff}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Time Off
+                          </BaseButton>
+                        </div>
+                        
+                        {/* Time Off Column Headers */}
+                        <div className="grid grid-cols-5 gap-2 items-center mb-3 px-3">
+                          <span className="text-sm font-medium text-muted-foreground">Day</span>
+                          <span className="text-sm font-medium text-muted-foreground">Start Time</span>
+                          <span className="text-sm font-medium text-muted-foreground">End Time</span>
+                          <span className="text-sm font-medium text-muted-foreground">Title</span>
+                          <span className="text-sm font-medium text-muted-foreground">Actions</span>
+                        </div>
+                        
+                        {selectedStaff.time_off.map((timeOff, index) => (
                         <div key={index} className="grid grid-cols-5 gap-2 items-center mb-2">
                           <Select
                             value={timeOff.day}
@@ -716,6 +750,16 @@ export function Staff() {
                       </p>
                     ) : (
                       <div className="space-y-3">
+                        {/* Services Column Headers */}
+                        <div className="grid grid-cols-6 gap-3 items-center px-3 py-2 border-b">
+                          <span className="text-sm font-medium text-muted-foreground">Service</span>
+                          <span className="text-sm font-medium text-muted-foreground">Duration</span>
+                          <span className="text-sm font-medium text-muted-foreground">Price</span>
+                          <span className="text-sm font-medium text-muted-foreground">Status</span>
+                          <span className="text-sm font-medium text-muted-foreground">Edit</span>
+                          <span className="text-sm font-medium text-muted-foreground">Remove</span>
+                        </div>
+                        
                         {selectedStaff.service_list.map((service, index) => (
                           <div key={index} className="grid grid-cols-6 gap-3 items-center p-3 border rounded-lg">
                             <Select
