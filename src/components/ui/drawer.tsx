@@ -1,49 +1,49 @@
 import * as React from "react"
-import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { Drawer as AntDrawer } from "antd"
 import { cn } from "@/lib/utils"
 import { X } from "lucide-react"
 import { BaseButton } from "@/components/base/BaseButton"
 
-const Drawer = DialogPrimitive.Root
+const Drawer = AntDrawer
 
-const DrawerTrigger = DialogPrimitive.Trigger
+const DrawerTrigger = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => (
+  <div onClick={onClick}>{children}</div>
+)
 
-const DrawerPortal = DialogPrimitive.Portal
+const DrawerPortal = ({ children }: { children: React.ReactNode }) => <>{children}</>
 
-const DrawerClose = DialogPrimitive.Close
+const DrawerClose = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => (
+  <div onClick={onClick}>{children}</div>
+)
 
 const DrawerOverlay = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay
+  <div
     ref={ref}
     className={cn("fixed inset-0 z-50 bg-black/80", className)}
     {...props}
   />
 ))
-DrawerOverlay.displayName = DialogPrimitive.Overlay.displayName
+DrawerOverlay.displayName = "DrawerOverlay"
 
 const DrawerContent = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+  any,
+  React.ComponentProps<typeof AntDrawer> & { children?: React.ReactNode }
 >(({ className, children, ...props }, ref) => (
-  <DrawerPortal>
-    <DrawerOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed right-0 top-0 z-50 h-full w-full max-w-md border-l bg-background shadow-lg",
-        "data-[state=open]:animate-slide-in-right data-[state=closed]:animate-slide-out-right",
-        className
-      )}
-      {...props}
-    >
-      <div className="flex flex-col h-full">
-        {children}
-      </div>
-    </DialogPrimitive.Content>
-  </DrawerPortal>
+  <AntDrawer
+    className={cn(
+      "fixed right-0 top-0 z-50 h-full w-full max-w-md border-l bg-background shadow-lg",
+      "data-[state=open]:animate-slide-in-right data-[state=closed]:animate-slide-out-right",
+      className
+    )}
+    {...props}
+  >
+    <div className="flex flex-col h-full">
+      {children}
+    </div>
+  </AntDrawer>
 ))
 DrawerContent.displayName = "DrawerContent"
 
@@ -84,48 +84,51 @@ const DrawerFooter = ({
 DrawerFooter.displayName = "DrawerFooter"
 
 const DrawerTitle = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, children, ...props }, ref) => (
+  <h3
     ref={ref}
     className={cn(
       "text-lg font-semibold leading-none tracking-tight",
       className
     )}
     {...props}
-  />
+  >
+    {children}
+  </h3>
 ))
-DrawerTitle.displayName = DialogPrimitive.Title.displayName
+DrawerTitle.displayName = "DrawerTitle"
 
 const DrawerDescription = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Description
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, children, ...props }, ref) => (
+  <p
     ref={ref}
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
-  />
+  >
+    {children}
+  </p>
 ))
-DrawerDescription.displayName = DialogPrimitive.Description.displayName
+DrawerDescription.displayName = "DrawerDescription"
 
 const DrawerCloseButton = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Close>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Close asChild>
-    <BaseButton
-      ref={ref}
-      variant="ghost"
-      size="sm"
-      className={cn("h-8 w-8 p-0", className)}
-      {...props}
-    >
-      <X className="h-4 w-4" />
-      <span className="sr-only">Close</span>
-    </BaseButton>
-  </DialogPrimitive.Close>
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, onClick, ...props }, ref) => (
+  <BaseButton
+    ref={ref}
+    variant="ghost"
+    size="sm"
+    className={cn("h-8 w-8 p-0", className)}
+    onClick={onClick}
+    {...props}
+  >
+    <X className="h-4 w-4" />
+    <span className="sr-only">Close</span>
+  </BaseButton>
 ))
 DrawerCloseButton.displayName = "DrawerCloseButton"
 

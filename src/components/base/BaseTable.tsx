@@ -1,15 +1,7 @@
 import * as React from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
-} from "@/components/ui/table";
+import { Table as AntTable } from "antd";
 import { BaseButton } from "@/components/base/BaseButton";
 import { BaseSelect, BaseSelectItem } from "@/components/base/BaseSelect";
 import { BaseTooltip } from "@/components/base/BaseTooltip";
@@ -116,6 +108,25 @@ export function BaseTable<T extends Record<string, any>>({
   const endIndex = pagination && showPagination ? startIndex + pagination.itemsPerPage : data.length;
   const currentData = pagination && showPagination ? data.slice(startIndex, endIndex) : data;
 
+  // Convert columns to Ant Design format
+  const antColumns = columns.map((column) => ({
+    title: (
+      <div className="flex items-center gap-2">
+        <span>{column.header}</span>
+        {isSortable(column.key) && getSortIcon(column.key)}
+      </div>
+    ),
+    dataIndex: String(column.key),
+    key: String(column.key),
+    width: column.width,
+    className: column.className,
+    render: (value: any, record: T) => renderCell(column, record),
+    onHeaderCell: () => ({
+      onClick: () => handleSort(column.key),
+      style: { cursor: isSortable(column.key) ? 'pointer' : 'default' }
+    }),
+  }));
+
   if (loading) {
     return (
       <div className={cn("w-full", className)}>
@@ -143,54 +154,23 @@ export function BaseTable<T extends Record<string, any>>({
 
   return (
     <div className={cn("w-full", className)}>
-      <Table>
-        {caption && <TableCaption>{caption}</TableCaption>}
-        
-        {showHeader && (
-          <TableHeader>
-            <TableRow>
-              {columns.map((column) => (
-                <TableHead
-                  key={String(column.key)}
-                  className={cn(
-                    isSortable(column.key) && "cursor-pointer hover:bg-muted/50",
-                    column.className
-                  )}
-                  style={{ width: column.width }}
-                  onClick={() => handleSort(column.key)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>{column.header}</span>
-                    {isSortable(column.key) && getSortIcon(column.key)}
-                  </div>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-        )}
-        
-        <TableBody>
-          {currentData.map((item, index) => (
-            <TableRow
-              key={index}
-              className={cn(
-                onRowClick && "cursor-pointer",
-                rowClassName?.(item, index)
-              )}
-              onClick={() => onRowClick?.(item)}
-            >
-              {columns.map((column) => (
-                <TableCell
-                  key={String(column.key)}
-                  className={column.className}
-                >
-                  {renderCell(column, item)}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <AntTable
+        columns={antColumns}
+        dataSource={currentData}
+        rowKey={(record) => record.id || record.key || record.employee_id || Math.random().toString()}
+        pagination={false}
+        showHeader={showHeader}
+        onRow={(record, index) => ({
+          onClick: () => onRowClick?.(record),
+          className: cn(
+            onRowClick && "cursor-pointer",
+            rowClassName?.(record, index || 0)
+          ),
+        })}
+        locale={{
+          emptyText: emptyMessage
+        }}
+      />
 
       {/* Pagination */}
       {pagination && showPagination && (

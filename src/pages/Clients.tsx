@@ -5,12 +5,13 @@ import { BaseCard, CardHeader, CardContent } from "@/components/base/BaseCard";
 import { BaseButton } from "@/components/base/BaseButton";
 import { BaseInput } from "@/components/base/BaseInput";
 import { BaseBadge } from "@/components/base/BaseBadge";
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
+import { BaseTable, createColumn } from "@/components/base/BaseTable";
 import { BaseDrawer } from "@/components/base/BaseDrawer";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BaseSelect, BaseSelectItem } from "@/components/base/BaseSelect";
 import { BaseLabel } from "@/components/base/BaseLabel";
 import { Plus, Search, Filter, Phone, Mail, Calendar, DollarSign } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
+import { notify } from "@/lib/notification";
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import clientsData from '@/data/clients.json';
@@ -81,20 +82,29 @@ export function Clients() {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.phone) {
-      toast.error("Please fill in all required fields");
+      notify.error({
+        title: "Validation Error",
+        message: "Please fill in all required fields"
+      });
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
+      notify.error({
+        title: "Invalid Email",
+        message: "Please enter a valid email address"
+      });
       return;
     }
 
     // Check if email already exists
     if (clients.some(client => client.email === formData.email)) {
-      toast.error("A client with this email already exists");
+      notify.error({
+        title: "Duplicate Email",
+        message: "A client with this email already exists"
+      });
       return;
     }
 
@@ -112,7 +122,7 @@ export function Clients() {
     setClients(prev => [...prev, newClient]);
     setFormData({ name: "", email: "", phone: "" });
     setIsDialogOpen(false);
-    toast.success("Client added successfully!");
+    notify.created("Client");
   };
 
   const filteredClients = useMemo(() => {
@@ -244,20 +254,14 @@ export function Clients() {
                 />
               </div>
               
-              <Select value={selectedFilter} onValueChange={setSelectedFilter}>
-                <SelectTrigger className="w-full sm:w-48">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Filter clients" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Clients</SelectItem>
-                  <SelectItem value="vip">VIP Clients</SelectItem>
-                  <SelectItem value="new">New Clients</SelectItem>
-                  <SelectItem value="regular">Regular Clients</SelectItem>
-                  <SelectItem value="high-spend">High Spenders ($1000+)</SelectItem>
-                  <SelectItem value="recent">Recent Visits (7 days)</SelectItem>
-                </SelectContent>
-              </Select>
+              <BaseSelect value={selectedFilter} onValueChange={setSelectedFilter} className="w-full sm:w-48">
+                <BaseSelectItem value="all">All Clients</BaseSelectItem>
+                <BaseSelectItem value="vip">VIP Clients</BaseSelectItem>
+                <BaseSelectItem value="new">New Clients</BaseSelectItem>
+                <BaseSelectItem value="regular">Regular Clients</BaseSelectItem>
+                <BaseSelectItem value="high-spend">High Spenders ($1000+)</BaseSelectItem>
+                <BaseSelectItem value="recent">Recent Visits (7 days)</BaseSelectItem>
+              </BaseSelect>
             </div>
           </CardContent>
         </BaseCard>
@@ -272,93 +276,83 @@ export function Clients() {
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Last Visit</TableHead>
-                    <TableHead>Lifetime Spend</TableHead>
-                    <TableHead>Tags</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredClients.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        {searchTerm || selectedFilter !== "all" 
-                          ? "No clients found matching your criteria" 
-                          : "No clients added yet"
-                        }
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredClients.map((client) => (
-                      <TableRow key={client.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-full ${getAvatarColor(client.name)} flex items-center justify-center text-white font-semibold text-sm`}>
-                              {client.name.charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                              <div className="font-medium">{client.name}</div>
-                              <div className="text-sm text-muted-foreground">
-                                Member since {formatDate(client.createdAt)}
-                              </div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-muted-foreground" />
-                            {client.phone}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-muted-foreground" />
-                            {client.email}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
-                            {formatDate(client.lastVisit)}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium">
-                              {formatCurrency(client.lifetimeSpend)}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {client.tags.map((tag, index) => (
-                              <BaseBadge 
-                                key={index} 
-                                variant={
-                                  tag === "VIP" ? "success" : 
-                                  tag === "New Client" ? "warning" : 
-                                  "secondary"
-                                }
-                                size="sm"
-                              >
-                                {tag}
-                              </BaseBadge>
-                            ))}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            <BaseTable
+              data={filteredClients}
+              columns={[
+                createColumn('name', 'Name', {
+                  render: (value, client: Client) => (
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full ${getAvatarColor(client.name)} flex items-center justify-center text-white font-semibold text-sm`}>
+                        {client.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="font-medium">{client.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          Member since {formatDate(client.createdAt)}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                }),
+                createColumn('phone', 'Phone', {
+                  render: (value) => (
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      {value}
+                    </div>
+                  )
+                }),
+                createColumn('email', 'Email', {
+                  render: (value) => (
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      {value}
+                    </div>
+                  )
+                }),
+                createColumn('lastVisit', 'Last Visit', {
+                  render: (value) => (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      {formatDate(value)}
+                    </div>
+                  )
+                }),
+                createColumn('lifetimeSpend', 'Lifetime Spend', {
+                  render: (value) => (
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">
+                        {formatCurrency(value)}
+                      </span>
+                    </div>
+                  )
+                }),
+                createColumn('tags', 'Tags', {
+                  render: (value) => (
+                    <div className="flex flex-wrap gap-1">
+                      {value.map((tag: string, index: number) => (
+                        <BaseBadge 
+                          key={index} 
+                          variant={
+                            tag === "VIP" ? "success" : 
+                            tag === "New Client" ? "warning" : 
+                            "secondary"
+                          }
+                          size="sm"
+                        >
+                          {tag}
+                        </BaseBadge>
+                      ))}
+                    </div>
+                  )
+                })
+              ]}
+              emptyMessage={searchTerm || selectedFilter !== "all" 
+                ? "No clients found matching your criteria" 
+                : "No clients added yet"
+              }
+            />
           </CardContent>
         </BaseCard>
       </Container>

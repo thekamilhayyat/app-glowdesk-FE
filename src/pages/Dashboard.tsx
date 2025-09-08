@@ -2,7 +2,7 @@ import { Container } from "@/components/ui/Container";
 import { BaseCard, CardHeader, CardContent } from "@/components/base/BaseCard";
 import { BaseBadge } from "@/components/base/BaseBadge";
 import { BaseButton } from "@/components/base/BaseButton";
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
+import { BaseTable, createColumn } from "@/components/base/BaseTable";
 
 // Mock data
 const kpiData = [
@@ -87,34 +87,22 @@ export function Dashboard() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Time</TableHead>
-                      <TableHead>Client</TableHead>
-                      <TableHead>Service</TableHead>
-                      <TableHead>Staff</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {todaysSchedule.map((appointment, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">{appointment.time}</TableCell>
-                        <TableCell>{appointment.client}</TableCell>
-                        <TableCell>{appointment.service}</TableCell>
-                        <TableCell>{appointment.staff}</TableCell>
-                        <TableCell>
-                          <BaseBadge variant={getStatusBadge(appointment.status)} size="sm">
-                            {appointment.status}
-                          </BaseBadge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              <BaseTable
+                data={todaysSchedule}
+                columns={[
+                  createColumn('time', 'Time'),
+                  createColumn('client', 'Client'),
+                  createColumn('service', 'Service'),
+                  createColumn('staff', 'Staff'),
+                  createColumn('status', 'Status', {
+                    render: (value) => (
+                      <BaseBadge variant={getStatusBadge(value)} size="sm">
+                        {value}
+                      </BaseBadge>
+                    )
+                  })
+                ]}
+              />
             </CardContent>
           </BaseCard>
 
@@ -124,28 +112,15 @@ export function Dashboard() {
               <h2 className="text-xl font-heading font-semibold">Recent Sales</h2>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Time</TableHead>
-                      <TableHead>Client</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead>Method</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentSales.map((sale, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">{sale.time}</TableCell>
-                        <TableCell>{sale.client}</TableCell>
-                        <TableCell className="font-medium">{sale.total}</TableCell>
-                        <TableCell>{sale.method}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              <BaseTable
+                data={recentSales}
+                columns={[
+                  createColumn('time', 'Time'),
+                  createColumn('client', 'Client'),
+                  createColumn('total', 'Total'),
+                  createColumn('method', 'Method')
+                ]}
+              />
             </CardContent>
           </BaseCard>
         </div>

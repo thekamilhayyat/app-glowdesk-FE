@@ -6,7 +6,7 @@ import { BaseDrawer } from '../../../components/base/BaseDrawer';
 import { useFormValidation } from '../../../hooks/useFormValidation';
 import { inventoryFormInputSchema } from '../../../lib/validations';
 import { toast } from 'sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+import { BaseSelect, BaseSelectItem } from '../../../components/base/BaseSelect';
 import { Textarea } from '../../../components/ui/textarea';
 import { getFieldError, hasFieldError } from '../../../hooks/useFormValidation';
 
@@ -130,7 +130,7 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
           {/* Type */}
           <div>
             <BaseLabel htmlFor="type">Type *</BaseLabel>
-            <Select
+            <BaseSelect
               value={inventoryForm.watch('type')}
               onValueChange={(value) => {
                 if (value === 'add_new_type') {
@@ -145,21 +145,18 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
                   inventoryForm.setValue('manufacturer_id', selectedType.type_id);
                 }
               }}
+              className={hasFieldError(inventoryForm.formState.errors, 'type') ? 'border-red-500' : ''}
+              placeholder="Select type"
             >
-              <SelectTrigger className={hasFieldError(inventoryForm.formState.errors, 'type') ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                {types.map((type) => (
-                  <SelectItem key={type.type_id} value={type.name}>
-                    {type.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="add_new_type" className="text-blue-600">
-                  + Add New Type
-                </SelectItem>
-              </SelectContent>
-            </Select>
+              {types.map((type) => (
+                <BaseSelectItem key={type.type_id} value={type.name}>
+                  {type.name}
+                </BaseSelectItem>
+              ))}
+              <BaseSelectItem value="add_new_type">
+                + Add New Type
+              </BaseSelectItem>
+            </BaseSelect>
             {getFieldError(inventoryForm.formState.errors, 'type') && (
               <p className="text-sm text-red-500 mt-1">{getFieldError(inventoryForm.formState.errors, 'type')}</p>
             )}
@@ -168,7 +165,7 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
           {/* Manufacturer */}
           <div>
             <BaseLabel htmlFor="manufacturer">Manufacturer *</BaseLabel>
-            <Select
+            <BaseSelect
               value={inventoryForm.watch('manufacturer')}
               onValueChange={(value) => {
                 if (value === 'add_new_manufacturer') {
@@ -183,21 +180,18 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
                   inventoryForm.setValue('manufacturer_id', selectedManufacturer.manufacturer_id);
                 }
               }}
+              className={hasFieldError(inventoryForm.formState.errors, 'manufacturer') ? 'border-red-500' : ''}
+              placeholder="Select manufacturer"
             >
-              <SelectTrigger className={hasFieldError(inventoryForm.formState.errors, 'manufacturer') ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Select manufacturer" />
-              </SelectTrigger>
-              <SelectContent>
-                {manufacturers.map((manufacturer) => (
-                  <SelectItem key={manufacturer.manufacturer_id} value={manufacturer.name}>
-                    {manufacturer.name}
-                  </SelectItem>
-                ))}
-                <SelectItem value="add_new_manufacturer" className="text-blue-600">
-                  + Add New Manufacturer
-                </SelectItem>
-              </SelectContent>
-            </Select>
+              {manufacturers.map((manufacturer) => (
+                <BaseSelectItem key={manufacturer.manufacturer_id} value={manufacturer.name}>
+                  {manufacturer.name}
+                </BaseSelectItem>
+              ))}
+              <BaseSelectItem value="add_new_manufacturer">
+                + Add New Manufacturer
+              </BaseSelectItem>
+            </BaseSelect>
             {getFieldError(inventoryForm.formState.errors, 'manufacturer') && (
               <p className="text-sm text-red-500 mt-1">{getFieldError(inventoryForm.formState.errors, 'manufacturer')}</p>
             )}

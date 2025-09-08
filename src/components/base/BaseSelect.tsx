@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select as AntSelect } from "antd";
 import { cn } from "@/lib/utils";
 
 interface BaseSelectProps {
@@ -25,20 +25,33 @@ export function BaseSelect({
   ...props
 }: BaseSelectProps) {
   return (
-    <Select value={value} onValueChange={onValueChange} disabled={disabled} {...props}>
-      <SelectTrigger 
-        className={cn(
-          "w-full",
-          error && "border-destructive focus-visible:ring-destructive",
-          className
-        )}
-      >
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        {children}
-      </SelectContent>
-    </Select>
+    <AntSelect
+      value={value}
+      onChange={onValueChange}
+      disabled={disabled}
+      placeholder={placeholder}
+      className={cn(
+        "w-full",
+        error && "border-destructive focus-visible:ring-destructive",
+        className
+      )}
+      {...props}
+    >
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child) && child.type === BaseSelectItem) {
+          return (
+            <AntSelect.Option 
+              key={child.props.value}
+              value={child.props.value} 
+              disabled={child.props.disabled}
+            >
+              {child.props.children}
+            </AntSelect.Option>
+          );
+        }
+        return child;
+      })}
+    </AntSelect>
   );
 }
 
@@ -50,8 +63,8 @@ interface BaseSelectItemProps {
 
 export function BaseSelectItem({ value, children, disabled = false }: BaseSelectItemProps) {
   return (
-    <SelectItem value={value} disabled={disabled}>
+    <AntSelect.Option value={value} disabled={disabled}>
       {children}
-    </SelectItem>
+    </AntSelect.Option>
   );
 } 

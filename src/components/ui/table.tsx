@@ -1,18 +1,16 @@
 import * as React from "react"
-
+import { Table as AntTable } from "antd"
 import { cn } from "@/lib/utils"
 
 const Table = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
+  any,
+  React.ComponentProps<typeof AntTable>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
-    <table
-      ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
-      {...props}
-    />
-  </div>
+  <AntTable
+    ref={ref}
+    className={cn("w-full", className)}
+    {...props}
+  />
 ))
 Table.displayName = "Table"
 

@@ -1,14 +1,5 @@
 import React from "react"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-  DrawerTitle,
-  DrawerCloseButton,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
+import { Drawer as AntDrawer } from "antd"
 import { BaseButton } from "@/components/base/BaseButton"
 
 export interface BaseDrawerProps {
@@ -31,24 +22,17 @@ export function BaseDrawer({
   className,
 }: BaseDrawerProps) {
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-      <DrawerContent className={className}>
-        <DrawerHeader>
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerCloseButton />
-        </DrawerHeader>
-        
-        <DrawerBody>
-          {children}
-        </DrawerBody>
-        
-        {footer && (
-          <DrawerFooter>
-            {footer}
-          </DrawerFooter>
-        )}
-      </DrawerContent>
-    </Drawer>
+    <>
+      {trigger && <div onClick={() => onOpenChange(true)}>{trigger}</div>}
+      <AntDrawer
+        open={open}
+        onClose={() => onOpenChange(false)}
+        title={title}
+        className={className}
+        footer={footer}
+      >
+        {children}
+      </AntDrawer>
+    </>
   )
 } 

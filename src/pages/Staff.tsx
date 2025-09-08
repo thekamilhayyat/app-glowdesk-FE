@@ -9,7 +9,7 @@ import { BaseInput } from "@/components/base/BaseInput";
 import { BaseLabel } from "@/components/base/BaseLabel";
 import { BaseBadge } from "@/components/base/BaseBadge";
 import { BaseDrawer } from "@/components/base/BaseDrawer";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BaseSelect, BaseSelectItem } from "@/components/base/BaseSelect";
 import { EmptyState } from "@/components/EmptyState";
 import { Plus, Edit2, Trash2, Clock, DollarSign } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
@@ -626,32 +626,22 @@ export function Staff() {
                     {weekDays.map((day) => (
                       <div key={day.key} className="grid grid-cols-3 gap-4 items-center">
                         <BaseLabel className="font-medium">{day.label}</BaseLabel>
-                        <Select
+                        <BaseSelect
                           value={selectedStaff.work_hours[day.key as keyof typeof selectedStaff.work_hours].start}
                           onValueChange={(value) => updateWorkHours(day.key, 'start', value)}
                         >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {timeOptions.map((time) => (
-                              <SelectItem key={time} value={time}>{time}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select
+                          {timeOptions.map((time) => (
+                            <BaseSelectItem key={time} value={time}>{time}</BaseSelectItem>
+                          ))}
+                        </BaseSelect>
+                        <BaseSelect
                           value={selectedStaff.work_hours[day.key as keyof typeof selectedStaff.work_hours].end}
                           onValueChange={(value) => updateWorkHours(day.key, 'end', value)}
                         >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {timeOptions.map((time) => (
-                              <SelectItem key={time} value={time}>{time}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          {timeOptions.map((time) => (
+                            <BaseSelectItem key={time} value={time}>{time}</BaseSelectItem>
+                          ))}
+                        </BaseSelect>
                       </div>
                     ))}
 
@@ -675,45 +665,30 @@ export function Staff() {
                         
                         {selectedStaff.time_off.map((timeOff, index) => (
                         <div key={index} className="grid grid-cols-5 gap-2 items-center mb-2">
-                          <Select
+                          <BaseSelect
                             value={timeOff.day}
                             onValueChange={(value) => updateTimeOff(index, 'day', value)}
                           >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {weekDays.map((day) => (
-                                <SelectItem key={day.key} value={day.label}>{day.label}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Select
+                            {weekDays.map((day) => (
+                              <BaseSelectItem key={day.key} value={day.label}>{day.label}</BaseSelectItem>
+                            ))}
+                          </BaseSelect>
+                          <BaseSelect
                             value={timeOff.start}
                             onValueChange={(value) => updateTimeOff(index, 'start', value)}
                           >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {timeOptions.map((time) => (
-                                <SelectItem key={time} value={time}>{time}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Select
+                            {timeOptions.map((time) => (
+                              <BaseSelectItem key={time} value={time}>{time}</BaseSelectItem>
+                            ))}
+                          </BaseSelect>
+                          <BaseSelect
                             value={timeOff.end}
                             onValueChange={(value) => updateTimeOff(index, 'end', value)}
                           >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {timeOptions.map((time) => (
-                                <SelectItem key={time} value={time}>{time}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            {timeOptions.map((time) => (
+                              <BaseSelectItem key={time} value={time}>{time}</BaseSelectItem>
+                            ))}
+                          </BaseSelect>
                           <BaseInput
                             value={timeOff.title}
                             onChange={(e) => updateTimeOff(index, 'title', e.target.value)}
@@ -762,37 +737,27 @@ export function Staff() {
                         
                         {selectedStaff.service_list.map((service, index) => (
                           <div key={index} className="grid grid-cols-6 gap-3 items-center p-3 border rounded-lg">
-                            <Select
+                            <BaseSelect
                               value={service.service_id}
                               onValueChange={(value) => updateService(index, 'service_id', value)}
                             >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {services.map((s) => (
-                                  <SelectItem key={s.id} value={s.id}>
-                                    {s.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                              {services.map((s) => (
+                                <BaseSelectItem key={s.id} value={s.id}>
+                                  {s.name}
+                                </BaseSelectItem>
+                              ))}
+                            </BaseSelect>
                             
-                            <Select
+                            <BaseSelect
                               value={service.duration_min.toString()}
                               onValueChange={(value) => updateService(index, 'duration_min', parseInt(value))}
                             >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {durationOptions.map((duration) => (
-                                  <SelectItem key={duration} value={duration.toString()}>
-                                    {duration} min
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                              {durationOptions.map((duration) => (
+                                <BaseSelectItem key={duration} value={duration.toString()}>
+                                  {duration} min
+                                </BaseSelectItem>
+                              ))}
+                            </BaseSelect>
                             
                             <div className="relative">
                               <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
