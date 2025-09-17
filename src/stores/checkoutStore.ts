@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { CheckoutSession, CheckoutItem, PaymentMethod, Appointment } from '@/types/calendar';
+import { useCalendarStore } from './calendarStore';
 
 interface CheckoutState {
   // Current checkout session
@@ -60,11 +61,40 @@ export const useCheckoutStore = create<CheckoutState>((set, get) => ({
 
   // Actions
   startCheckout: (appointment) => {
+    // Get services from calendar store to populate items
+    const calendarState = useCalendarStore.getState();
+    const { services } = calendarState;
+    
+    // Convert appointment services to checkout items
+    const items: CheckoutItem[] = appointment.serviceIds.map(serviceId => {
+      const service = services.find(s => s.id === serviceId);
+      if (!service) {
+        console.warn(`Service ${serviceId} not found in store`);
+        return {
+          id: `item_${serviceId}_${Date.now()}`,
+          type: 'service' as const,
+          name: `Unknown Service (${serviceId})`,
+          price: 0,
+          quantity: 1,
+          serviceId,
+        };
+      }
+      
+      return {
+        id: `item_${serviceId}_${Date.now()}`,
+        type: 'service' as const,
+        name: service.name,
+        price: service.price,
+        quantity: 1,
+        serviceId: service.id,
+      };
+    });
+
     const session: CheckoutSession = {
       id: `checkout_${appointment.id}_${Date.now()}`,
       appointmentId: appointment.id,
       clientId: appointment.clientId,
-      items: [], // Will be populated with appointment services
+      items,
       subtotal: 0,
       totalDiscount: 0,
       tax: 0,
@@ -285,6 +315,18 @@ export const useCheckoutStore = create<CheckoutState>((set, get) => ({
     const state = get();
     if (!state.currentSession) return;
 
+    // Validate payment is complete before finalizing
+    const remainingBalance = state.getRemainingBalance();
+    if (remainingBalance > 0.01) {
+      set({ error: `Cannot complete checkout: Remaining balance of $${remainingBalance.toFixed(2)} must be paid` });
+      return;
+    }
+
+    if (state.selectedPaymentMethods.length === 0) {
+      set({ error: 'Cannot complete checkout: At least one payment method required' });
+      return;
+    }
+
     // Update session status to completed
     set({
       currentSession: {
@@ -298,7 +340,16 @@ export const useCheckoutStore = create<CheckoutState>((set, get) => ({
         paymentMethods: state.selectedPaymentMethods,
       },
       currentStep: 'confirmation',
+      error: null,
     });
+
+    // Mark appointment as completed in calendar store
+    if (state.currentSession.appointmentId) {
+      const calendarState = useCalendarStore.getState();
+      calendarState.updateAppointment(state.currentSession.appointmentId, {
+        status: 'completed',
+      });
+    }
   },
 
   reset: () => set({
