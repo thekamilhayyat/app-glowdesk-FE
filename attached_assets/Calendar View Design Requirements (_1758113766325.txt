@@ -1,0 +1,220 @@
+Calendar View Design Requirements (GlossGenius/Mangomint Style)
+View Modes: Day, Week, and Month
+
+Offer flexible calendar views to cover different scheduling needs:
+
+Daily View: A detailed view of a single day’s schedule. This is the default for intensive scheduling. It should display all appointments for that day, and crucially support viewing multiple staff members side-by-side (see Multi-Staff below).
+
+Weekly View: A broader view showing a week at a glance. In weekly mode, display one staff member’s schedule across the week (with a selector to switch staff)
+mangomint.com
+. This helps in seeing an individual’s availability over the week. For team managers, include an option to toggle between an individual staff’s week or an aggregated team week view
+thesalonbusiness.com
+.
+
+Monthly View: A high-level month calendar for long-term planning. It should use a classic grid layout of days. Because space is limited in month cells, show appointments as small colored bars or text snippets (e.g., client name or service) – possibly with a “+X more” if multiple bookings in one day. Users can click a day to drill down into details. GlossGenius supports switching between day, week, and month views easily
+thesalonbusiness.com
+, so include clearly labeled tabs or toggles for all three view modes.
+
+Each view should be easily accessible via a toggle in the UI (e.g. buttons or tabs labeled “Day / Week / Month”). This allows quick navigation between immediate daily details and broader schedules
+thesalonbusiness.com
+. Ensure the transition maintains context (e.g. switching to week or month keeps the same date range when possible).
+
+Multi-Staff Scheduling (Team Calendar)
+
+In a salon or spa environment, it’s essential to see multiple staff calendars at once. The Day view should display parallel columns for each staff member working that day, much like Mangomint’s interface where you can “toggle between individual staff members and full team views”
+thesalonbusiness.com
+. This enables a manager to view the whole team’s appointments side-by-side. For example, in the image above, each stylist or provider has their own column of appointments, so you can compare availability and avoid overlaps easily.
+
+Staff Columns: List staff names at the top of each column. Under each, list their appointments vertically by time. If a staff member is not scheduled to work on a given day, their column can be grayed out or omitted for that day
+mangomint.com
+. (Mangomint uses a light gray background on days a staff is off
+mangomint.com
+.)
+
+Filtering: Provide a filter or checkbox list to show/hide specific staff. GlossGenius lets you “view the schedule of the whole team or filter by individuals”
+glossgenius.com
+, which is important if you have many staff and need to focus on a few. In week or month view, you might default to a single staff’s calendar with an option to switch staff, since showing all staff in those views could be overwhelming.
+
+Multiple Locations (if applicable): If the system supports multiple locations, include a location filter as well (so you only see staff from one location at a time, for example). Each location could have its own calendar view.
+
+This multi-staff layout should maintain clarity: use consistent time scales across columns and clearly separate each staff’s column with divider lines or spacing. Color-coding (discussed below) can also help differentiate appointments by staff if they ever appear in a combined view.
+
+Appointment Card Details (What Each Appointment Shows)
+
+Each appointment on the calendar should display key information so that staff can read details at a glance without clicking. Taking inspiration from GlossGenius and Mangomint, each appointment block should include:
+
+Client Name: The client’s first name (and possibly last initial) should be prominently shown, since staff often recognize appointments by client.
+
+Service Name: Include the service or service category (e.g. “Haircut” or “Color – Full Highlights”). GlossGenius’s calendar, for example, colors appointments by service category
+thesalonbusiness.com
+, implying the service type is a key piece of info to show (whether via text, color, or both).
+
+Assigned Staff (if needed): In a multi-staff day view, the staff is implied by the column. But in views where multiple staff’s appointments might co-mingle (say a combined Month view or an agenda list), it’s important to tag each appointment with the staff member’s name or initials. For instance, a month view square could say “12:00 John – Haircut (Amy)” to show client and service with the staff in parentheses.
+
+Time/Duration: The positioning on the calendar grid shows the time and length, but it can help to include the start time or duration in text as well. For example, an appointment block might say “2:00pm – John Doe (Haircut)” or “John Doe – Haircut (1h)” depending on space. In very tight layouts (like month view), maybe just the time is shown as a prefix.
+
+All this information should be presented in a visually clear hierarchy (perhaps client name bold, service in regular text). Do not truncate critical info: ensure the card is wide enough (or text is wrapped/truncated gracefully with ellipses) so that at least the client and service can be identified at a glance. Also, consider hover tooltips or an expand-on-click for more details if an appointment has multiple services or long names. The goal is that a stylist glancing at the calendar can answer “who is coming in and for what service” instantly from the block itself.
+
+Color-Coding and Status Indicators
+
+Use visual cues like color coding and icons to convey appointment status and other details without needing to open each appointment. Both GlossGenius and Mangomint leverage color and symbols effectively:
+
+Status Color Codes: Consider coloring appointment blocks based on their status. Mangomint, for example, uses peach-colored blocks for unconfirmed appointments and blue for confirmed
+mangomint.com
+. This gives an instant status update to the viewer. Common statuses to represent:
+
+Pending Confirmation (client requested or not yet accepted) – could be a distinct color (e.g. peach/orange) for “unconfirmed”
+mangomint.com
+.
+
+Confirmed – a standard color (e.g. blue or your primary brand color) indicating the appointment is confirmed
+mangomint.com
+.
+
+In Progress / Checked-In – if you track when a client has arrived or service is started, use another color (Mangomint uses pink for “in service” appointments
+mangomint.com
+).
+
+Completed – past appointments or ones marked complete could turn gray or desaturated to show they’re done
+mangomint.com
+. Mangomint specifically turns completed appointments dark gray
+mangomint.com
+.
+
+No-Show / Canceled – display these in a very muted way (e.g. faded with a strikethrough). Mangomint fades and crosses out canceled appointments
+mangomint.com
+. This way the history is visible on the calendar but clearly marked as canceled. (You might also allow a setting to hide canceled appointments entirely
+mangomint.com
+.)
+
+Service Category Colors: Alternatively (or additionally), color-code by service type or category, as GlossGenius does
+thesalonbusiness.com
+. For instance, hair services could be one color, nails another, etc. This helps quickly identify the kind of appointment. A hybrid approach could work: perhaps use a colored stripe or icon to denote category while the overall block color denotes status – or vice versa. Make sure to include a legend or consistent palette so staff can learn the meaning of each color.
+
+Appointment Icons/Tags: Include small icons on the appointment blocks to indicate special attributes, taking motivation from Mangomint’s icon set
+mangomint.com
+mangomint.com
+:
+
+A “⭐️” star icon if the client specifically requested that staff (preferred stylist request).
+
+A “🆕” “NEW” label if it’s that client’s first appointment (new client).
+
+A “💬” speech bubble if there are unread client messages or notes attached
+mangomint.com
+. Similarly, a note icon if internal notes are attached to the appointment
+mangomint.com
+.
+
+A “🔁” recurring icon (two circling arrows) if the appointment is part of a series/repeating booking
+mangomint.com
+.
+
+Gender preference icons (M/F) if your booking system handles requests for male or female providers
+mangomint.com
+ (applicable for spas where clients choose provider gender).
+
+A “🏷️” membership ribbon icon if the client is a member/VIP
+mangomint.com
+.
+
+A “✏️” pen icon if there’s an intake form to fill out for this appointment (e.g. consultation form not completed yet)
+mangomint.com
+.
+
+A simple “$” or checkmark if the appointment has been paid in advance or a deposit made – or conversely an icon to show payment is pending. For example, after checkout you might show a checkmark to indicate it’s settled (paid).
+
+These icons should be subtle (small and perhaps monochrome) and preferably appear at one edge of the appointment block so as not to clutter the main info. A hover tooltip can explain them if needed.
+
+By combining color and icons, the calendar provides at-a-glance information: a stylist can see not just who/what, but also the status (confirmed? new client? any special notes or requirements?) immediately. Ensure the design has a legend or onboarding so users can learn the color code and icon meanings.
+
+Interactive Scheduling Features
+
+Modern calendar UIs like these need to be highly interactive for efficiency:
+
+Drag-and-Drop Rescheduling: Implement drag-and-drop for appointments. A user should be able to click an appointment and drag it to a new time slot or even another staff’s column to quickly reschedule
+mangomint.com
+. For example, Mangomint’s calendar lets you drag an appointment to change its time or staff
+mangomint.com
+, and the interface updates accordingly. Visually, while dragging, the system can show a semi-transparent preview of the appointment “card” under the cursor and highlight the target time slot. Once dropped, prompt for confirmation if needed, and update the appointment’s timing (and staff, if moved across columns). This makes rescheduling effortless and intuitive
+thesalonbusiness.com
+.
+
+Drag-to-Create: Allow users to create new appointments by selecting an empty time range. For instance, clicking or dragging on the calendar grid could open a “New Appointment” dialog pre-filled with the selected date/time (and staff). GlossGenius’s mobile app uses a “+” button for new appointments
+glossgenius.com
+, but on desktop, dragging to create is a convenient pattern. Designing a slight “ghost” block as you drag over empty slots can indicate the duration being selected.
+
+Resize to Adjust Duration: If an appointment’s length can change, allow dragging the bottom edge of the appointment block to extend or shorten its duration (common in many calendar tools). This should snap to the time grid (e.g., 15-min increments) and upon release, prompt to confirm the new duration.
+
+Visual Feedback: During drag operations, use visual cues – e.g., a tooltip displaying the new time while dragging, or a highlighted outline where the appointment will land. Also consider transient indicators like “moving to 3:30pm” or “cloning to Tuesday” if you support drag while holding a modifier key to copy appointments.
+
+Prevent Overlaps: The design should indicate if an appointment is dragged into a slot that conflicts (e.g., another appointment for that staff). You might show a red outline or not allow the drop. The UI should guide the user to permissible drops only (perhaps by temporarily shifting other appointments if allowed or showing an error message).
+
+Additionally, consider standard interactions like click to open details/edit: Clicking an appointment should open an editing pane or pop-up (where you can change time, service, or mark as paid, etc.). Also provide a quick way to cancel/delete an appointment (perhaps via a right-click context menu or a small “x” on the card, with a confirm dialog to avoid mistakes). These interactive elements make the calendar not just a static display but a working tool for daily schedule management.
+
+Calendar Navigation & UI Controls
+
+To manage dates and views efficiently, include intuitive navigation controls:
+
+Date Navigation: Provide “Previous” and “Next” buttons (often as left/right arrows) to move the calendar backward or forward. In day view, these go to the previous or next day; in week view, to the adjacent weeks
+mangomint.com
+. A “Today” button is essential – one click to return to the current day (especially helpful if the user has scrolled far in the future/past).
+
+Date Picker: Include a drop-down date picker or small calendar icon that opens a mini-calendar for jumping to any specific date
+mangomint.com
+. This allows users to quickly skip to, say, two months ahead without hitting “next” dozens of times.
+
+View Switcher: As mentioned, have clearly visible toggles for Day/Week/Month. Ensure it’s obvious which view is active (highlighted) and that switching doesn’t reset the chosen date. For example, if viewing the week of Sept 8 and switching to month, the month view should show September (not the current month unless Sept 8 is current).
+
+Time Scale & Business Hours: Display the time of day along the side (e.g., 7am, 8am... in 15 or 30 min increments). Let the calendar be scrollable vertically if the day extends beyond the screen. It’s useful to highlight the business’s working hours – for instance, show non-business hours in a darker shade or with a striped background. Mangomint allows configuring visible hours in settings
+mangomint.com
+, so design with a mindset that not all 24 hours will necessarily show (you might only show 8am-8pm, etc., with an option to reveal off-hours if needed).
+
+Current Time Indicator: In day view, draw a horizontal line across all staff columns at the current time of day (e.g., a red line)
+mangomint.com
+. This real-time indicator helps staff see “we are here now” on the schedule – useful for running on time. Possibly also highlight the current day in week/month views (e.g., shading today’s column or cell).
+
+Legends and Labels: If using color-coding, include a small legend on the screen (or an info icon that toggles a legend). Label icons or colors with their meaning, either persistently in a footer/sidebar or as a tooltip on hover. This is especially helpful for new users to decode statuses and service types.
+
+Scrolling & Zoom: Ensure the UI allows easy scrolling through the day’s timeline, especially if showing many hours. Consider a “zoom” control to adjust how many hours are visible at once (e.g., a slider to compress/expand the vertical time scale). Mangomint’s display preferences include a zoom level to ensure short appointments remain visible
+mangomint.com
+ – a design could include a default that fits typical appointments but allows adjustment if needed.
+
+The overall navigation should feel snappy and clear, with controls grouped (e.g., all date/view controls in a top bar). This way, users can quickly find the date and view they want, much like they can in Google Calendar or these salon apps.
+
+Special Appointment States & Actions
+
+Salon calendars often need to handle more than just “booked or not booked.” Inspired by Mangomint’s and GlossGenius’s features, consider these states and how they reflect in the UI:
+
+Confirmed vs. Tentative: As noted under color-coding, if your system distinguishes appointments that are confirmed by the client/staff versus those awaiting confirmation, make sure there’s a clear visual difference. An unconfirmed (tentative) booking might display with a dashed outline or a lighter color until confirmed. This could be paired with a small “awaiting confirmation” icon or text. Once confirmed, the block can turn solid and change color
+mangomint.com
+.
+
+Paid vs. Unpaid: If the calendar ties into a point-of-sale, it’s useful to mark whether an appointment has been paid for (or if a deposit was taken). For example, after checking out a client, the appointment could get a small “paid” badge or turn a different shade of gray to indicate completion. If an appointment is unpaid (e.g., a no-show who still owes a cancellation fee), that could be shown with an alert icon or different highlight. GlossGenius allows viewing client payment info from the calendar
+thesalonbusiness.com
+, so designing a quick visual indicator of payment status can save clicks.
+
+No-Show: Define how a no-show is handled. Often, marking an appointment as no-show essentially cancels it, but you might want to preserve it on the calendar for record-keeping. A no-show could appear as a canceled (crossed-out) appointment with a label “No-Show”. Staff might mark it via the appointment’s context menu. The design should accommodate showing that label or icon distinctly (perhaps an “X” icon or a red highlight) so everyone knows that slot went unused.
+
+Checked-In/Waiting: If using a check-in system (as Mangomint’s mention of a waiting room suggests
+thesalonbusiness.com
+), you might highlight appointments when a client has checked in. For example, flashing or an icon (🕒 or person icon) when a client is waiting in lobby. This could tie into a front-desk view or a status filter (e.g., a view that lists who’s waiting vs in service). This is a more advanced feature, but mention it if relevant: “consider a mode or indicator for clients who have arrived (checked in) and those currently being served.”
+
+Recurring Appointments: Recurring series should be indicated so the user knows a change might affect all in the series. An icon (the circular arrows ♻️ mentioned) on the appointment card helps
+mangomint.com
+. If a user tries to drag/drop or edit a recurring appointment, the UI should ask whether to apply to this occurrence or the series. Ensure the design accounts for that dialog and how recurring events are displayed (maybe with a linking visual or same color).
+
+Personal Time Blocks: Many salon calendars allow blocking personal time (for breaks, meetings, etc.). Represent these with a distinct style (perhaps a hatched pattern or a solid color like gray with stripes
+mangomint.com
+). They won’t have a client or service, just a label (e.g., “Lunch” or “Personal Block”). Make sure they are visibly different from client appointments so they’re not mistaken for open slots.
+
+Finally, include an easy way to add or view notes about an appointment directly from the calendar. For instance, if an appointment has a note (consultation details, etc.), the note icon on the card is one clue; additionally, a hover or a one-click could show a tooltip of the note. This reduces the need to open full details frequently.
+
+By covering all these elements – multi-view layouts, rich appointment details, color/status cues, drag-and-drop, and special state handling – the calendar design will closely emulate the best of GlossGenius and Mangomint. It will provide a comprehensive, user-friendly scheduling experience where salon staff can manage bookings, at a glance and interactively, on any device
+glossgenius.com
+. Following these detailed requirements in your Figma design will ensure the calendar view is both visually appealing and packed with the practical features that users in the beauty/wellness industry expect from top-tier software.
+
+Sources: Key design inspirations were drawn from GlossGenius (salon software) and Mangomint’s calendar features and reviews, which highlight multi-staff daily columns, easy view switching, color-coded status, and interactive drag-and-drop scheduling
+thesalonbusiness.com
+thesalonbusiness.com
+. These informed the requirements to create a calendar UI that matches the UX quality of those platforms.
