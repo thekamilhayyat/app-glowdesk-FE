@@ -1,0 +1,163 @@
+Overview
+
+In salon management software, an appointment can be “converted” into a ticket or sale record through a checkout process. Both GlossGenius and Mangomint provide workflows to take a scheduled appointment and turn it into a finalized sale (including services rendered, any products sold, tips, taxes, etc.). Below we detail how each system handles this conversion, and outline best practices (manual and automated flows) for designing a similar feature. Key considerations such as manual vs. automatic checkout, tips, taxes, discounts, calendar integration, and multiple payment methods are included, followed by a suggested Figma design prompt.
+
+GlossGenius – Appointment Checkout Process
+
+GlossGenius uses a “Checkout” system to convert appointments to sales. Staff can manually initiate the checkout when an appointment is completed or ready to pay:
+
+Starting the Checkout: In the GlossGenius app, there is a dedicated Checkout tab/section. Any upcoming or recent appointments that are waiting to be processed will appear in a queue here. Tapping an appointment from the queue launches the checkout process for that client
+glossgenius.com
+. (On the GlossGenius desktop interface, a staff member can similarly click on an appointment in the calendar and proceed to checkout.)
+
+Appointment Details: When checkout begins, the appointment’s details (services booked, prices, assigned staff) are automatically pulled into a ticket. The user can review or adjust these details. GlossGenius also allows adding additional items if needed – for example, adding a retail product or an extra service to the sale before finalizing. This is supported by GlossGenius’s inventory features (retail items can be added to an appointment’s sale)
+glossgenius.com
+glossgenius.com
+.
+
+Applying Discounts: GlossGenius supports applying discounts during checkout. According to GlossGenius help documentation, you can apply a discount either to a specific line item (service or product) or to the entire purchase
+glossgenius.elevio.help
+. For instance, a percentage or fixed-dollar discount can be entered if you’re giving a special deal. The system will then adjust the prices accordingly and calculate sales tax after the discount (i.e. tax is computed on the discounted price, not the original price)
+glossgenius.elevio.help
+.
+
+Taxes: Tax calculation in GlossGenius is largely automated once you’ve set up your tax rates. In the settings, businesses can specify sales tax for products and services; the app will then automatically apply the appropriate sales tax at checkout for taxable items
+glossgenius.com
+. For example, if you’ve configured a 10% retail tax, any product added in checkout will show that tax added so you don’t have to calculate it manually
+glossgenius.com
+. The checkout summary will display the tax amount along with the subtotal and total.
+
+Tip Collection: GlossGenius streamlines the gratuity (tip) step to avoid awkwardness. During the checkout flow, the app includes an in-app prompt for adding a tip so clients can easily include a tip as they complete their payment
+glossgenius.com
+. The interface might present preset tip percentages (e.g. 15%, 20%, 25%) and/or allow a custom tip amount. This prompt appears seamlessly, ensuring the client has an opportunity to add a tip before finalizing payment – avoiding the need for the service provider to verbally ask. (GlossGenius notes that using features like Tap-to-Pay increased average tip amounts by making tipping easier
+glossgenius.com
+.)
+
+Payment and Ticket Completion: GlossGenius offers integrated payment processing and multiple payment options. The staff can choose the client’s payment method on the checkout screen. GlossGenius supports in-person payments (credit/debit cards via a card reader, contactless payments like Apple Pay, etc.) as well as recording cash payments or other methods. The GlossGenius card reader hardware allows quick swipes or tap payments that integrate with the app
+glossgenius.com
+. If a client has a card on file (e.g., stored from booking with a deposit or for cancellation fees), the app can charge that card as well. Once the payment is processed or recorded, the appointment is marked as paid and the system creates a completed sale record (receipt). GlossGenius also keeps a log of past transactions; users can view receipts of past sales in the Checkout section under a “Past” transactions list
+glossgenius.com
+.
+
+Manual vs. Automatic: In GlossGenius, the flow is generally manual – a staff member must tap the appointment in the Checkout list or calendar to initiate the ticket. The software doesn’t automatically pop up the checkout screen at the appointment time. However, it does provide notifications and a queue for pending checkouts to remind staff. (There is no explicit “auto-open ticket” feature mentioned for GlossGenius when an appointment begins; the user needs to take the action to start checkout, which is typical for salon POS systems.) Once initiated, the checkout process is quick – GlossGenius boasts completing a checkout in under 60 seconds
+glossgenius.com
+.
+
+GlossGenius’s design emphasizes ease and completeness: from one screen, the user can add any extra charges or discounts, let the client tip, and then process payment. The conversion from appointment to sale is seamless and integrated into their app’s workflow.
+
+Mangomint – Appointment to Sale Workflow
+
+Mangomint likewise converts appointments to sales through a checkout process, with a strong focus on flexibility and multi-step sales features. One of Mangomint’s strengths is how directly integrated the sales flow is with the calendar and appointment status.
+
+Starting the Checkout (Manual): To check out an appointment in Mangomint, the staff clicks on the appointment in the Calendar view, then simply selects the “Checkout” option
+mangomint.com
+. This immediately creates a new sale ticket populated with that appointment’s details. (The appointment often needs to be marked as “Checked In” or in an “In Service” status first, indicating the client is currently being served, especially if combining multiple appointments – more on that shortly.) Once “Checkout” is clicked, a sales panel opens for that appointment. Mangomint’s design allows accessing checkout directly from the calendar entry, which the user specifically requested – this makes it very fast to go from scheduling to payment.
+
+Mangomint’s calendar interface, showing an appointment in progress (“In Service”) with a Checkout button readily available. Clicking this begins the ticket/payment process for that appointment.
+mangomint.com
+
+Checkout Screen and Adding Items: After initiating checkout, Mangomint shows a checkout panel that lists the services from the appointment and their prices, and it allows modifications before payment. The user can add more line items via clearly visible options: “Add Service”, “Add Product”, or “More” (for other item types like gift cards or custom fees)
+mangomint.com
+. For example, if the client decided to buy a shampoo or add an extra service, the front desk can click “Add Product” or “Add Service” to include it on the ticket. Mangomint even supports scanning product barcodes during checkout to quickly add retail products to the sale
+mangomint.com
+. The interface updates the subtotal as new items are added. Once all items are correct, the staff clicks “Go to Payments” (on desktop) or a “Pay” button (on mobile) to proceed
+mangomint.com
+.
+
+Example of Mangomint’s Checkout panel for an appointment. The client’s booked service is listed (with price and provider), and the interface offers Add Service, Add Product, and More options to include additional items. A running subtotal is shown, and a “Go to Payments” button will proceed to the payment/tip screen.
+mangomint.com
+
+Discounts and Adjustments: Mangomint provides robust options for applying discounts during checkout. Staff can apply a discount either by entering a custom discount on an item or the whole ticket, or by using a predefined offer/promo code. In the checkout panel, the “More” menu includes options like “Apply Discount”
+mangomint.com
+. When a discount is applied, the discounted amount is reflected and the system automatically adjusts the tax calculation accordingly (tax in Mangomint is calculated on the post-discount price, similar to GlossGenius). Mangomint’s help center specifically has an article “Apply a Discount During Checkout,” indicating this is a built-in workflow (e.g. you might tap “Discount” and choose a percentage or dollar amount off)
+mangomint.com
+. Additionally, Mangomint supports adding surcharges or fees if needed (for example, an extra service fee)
+mangomint.com
+, and even allows saving an open ticket for later if a client needs to pause checkout
+mangomint.com
+.
+
+Taxes: Tax handling in Mangomint is configurable but straightforward for the user at checkout. Once you’ve set up tax rates (for products or services) in the system, any taxable item added to the ticket will have tax automatically calculated. On the payment screen, Mangomint displays a breakdown including Subtotal and Tax before the total
+images.ctfassets.net
+ (see image below). This transparency lets staff and clients see how much tax is being added. (In the example screenshot, a product with a retail tax shows a tax line of $3.40, which was computed based on the item’s price.)
+
+Tip Collection: Mangomint’s checkout flow includes a dedicated step for tips as well. After clicking “Go to Payments,” the interface will prompt for gratuity. If the business is not using a special client-facing device, the staff interface shows preset tip percentage buttons (common values like 15%, 20%, 25%) and allows a custom tip amount entry
+mangomint.com
+. The staff can either select one of those options or skip if no tip. This calculated tip is then added to the total. If the salon uses a Front Desk Display (an iPad facing the client for self-checkout), Mangomint will let the client select their tip on the iPad directly; whatever tip they choose is automatically recorded in the system
+mangomint.com
+. This approach is very client-friendly: the client privately selects a tip on the screen, and it spares the employee from handling that step. Mangomint supports splitting tips among staff if multiple providers were involved, though that happens behind the scenes or in tip allocation settings (not necessarily in the checkout UI itself)
+mangomint.com
+.
+
+Payment Methods: Mangomint allows completing the sale with various payment types, supporting in-person, online, or hybrid payments. On the payment screen (after tip), the system shows multiple payment buttons: e.g. Cash, Credit Card, Gift Card, Check, Groupon, Other. The user can tap the appropriate payment method to record the payment. For integrated credit card processing, Mangomint can use a card reader or card on file. If using the Front Desk Display, the client can swipe/tap their card on the reader themselves, and the system will process it
+mangomint.com
+. Mangomint also supports split payments – for example, you could apply part of the total to a gift card and the rest to a credit card, or split between cash and card
+mangomint.com
+. This is useful for hybrid payment scenarios (the client wants to use two forms of payment). The checkout interface in Mangomint makes it easy to do this by selecting one method, entering an amount, then selecting another method for the balance
+mangomint.com
+. After payment is processed or logged, the sale is completed (the appointment is marked as checked out/paid) and a receipt can be printed or sent via email. Mangomint also provides options to send or print receipts at the end of checkout
+mangomint.com
+.
+
+Mangomint’s Payment screen during checkout. The interface displays a subtotal, calculated tax, and allows the user to select or input a tip amount (via preset percentages or custom entry). Below that, it shows the total and an “Amount to charge.” Multiple payment method buttons (Cash, Credit Card, Gift Card, etc.) are available, enabling different or split payment types. This design ensures tips, taxes, and discounts are accounted for before finalizing the sale.
+mangomint.com
+
+Combined Appointments (Advanced): A noteworthy feature of Mangomint is the ability to check out multiple appointments together (for example, a client had two separate appointments in one day, or a family/group checkout). If the client has more than one appointment on the same day (and same location), the staff can start checkout for one appointment, then use an “Add Appointment” option to include the other appointment into the same ticket
+mangomint.com
+mangomint.com
+. (The system requires that those appointments be marked as “checked in” to ensure they are active.) This merges the services from both appointments into one combined sale, which is convenient for a single payment. While this is a more advanced flow, it demonstrates how the appointment→ticket conversion can handle complex scenarios. GlossGenius, by contrast, handles multi-service scenarios within one appointment (and has a separate concept for multi-professional appointments), but generally does one appointment per checkout by default.
+
+Manual vs. Automatic: Mangomint’s primary flow is also manually initiated by staff (clicking the appointment’s checkout button). There isn’t an automatic pop-up of a ticket at the exact appointment start time – the staff still decides when to begin checkout. However, Mangomint uses status changes (like check-in) to manage readiness for checkout, which could be seen as a semi-automated step: e.g., when an appointment is marked “Completed” or reaches its end time, the calendar highlights it for checkout. In addition, Mangomint’s design allows creating a new walk-in sale from scratch (without a prior appointment) via the Sales screen
+mangomint.com
+, but that’s outside the appointment conversion flow. The key is that from the calendar, with one click, staff can smoothly transition to the payment process.
+
+Key Considerations for Design
+
+Both GlossGenius and Mangomint illustrate best practices for converting appointments to sales. Below are the key features and flows your design should include, given the requirements (manual/automated flows, tips, taxes, discounts, calendar access, and multiple payment types):
+
+Calendar Integration: Ensure that appointments on the calendar have an easy, direct way to initiate checkout. For example, clicking an appointment could open a detail view with a “Checkout” button
+mangomint.com
+, or a right-click context menu could offer “Create Ticket/Checkout”. This reduces friction by letting staff start the sale from the scheduling interface without needing to navigate elsewhere.
+
+Manual Checkout Flow: Design a clear manual process where a staff member selects an appointment and manually begins the checkout/ticket. This includes a checkout screen pre-loaded with the appointment’s services and client info. The user should be able to review the items, adjust quantities or prices if needed, and add additional services or products to the ticket. Provide obvious “Add Item” options (like “Add Service” or “Add Product”) on the checkout screen so any upsells or last-minute additions can be included
+mangomint.com
+.
+
+Automated (Triggered) Flow: Include support for an automated checkout trigger as an optional enhancement. For example, when an appointment’s scheduled time arrives or when the staff marks the client as “Checked In/Service Started,” the system could automatically create a pending ticket in the background or prompt “Start Checkout for [Client] now?”. This might show up as a notification or an entry in a checkout queue (similar to GlossGenius’s queue of appointments ready to be checked out
+glossgenius.com
+). The design could indicate active appointments that are ready for payment (perhaps highlighting them). Automated flow ensures that busy staff don’t forget to initiate a sale – the system can open the ticket for them or remind them at the right time.
+
+Appointment Details on Ticket: The ticket should clearly list all services from the appointment (with descriptions, assigned staff, and prices). If multiple service providers were involved, show each service with the respective provider. This is important for both clarity and for back-end tip distribution. Allow modifications like changing the service provider or editing service price (with proper permission) in case something changed – Mangomint, for instance, has a feature to change the service provider on a sale if needed
+mangomint.com
+mangomint.com
+.
+
+Adding Products or Extras: Many times, clients purchase products (shampoo, etc.) or add minor services during their visit. The checkout UI should let the user add additional products or services not originally in the appointment. This could be via an “Add” button and a search through the product/service list. Inventory integration (for retail products) is useful – e.g., scanning a barcode or selecting from a list will append that item to the ticket
+mangomint.com
+. Each added item updates the subtotal.
+
+Applying Discounts: Include a way to apply discounts or promo codes. A simple approach is an “Apply Discount” button or a field on the checkout screen. This could open options: select a percentage or dollar discount, or choose from predefined promotions. Support applying the discount to the entire sale or to specific items. When a discount is applied, visually indicate the discount (e.g., show the original price struck-through and the new price, or list a line like “Discount: -$10”). Ensure that any taxes update based on the discounted amounts (both GlossGenius and Mangomint calculate tax on the discounted price rather than the original
+glossgenius.elevio.help
+). This avoids any confusion and keeps the totals accurate.
+
+Tax Calculation: Show taxes clearly in the sale summary. After all items (and any discounts) are entered, display a line for tax (if applicable) and then the final total. The system should automatically compute tax for taxable items using the pre-set rates. For design purposes, have a breakdown area (e.g., a mini summary) that lists Subtotal, Tax, Tip, and Total. This transparency builds trust and helps the stylist double-check everything before charging. If multiple types of tax exist (less likely here, but if you had separate service tax vs product tax), those could be combined or listed separately depending on complexity.
+
+Tip Input: The design must support collecting a tip during checkout. A common and user-friendly design is to present 2-3 tip percentage buttons (like 15%, 20%, 25%) and also a custom amount field
+mangomint.com
+. If the client is handling the tipping directly (e.g., via a customer-facing screen or their own device), show the tipping options on that interface. If the staff is entering it on behalf of the client (maybe the client tells them the tip or it’s a cash tip), allow manual entry. The UI should add the selected tip to the total and clearly label it. Including the tip step as part of the checkout flow (before final payment) ensures it isn’t overlooked. Both systems emphasize making this step seamless – GlossGenius even mentions an “in-app prompt” for tips to avoid awkward questions
+glossgenius.com
+. Your design should do the same, possibly with a friendly prompt like “Add gratuity?” with preset buttons.
+
+Multiple Payment Methods: Support a variety of payment types to cater to in-person and online scenarios. At minimum include Cash, Credit/Debit Card, and Gift Card as options. Other possibilities are Check or “Other” (for things like third-party vouchers or bank transfers). In an in-person context, if a card is chosen, integrate with a card reader or have a way to enter card details (or use Tap-to-Pay on a device). For online payments (if the client isn’t physically present), the system could use a card on file or send a payment link – in the UI, this might be a “Charge Card on File” button or a “Send Payment Request” option. Also, crucially, allow splitting payments: e.g., a client wants to pay part cash, part card. The UI might let the user enter a specific amount for one method, then the remaining balance automatically switches to another method. Mangomint’s UI, for instance, would handle this by selecting one payment, then the next, until the balance is zero
+mangomint.com
+. Design-wise, this could be a “Split Payment” flow where after choosing the first method, the interface shows remaining balance and lets the user pick another method for that remainder.
+
+Completing the Sale: Once payment is processed (or recorded, in case of cash), provide confirmation that the ticket is closed. Optionally, include receipt options (print, email, text receipt) and perhaps a prompt to rebook or review. GlossGenius sends a digital receipt which can prompt the client to leave a review
+glossgenius.com
+ – your design could mention a confirmation screen with “Sale complete – choose receipt or done.” After completion, the appointment’s status on the calendar should update (e.g., marked as paid/checked-out). The sale record should be accessible in a sales history for later reference.
+
+User Roles and Flow Differences: Consider the environment: a solo professional might use the same device for everything (they tap the tip themselves based on client’s word, etc.), whereas a team salon might have a front-desk iPad where the client completes part of the checkout (like tipping and signing). Your design can accommodate both by having a modular flow. For instance, if a “client-facing mode” is active, once all items are added the device can be handed to the client for tip selection and payment entry (like how Mangomint’s Front Desk Display works
+mangomint.com
+). If not, the staff just does all steps on their interface. This flexibility is a plus in design but make sure the primary elements (tip, payment, etc.) are present either way.
+
+By incorporating the above, the appointment-to-sale conversion flow will be comprehensive and user-friendly. The goal is to make it as efficient as possible (few taps to get from calendar to payment) while also handling all necessary details (gratuity, discounts, taxes, multiple payment types) so the final ticket is accurate.

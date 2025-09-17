@@ -8,13 +8,11 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "0.0.0.0",
     port: 5000,
-    allowedHosts: true,
+    allowedHosts: [".replit.dev", ".repl.co"],
   },
-  plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
+  plugins: [react(), mode === "development" && componentTagger()].filter(
+    Boolean,
+  ),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
