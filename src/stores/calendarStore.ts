@@ -35,6 +35,9 @@ interface CalendarState {
   navigatePrevious: () => void;
   navigateNext: () => void;
   goToToday: () => void;
+
+  // Data initialization
+  initializeData: (data: { appointments: Appointment[]; staff: StaffMember[]; services: Service[]; clients: Client[] }) => void;
   
   // Helpers
   getAppointmentsForDay: (date: Date, staffId?: string) => Appointment[];
@@ -134,6 +137,16 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   },
 
   goToToday: () => set({ currentDate: new Date() }),
+
+  // Data initialization
+  initializeData: (data) => {
+    set({
+      appointments: data.appointments,
+      staff: data.staff,
+      services: data.services,
+      clients: data.clients,
+    });
+  },
 
   // Helper functions
   getAppointmentsForDay: (date, staffId) => {

@@ -7,17 +7,16 @@ import { useCheckoutStore } from '@/stores/checkoutStore';
 import { generateMockData } from '@/lib/mockCalendarData';
 
 export default function CalendarPage() {
-  const { appointments, staff, services, clients } = useCalendarStore();
+  const { appointments, staff, services, clients, initializeData } = useCalendarStore();
   const { isOpen: isCheckoutOpen } = useCheckoutStore();
 
   // Initialize with mock data on first load
   useEffect(() => {
     if (appointments.length === 0 && staff.length === 0) {
       const mockData = generateMockData();
-      // TODO: Load this data into the store
-      console.log('Mock data generated:', mockData);
+      initializeData(mockData);
     }
-  }, [appointments.length, staff.length]);
+  }, [appointments.length, staff.length, initializeData]);
 
   return (
     <AppLayout>
