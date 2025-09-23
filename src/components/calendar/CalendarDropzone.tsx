@@ -47,10 +47,10 @@ export function CalendarDropzone({ children, onAppointmentMove }: CalendarDropzo
       const staffDifferent = staffId && staffId !== appointment.staffId;
       
       if (timeDifferent || staffDifferent) {
-        moveAppointment(appointment.id, newStartTime, staffId);
-        
         if (onAppointmentMove) {
           onAppointmentMove(appointment.id, newStartTime, staffId);
+        } else {
+          moveAppointment(appointment.id, newStartTime, staffId);
         }
       }
     }
