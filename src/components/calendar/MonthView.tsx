@@ -10,7 +10,8 @@ interface MonthViewProps {
   services: Service[];
   selectedStaffIds: string[];
   onDayClick?: (date: Date) => void;
-  onAppointmentClick?: (appointment: Appointment) => void;
+  onAppointmentCheckout?: (appointment: Appointment) => void;
+  onAppointmentEdit?: (appointment: Appointment) => void;
   className?: string;
 }
 
@@ -22,7 +23,8 @@ export function MonthView({
   services,
   selectedStaffIds,
   onDayClick,
-  onAppointmentClick,
+  onAppointmentCheckout,
+  onAppointmentEdit,
   className,
 }: MonthViewProps) {
   const monthStart = startOfMonth(date);
@@ -65,7 +67,7 @@ export function MonthView({
         {weekDays.map((dayName) => (
           <div
             key={dayName}
-            className="p-3 text-center text-sm font-medium text-gray-600 border-r last:border-r-0"
+            className="p-3 md:p-4 lg:p-5 text-center text-sm md:text-base font-medium text-gray-600 border-r last:border-r-0"
             data-testid={`month-header-${dayName.toLowerCase()}`}
           >
             {dayName}
@@ -85,7 +87,7 @@ export function MonthView({
             <div
               key={day.toDateString()}
               className={cn(
-                'border-r border-b last:border-r-0 p-2 cursor-pointer hover:bg-gray-50 transition-colors min-h-[120px]',
+                'border-r border-b last:border-r-0 p-2 md:p-3 lg:p-4 cursor-pointer hover:bg-gray-50 transition-colors min-h-[120px] md:min-h-[150px] lg:min-h-[180px]',
                 !isCurrentMonth && 'bg-gray-50 text-gray-400',
                 isToday && 'bg-blue-50',
                 hasAppointments && 'bg-green-50/30'
@@ -127,22 +129,36 @@ export function MonthView({
                     <div
                       key={appointment.id}
                       className={cn(
-                        'text-xs p-1 rounded cursor-pointer hover:shadow-sm transition-shadow',
+                        'text-xs p-1 rounded cursor-pointer hover:shadow-sm transition-shadow group',
                         'bg-white border border-gray-200'
                       )}
                       style={{ borderLeftColor: appointmentStaff.color, borderLeftWidth: '3px' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAppointmentClick?.(appointment);
-                      }}
                       data-testid={`month-appointment-${appointment.id}`}
                     >
-                      <div className="font-medium truncate">
+                      <div 
+                        className="font-medium truncate"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAppointmentEdit?.(appointment);
+                        }}
+                      >
                         {format(appointment.startTime, 'h:mm a')} - {client.firstName}
                       </div>
                       {primaryService && (
-                        <div className="text-gray-500 truncate">
-                          {primaryService.name}
+                        <div className="text-gray-500 truncate flex justify-between items-center">
+                          <span>{primaryService.name}</span>
+                          {(['confirmed', 'checked-in', 'in-progress'].includes(appointment.status)) && (
+                            <button
+                              className="text-blue-600 hover:text-blue-800 text-xs md:text-sm font-medium opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity px-1 py-1 rounded touch-manipulation"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onAppointmentCheckout?.(appointment);
+                              }}
+                              data-testid={`checkout-${appointment.id}`}
+                            >
+                              ✓
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>

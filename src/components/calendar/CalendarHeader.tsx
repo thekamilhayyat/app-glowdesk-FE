@@ -60,10 +60,10 @@ export function CalendarHeader({
   const activeStaff = staff.filter(s => s.isActive);
 
   return (
-    <div className="border-b bg-white p-4">
+    <div className="border-b bg-white p-4 md:p-5 lg:p-6">
       {/* Top row - View toggles and actions */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mb-4 md:mb-5">
+        <div className="flex items-center gap-2 md:gap-3">
           {/* View toggle buttons */}
           <div className="flex rounded-lg border">
             {(['day', 'week', 'month'] as CalendarView[]).map((view) => (
@@ -71,7 +71,7 @@ export function CalendarHeader({
                 key={view}
                 variant={currentView === view ? 'default' : 'ghost'}
                 size="sm"
-                className="rounded-none first:rounded-l-lg last:rounded-r-lg"
+                className="rounded-none first:rounded-l-lg last:rounded-r-lg px-3 md:px-4 lg:px-6 py-2 md:py-3 text-sm md:text-base"
                 onClick={() => onViewChange(view)}
                 data-testid={`view-${view}`}
               >

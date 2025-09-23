@@ -89,7 +89,6 @@ export function Calendar({ className }: CalendarProps) {
           <MonthView
             {...commonProps}
             onDayClick={handleDayClick}
-            onAppointmentClick={handleAppointmentEdit}
           />
         );
       default:

@@ -73,10 +73,8 @@ export function AppointmentCard({
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
       className={cn(
-        'p-3 rounded-lg border-l-4 border shadow-sm hover:shadow-md transition-shadow cursor-grab',
+        'p-3 md:p-4 lg:p-5 rounded-lg border-l-4 border shadow-sm hover:shadow-md transition-shadow',
         statusColors[appointment.status],
         isDragging && 'opacity-50',
         appointment.status === 'canceled' && 'line-through',
@@ -85,7 +83,11 @@ export function AppointmentCard({
       data-testid={`appointment-card-${appointment.id}`}
     >
       {/* Header with time and status */}
-      <div className="flex justify-between items-start mb-2">
+      <div 
+        className="flex justify-between items-start mb-2 cursor-grab"
+        {...listeners}
+        {...attributes}
+      >
         <div className="flex items-center gap-2">
           <Clock className="h-3 w-3" />
           <span className="text-xs font-medium">
@@ -155,12 +157,12 @@ export function AppointmentCard({
       </div>
 
       {/* Action buttons */}
-      <div className="flex gap-1 mt-2">
+      <div className="flex gap-1 md:gap-2 mt-2">
         {onEdit && (
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 px-2 text-xs"
+            className="h-6 md:h-8 lg:h-10 px-2 md:px-3 lg:px-4 text-xs md:text-sm"
             onClick={(e) => {
               e.stopPropagation();
               onEdit();
@@ -174,7 +176,7 @@ export function AppointmentCard({
           <Button
             variant="default"
             size="sm"
-            className="h-6 px-2 text-xs"
+            className="h-6 md:h-8 lg:h-10 px-2 md:px-3 lg:px-4 text-xs md:text-sm"
             onClick={(e) => {
               e.stopPropagation();
               onCheckout();
