@@ -64,20 +64,20 @@ export function DayView({
     <div className={cn('flex flex-col h-full', className)} data-testid="day-view">
       {/* Staff header row */}
       <div className="flex border-b bg-gray-50">
-        <div className="w-20 p-2 border-r">
-          <span className="text-sm font-medium text-gray-600">Time</span>
+        <div className="w-20 md:w-24 lg:w-28 p-2 md:p-3 border-r">
+          <span className="text-sm md:text-base font-medium text-gray-600">Time</span>
         </div>
         {displayStaff.map((staffMember) => (
           <div
             key={staffMember.id}
-            className="flex-1 p-2 border-r last:border-r-0 text-center"
+            className="flex-1 p-2 md:p-3 lg:p-4 border-r last:border-r-0 text-center"
             style={{ borderLeftColor: staffMember.color, borderLeftWidth: '3px' }}
             data-testid={`staff-column-${staffMember.id}`}
           >
-            <div className="font-medium text-sm">
+            <div className="font-medium text-sm md:text-base">
               {staffMember.firstName} {staffMember.lastName}
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs md:text-sm text-gray-500">
               {appointmentsByStaff[staffMember.id]?.length || 0} appointments
             </div>
           </div>
@@ -103,7 +103,7 @@ export function DayView({
                     return (
                       <div
                         key={`${hour}-${minute}`}
-                        className="absolute w-full h-[60px] border-b border-gray-100"
+                        className="absolute w-full h-[60px] md:h-[80px] lg:h-[100px] border-b border-gray-100"
                         style={{ top: slotIndex * 60 }}
                       >
                         <TimeSlot

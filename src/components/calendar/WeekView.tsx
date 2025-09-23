@@ -93,23 +93,23 @@ export function WeekView({
             <div
               key={day.toDateString()}
               className={cn(
-                'p-3 border-r last:border-r-0 cursor-pointer hover:bg-gray-100 transition-colors',
+                'p-3 md:p-4 lg:p-5 border-r last:border-r-0 cursor-pointer hover:bg-gray-100 transition-colors',
                 isToday && 'bg-blue-50 border-blue-200'
               )}
               onClick={() => onDayClick?.(day)}
               data-testid={`week-day-${format(day, 'yyyy-MM-dd')}`}
             >
               <div className="text-center">
-                <div className="text-xs text-gray-500 uppercase tracking-wide">
+                <div className="text-xs md:text-sm text-gray-500 uppercase tracking-wide">
                   {format(day, 'EEE')}
                 </div>
                 <div className={cn(
-                  'text-lg font-semibold mt-1',
+                  'text-lg md:text-xl lg:text-2xl font-semibold mt-1',
                   isToday && 'text-blue-600'
                 )}>
                   {format(day, 'd')}
                 </div>
-                <div className="text-xs text-gray-400 mt-1">
+                <div className="text-xs md:text-sm text-gray-400 mt-1">
                   {dayAppointments.length} apt{dayAppointments.length !== 1 ? 's' : ''}
                 </div>
               </div>
