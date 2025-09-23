@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { CalendarView, Appointment, StaffMember, Service, Client } from '@/types/calendar';
 
+interface CalendarConflictResult {
+  ok: boolean;
+  conflicts?: Appointment[];
+  message?: string;
+}
+
 interface CalendarState {
   // View state
   currentView: CalendarView;
@@ -26,10 +32,10 @@ interface CalendarState {
   setDraggedAppointment: (appointment: Appointment | null) => void;
   
   // Data actions
-  addAppointment: (appointment: Appointment) => void;
-  updateAppointment: (id: string, updates: Partial<Appointment>) => void;
+  addAppointment: (appointment: Appointment) => CalendarConflictResult;
+  updateAppointment: (id: string, updates: Partial<Appointment>) => CalendarConflictResult;
   deleteAppointment: (id: string) => void;
-  moveAppointment: (id: string, newStartTime: Date, newStaffId?: string) => void;
+  moveAppointment: (id: string, newStartTime: Date, newStaffId?: string) => CalendarConflictResult;
   
   // Navigation
   navigatePrevious: () => void;
@@ -44,6 +50,12 @@ interface CalendarState {
   getAppointmentsForWeek: (startDate: Date, staffId?: string) => Appointment[];
   getAppointmentsForMonth: (date: Date) => Appointment[];
   getAvailableTimeSlots: (date: Date, staffId: string, duration: number) => Date[];
+  
+  // Overlap validation
+  overlaps: (aStart: Date, aEnd: Date, bStart: Date, bEnd: Date) => boolean;
+  findConflicts: (staffId: string, start: Date, end: Date, excludeId?: string) => Appointment[];
+  canSchedule: (staffId: string, start: Date, end: Date, excludeId?: string) => boolean;
+  isTimeRangeAvailable: (date: Date, staffId: string, start: Date, end: Date, excludeId?: string) => boolean;
 }
 
 export const useCalendarStore = create<CalendarState>((set, get) => ({
@@ -66,16 +78,73 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   setSelectedAppointment: (appointment) => set({ selectedAppointment: appointment }),
   setDraggedAppointment: (appointment) => set({ draggedAppointment: appointment }),
 
+  // Overlap validation helpers
+  overlaps: (aStart, aEnd, bStart, bEnd) => {
+    return aStart.getTime() < bEnd.getTime() && aEnd.getTime() > bStart.getTime();
+  },
+
+  findConflicts: (staffId, start, end, excludeId) => {
+    const state = get();
+    return state.appointments.filter((apt) => {
+      if (excludeId && apt.id === excludeId) return false;
+      if (apt.staffId !== staffId) return false;
+      return state.overlaps(start, end, apt.startTime, apt.endTime);
+    });
+  },
+
+  canSchedule: (staffId, start, end, excludeId) => {
+    const state = get();
+    return state.findConflicts(staffId, start, end, excludeId).length === 0;
+  },
+
+  isTimeRangeAvailable: (date, staffId, start, end, excludeId) => {
+    const state = get();
+    return state.canSchedule(staffId, start, end, excludeId);
+  },
+
   // Data actions
-  addAppointment: (appointment) => 
-    set((state) => ({ appointments: [...state.appointments, appointment] })),
+  addAppointment: (appointment) => {
+    const state = get();
+    if (!state.canSchedule(appointment.staffId, appointment.startTime, appointment.endTime)) {
+      const conflicts = state.findConflicts(appointment.staffId, appointment.startTime, appointment.endTime);
+      const clientName = conflicts.length > 0 ? state.clients.find(c => c.id === conflicts[0].clientId)?.firstName || 'Unknown' : 'Unknown';
+      return {
+        ok: false,
+        conflicts,
+        message: `Conflict with ${clientName}'s appointment`
+      };
+    }
+    set((state) => ({ appointments: [...state.appointments, appointment] }));
+    return { ok: true };
+  },
   
-  updateAppointment: (id, updates) =>
+  updateAppointment: (id, updates) => {
+    const state = get();
+    const currentApt = state.appointments.find(apt => apt.id === id);
+    if (!currentApt) return { ok: false, message: 'Appointment not found' };
+    
+    // Calculate new times if time-related updates are provided
+    const newStartTime = updates.startTime || currentApt.startTime;
+    const newEndTime = updates.endTime || currentApt.endTime;
+    const newStaffId = updates.staffId || currentApt.staffId;
+    
+    if (!state.canSchedule(newStaffId, newStartTime, newEndTime, id)) {
+      const conflicts = state.findConflicts(newStaffId, newStartTime, newEndTime, id);
+      const clientName = conflicts.length > 0 ? state.clients.find(c => c.id === conflicts[0].clientId)?.firstName || 'Unknown' : 'Unknown';
+      return {
+        ok: false,
+        conflicts,
+        message: `Conflict with ${clientName}'s appointment`
+      };
+    }
+    
     set((state) => ({
       appointments: state.appointments.map((apt) =>
         apt.id === id ? { ...apt, ...updates, updatedAt: new Date() } : apt
       ),
-    })),
+    }));
+    return { ok: true };
+  },
   
   deleteAppointment: (id) =>
     set((state) => ({
@@ -85,16 +154,30 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   moveAppointment: (id, newStartTime, newStaffId) => {
     const state = get();
     const appointment = state.appointments.find((apt) => apt.id === id);
-    if (!appointment) return;
+    if (!appointment) {
+      return { ok: false, message: 'Appointment not found' };
+    }
     
     const duration = appointment.endTime.getTime() - appointment.startTime.getTime();
     const newEndTime = new Date(newStartTime.getTime() + duration);
+    const targetStaffId = newStaffId || appointment.staffId;
     
-    state.updateAppointment(id, {
+    if (!state.canSchedule(targetStaffId, newStartTime, newEndTime, id)) {
+      const conflicts = state.findConflicts(targetStaffId, newStartTime, newEndTime, id);
+      const clientName = conflicts.length > 0 ? state.clients.find(c => c.id === conflicts[0].clientId)?.firstName || 'Unknown' : 'Unknown';
+      return {
+        ok: false,
+        conflicts,
+        message: `Cannot move: Conflict with ${clientName}'s appointment`
+      };
+    }
+    
+    const result = state.updateAppointment(id, {
       startTime: newStartTime,
       endTime: newEndTime,
-      staffId: newStaffId || appointment.staffId,
+      staffId: targetStaffId,
     });
+    return result;
   },
 
   // Navigation
