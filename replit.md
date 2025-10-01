@@ -2,6 +2,16 @@
 
 This is a salon management system called "Glowdesk" built with React, TypeScript, and Vite. The application provides a comprehensive solution for managing salon operations including client management, staff scheduling, service offerings, appointments, and inventory tracking. It features a modern, responsive interface with authentication, dashboard analytics, and complete CRUD operations for all business entities.
 
+# Recent Changes (October 1, 2025)
+
+## Bug Fixes
+- **Fixed duplicate appointment rendering in Day view**: Added deduplication logic at the store level to prevent duplicate appointments
+  - `initializeData` now deduplicates appointments by ID when loading data into the store
+  - `addAppointment` checks for existing appointment IDs before adding new appointments
+  - This ensures data integrity throughout the application and fixes issues with drag-and-drop
+- **Fixed incorrect type imports**: Updated imports across calendar components to use individual type files instead of non-existent '@/types/calendar' exports
+- **Added missing client names in mock data**: Updated mock client data to include required `name` field along with firstName and lastName
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
