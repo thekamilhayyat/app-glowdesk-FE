@@ -12,18 +12,8 @@ export default function CalendarPage() {
 
   // Initialize with mock data on first load
   useEffect(() => {
-    console.log('Calendar useEffect triggered:', {
-      appointmentsLength: appointments.length,
-      staffLength: staff.length
-    });
-    
     if (appointments.length === 0 && staff.length === 0) {
-      console.log('Initializing mock data...');
       const mockData = generateMockData();
-      console.log('Generated mock data:', {
-        appointmentCount: mockData.appointments.length,
-        appointmentIds: mockData.appointments.map(a => a.id)
-      });
       initializeData(mockData);
     }
   }, [appointments.length, staff.length, initializeData]);

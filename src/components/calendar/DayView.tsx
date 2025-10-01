@@ -50,20 +50,6 @@ export function DayView({
     return acc;
   }, {} as Record<string, Appointment[]>);
 
-  console.log('DayView rendering:', {
-    date: date.toDateString(),
-    totalAppointments: appointments.length,
-    dayAppointments: dayAppointments.length,
-    dayAppointmentIds: dayAppointments.map(a => a.id),
-    displayStaffCount: displayStaff.length,
-    displayStaffIds: displayStaff.map(s => s.id),
-    appointmentsByStaff: Object.entries(appointmentsByStaff).map(([staffId, apts]) => ({
-      staffId,
-      count: apts.length,
-      appointmentIds: apts.map(a => a.id)
-    }))
-  });
-
   // Calculate position for appointments in the grid
   const getAppointmentPosition = (appointment: Appointment) => {
     const startHour = 9;
@@ -103,72 +89,76 @@ export function DayView({
 
       {/* Time grid with appointments */}
       <div className="flex-1 overflow-auto">
-        <div className="relative">
-          <TimeGrid startHour={9} endHour={18} intervalMinutes={30}>
-            {/* Staff columns */}
-            <div className="flex absolute inset-0">
-              {displayStaff.map((staffMember, staffIndex) => (
-                <div
-                  key={staffMember.id}
-                  className="flex-1 relative border-r last:border-r-0"
-                  data-testid={`staff-time-column-${staffMember.id}`}
-                >
-                  {/* Time slots for drag and drop */}
-                  {Array.from({ length: 18 }, (_, slotIndex) => {
-                    const hour = 9 + Math.floor(slotIndex / 2);
-                    const minute = (slotIndex % 2) * 30;
-                    return (
-                      <div
-                        key={`${hour}-${minute}`}
-                        className="absolute w-full h-[60px] md:h-[80px] lg:h-[100px] border-b border-gray-100"
-                        style={{ top: slotIndex * 60 }}
-                      >
-                        <TimeSlot
-                          hour={hour}
-                          minute={minute}
-                          staffId={staffMember.id}
-                          onSlotClick={(time) => onTimeSlotClick?.(time, staffMember.id)}
-                        />
-                      </div>
-                    );
-                  })}
+        <div className="flex relative">
+          {/* Time column */}
+          <div className="w-20 md:w-24 lg:w-28 border-r">
+            <TimeGrid startHour={9} endHour={18} intervalMinutes={30} />
+          </div>
+          
+          {/* Staff columns */}
+          <div className="flex flex-1">
+            {displayStaff.map((staffMember, staffIndex) => (
+              <div
+                key={staffMember.id}
+                className="flex-1 relative border-r last:border-r-0"
+                data-testid={`staff-time-column-${staffMember.id}`}
+                style={{ minHeight: '1080px' }} // 18 slots * 60px
+              >
+                {/* Time slots for drag and drop */}
+                {Array.from({ length: 18 }, (_, slotIndex) => {
+                  const hour = 9 + Math.floor(slotIndex / 2);
+                  const minute = (slotIndex % 2) * 30;
+                  return (
+                    <div
+                      key={`${hour}-${minute}`}
+                      className="absolute w-full h-[60px] border-b border-gray-100"
+                      style={{ top: slotIndex * 60 }}
+                    >
+                      <TimeSlot
+                        hour={hour}
+                        minute={minute}
+                        staffId={staffMember.id}
+                        onSlotClick={(time) => onTimeSlotClick?.(time, staffMember.id)}
+                      />
+                    </div>
+                  );
+                })}
 
-                  {/* Appointments for this staff member */}
-                  {appointmentsByStaff[staffMember.id]?.map((appointment) => {
-                    const client = clients.find(c => c.id === appointment.clientId);
-                    const appointmentServices = services.filter(s => 
-                      appointment.serviceIds.includes(s.id)
-                    );
-                    const position = getAppointmentPosition(appointment);
+                {/* Appointments for this staff member */}
+                {appointmentsByStaff[staffMember.id]?.map((appointment) => {
+                  const client = clients.find(c => c.id === appointment.clientId);
+                  const appointmentServices = services.filter(s => 
+                    appointment.serviceIds.includes(s.id)
+                  );
+                  const position = getAppointmentPosition(appointment);
 
-                    if (!client) return null;
+                  if (!client) return null;
 
-                    return (
-                      <div
-                        key={appointment.id}
-                        className="absolute left-1 right-1 z-10"
-                        style={{
-                          top: position.top,
-                          height: position.height,
-                        }}
-                        data-testid={`appointment-position-${appointment.id}`}
-                      >
-                        <AppointmentCard
-                          appointment={appointment}
-                          client={client}
-                          services={appointmentServices}
-                          staff={staffMember}
-                          onCheckout={() => onAppointmentCheckout?.(appointment)}
-                          onEdit={() => onAppointmentEdit?.(appointment)}
-                          className="h-full"
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </TimeGrid>
+                  return (
+                    <div
+                      key={appointment.id}
+                      className="absolute left-1 right-1 z-10"
+                      style={{
+                        top: position.top,
+                        height: position.height,
+                      }}
+                      data-testid={`appointment-position-${appointment.id}`}
+                    >
+                      <AppointmentCard
+                        appointment={appointment}
+                        client={client}
+                        services={appointmentServices}
+                        staff={staffMember}
+                        onCheckout={() => onAppointmentCheckout?.(appointment)}
+                        onEdit={() => onAppointmentEdit?.(appointment)}
+                        className="h-full"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
