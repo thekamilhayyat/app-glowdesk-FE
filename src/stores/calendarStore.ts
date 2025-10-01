@@ -1,11 +1,9 @@
 import { create } from 'zustand';
-import { CalendarView, Appointment, StaffMember, Service, Client } from '@/types/calendar';
-
-interface CalendarConflictResult {
-  ok: boolean;
-  conflicts?: Appointment[];
-  message?: string;
-}
+import { CalendarView, CalendarConflictResult } from '@/types/calendar';
+import { Appointment, AppointmentStatus } from '@/types/appointment';
+import { StaffMember } from '@/types/staff';
+import { Service } from '@/types/service';
+import { Client } from '@/types/client';
 
 interface CalendarState {
   // View state
@@ -36,6 +34,7 @@ interface CalendarState {
   updateAppointment: (id: string, updates: Partial<Appointment>) => CalendarConflictResult;
   deleteAppointment: (id: string) => void;
   moveAppointment: (id: string, newStartTime: Date, newStaffId?: string) => CalendarConflictResult;
+  addClient: (client: Client) => void;
   
   // Navigation
   navigatePrevious: () => void;
@@ -149,6 +148,11 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   deleteAppointment: (id) =>
     set((state) => ({
       appointments: state.appointments.filter((apt) => apt.id !== id),
+    })),
+
+  addClient: (client) =>
+    set((state) => ({
+      clients: [...state.clients, client],
     })),
   
   moveAppointment: (id, newStartTime, newStaffId) => {

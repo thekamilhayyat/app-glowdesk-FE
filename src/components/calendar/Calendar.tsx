@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { useCalendarStore } from '@/stores/calendarStore';
 import { CalendarHeader } from './CalendarHeader';
 import { DayView } from './DayView';
 import { WeekView } from './WeekView';
 import { MonthView } from './MonthView';
 import { CalendarDropzone } from './CalendarDropzone';
+import { AppointmentDialog } from './AppointmentDialog';
 import { useCheckoutStore } from '@/stores/checkoutStore';
-import { Appointment } from '@/types/calendar';
+import { Appointment } from '@/types/appointment';
 import { useToast } from '@/hooks/use-toast';
 
 interface CalendarProps {
@@ -37,23 +39,47 @@ export function Calendar({ className }: CalendarProps) {
   const { startCheckout } = useCheckoutStore();
   const { toast } = useToast();
 
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | undefined>();
+  const [prefillData, setPrefillData] = useState<{ date?: Date; time?: string; staffId?: string } | undefined>();
+
   const handleAppointmentCheckout = (appointment: Appointment) => {
     startCheckout(appointment);
   };
 
   const handleAppointmentEdit = (appointment: Appointment) => {
-    // TODO: Open appointment edit dialog
-    console.log('Edit appointment:', appointment);
+    setSelectedAppointment(appointment);
+    setDialogMode('edit');
+    setPrefillData(undefined);
+    setDialogOpen(true);
   };
 
   const handleNewAppointment = () => {
-    // TODO: Open new appointment dialog
-    console.log('New appointment');
+    const now = new Date();
+    const roundedMinutes = Math.ceil(now.getMinutes() / 30) * 30;
+    const roundedTime = new Date(now);
+    roundedTime.setMinutes(roundedMinutes, 0, 0);
+    
+    setSelectedAppointment(undefined);
+    setDialogMode('create');
+    setPrefillData({
+      date: roundedTime,
+      time: roundedTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+    });
+    setDialogOpen(true);
   };
 
   const handleTimeSlotClick = (time: Date, staffId: string) => {
-    // TODO: Open new appointment dialog with pre-filled time and staff
-    console.log('Time slot clicked:', time, staffId);
+    setSelectedAppointment(undefined);
+    setDialogMode('create');
+    setPrefillData({
+      date: time,
+      time: time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+      staffId,
+    });
+    setDialogOpen(true);
   };
 
   const handleAppointmentMove = (appointmentId: string, newStartTime: Date, newStaffId?: string) => {
@@ -139,6 +165,14 @@ export function Calendar({ className }: CalendarProps) {
           {renderCalendarView()}
         </div>
       </CalendarDropzone>
+
+      <AppointmentDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        mode={dialogMode}
+        appointment={selectedAppointment}
+        prefillData={prefillData}
+      />
     </div>
   );
 }
