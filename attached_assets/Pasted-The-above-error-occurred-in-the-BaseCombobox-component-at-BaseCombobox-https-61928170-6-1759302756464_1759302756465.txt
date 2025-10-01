@@ -1,0 +1,44 @@
+The above error occurred in the <BaseCombobox> component:
+
+    at BaseCombobox (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/src/components/base/BaseCombobox.tsx:27:32)
+    at form
+    at div
+    at DrawerPanel3 (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:62170:5)
+    at div
+    at DrawerPanel2 (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:61863:25)
+    at div
+    at DomWrapper4 (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:7085:5)
+    at https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:7472:32
+    at div
+    at DrawerPopup (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:61904:25)
+    at https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:16396:21
+    at Drawer2 (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:62090:27)
+    at NoFormStyle (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:20169:3)
+    at NoCompactStyle (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:12252:5)
+    at ContextIsolator (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:20195:5)
+    at Drawer3 (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:62514:5)
+    at BaseDrawer (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/src/components/base/BaseDrawer.tsx:23:30)
+    at AppointmentDialog (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/src/components/calendar/AppointmentDialog.tsx?t=1759300701380:36:37)
+    at div
+    at Calendar (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/src/components/calendar/Calendar.tsx?t=1759300701380:32:28)
+    at div
+    at main
+    at div
+    at AppLayout (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/src/components/layout/AppLayout.tsx:22:29)
+    at CalendarPage (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/src/pages/Calendar.tsx?t=1759300701380:31:72)
+    at ProtectedRoute (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/src/components/ProtectedRoute.tsx:24:34)
+    at RenderedRoute (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=8b8249b3:4088:5)
+    at Routes (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=8b8249b3:4558:5)
+    at Router (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=8b8249b3:4501:15)
+    at BrowserRouter (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=8b8249b3:5247:5)
+    at AuthProvider (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/src/contexts/AuthContext.tsx:34:32)
+    at Provider (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/chunk-IEUL66Q4.js?v=8b8249b3:58:15)
+    at TooltipProvider (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=8b8249b3:2268:5)
+    at div
+    at App (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/antd.js?v=8b8249b3:23178:16)
+    at QueryClientProvider (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=8b8249b3:2934:3)
+    at App
+    at ThemeProvider (https://61928170-6ef4-4f7b-ae49-a19571a2f6a4-00-sg32go2k03hs.worf.replit.dev/src/components/ui/theme-provider.tsx:28:33)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.

@@ -284,7 +284,7 @@ export function AppointmentDialog({
 
   const clientOptions = clients.map(client => ({
     id: client.id,
-    label: client.name,
+    label: client.name || `${client.firstName || ''} ${client.lastName || ''}`.trim() || 'Unnamed Client',
     sublabel: client.email,
   }));
 
