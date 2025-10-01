@@ -104,6 +104,15 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   // Data actions
   addAppointment: (appointment) => {
     const state = get();
+    
+    // Check if appointment with this ID already exists
+    if (state.appointments.some(apt => apt.id === appointment.id)) {
+      return {
+        ok: false,
+        message: 'Appointment with this ID already exists'
+      };
+    }
+    
     if (!state.canSchedule(appointment.staffId, appointment.startTime, appointment.endTime)) {
       const conflicts = state.findConflicts(appointment.staffId, appointment.startTime, appointment.endTime);
       const clientName = conflicts.length > 0 ? state.clients.find(c => c.id === conflicts[0].clientId)?.firstName || 'Unknown' : 'Unknown';
@@ -227,8 +236,13 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   // Data initialization
   initializeData: (data) => {
+    // Deduplicate appointments by ID to prevent duplicate entries
+    const uniqueAppointments = Array.from(
+      new Map(data.appointments.map(apt => [apt.id, apt])).values()
+    );
+    
     set({
-      appointments: data.appointments,
+      appointments: uniqueAppointments,
       staff: data.staff,
       services: data.services,
       clients: data.clients,
