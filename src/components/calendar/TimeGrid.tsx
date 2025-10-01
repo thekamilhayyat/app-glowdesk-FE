@@ -37,19 +37,14 @@ export function TimeGrid({
       {timeSlots.map(({ hour, minute }) => (
         <div
           key={`${hour}-${minute}`}
-          className="flex border-b border-gray-100 min-h-[60px]"
+          className="border-b border-gray-100 min-h-[60px] p-2 text-sm text-gray-500"
           data-testid={`time-slot-${hour}-${minute}`}
         >
           {/* Time label */}
-          <div className="w-20 p-2 text-sm text-gray-500 border-r">
+          <div>
             {hour === 12 ? '12' : hour > 12 ? hour - 12 : hour}:
             {minute.toString().padStart(2, '0')}
             {hour < 12 ? ' AM' : ' PM'}
-          </div>
-          
-          {/* Slot content area */}
-          <div className="flex-1 relative">
-            {children}
           </div>
         </div>
       ))}
