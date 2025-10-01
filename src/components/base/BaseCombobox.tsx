@@ -44,10 +44,11 @@ export function BaseCombobox({
 
   const selectedOption = options.find(opt => opt.id === value);
 
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (option.sublabel && option.sublabel.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredOptions = options.filter(option => {
+    const labelMatch = option.label?.toLowerCase()?.includes(searchTerm.toLowerCase()) || false;
+    const sublabelMatch = option.sublabel?.toLowerCase()?.includes(searchTerm.toLowerCase()) || false;
+    return labelMatch || sublabelMatch;
+  });
 
   // Close dropdown when clicking outside
   useEffect(() => {
