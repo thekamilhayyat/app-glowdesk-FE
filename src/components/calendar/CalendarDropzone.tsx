@@ -1,6 +1,6 @@
 import { DndContext, DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core';
 import { useCalendarStore } from '@/stores/calendarStore';
-import { Appointment } from '@/types/calendar';
+import { Appointment } from '@/types/appointment';
 
 interface CalendarDropzoneProps {
   children: React.ReactNode;
