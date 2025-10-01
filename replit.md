@@ -5,10 +5,11 @@ This is a salon management system called "Glowdesk" built with React, TypeScript
 # Recent Changes (October 1, 2025)
 
 ## Bug Fixes
-- **Fixed duplicate appointment rendering in Day view**: Added deduplication logic at the store level to prevent duplicate appointments
-  - `initializeData` now deduplicates appointments by ID when loading data into the store
-  - `addAppointment` checks for existing appointment IDs before adding new appointments
-  - This ensures data integrity throughout the application and fixes issues with drag-and-drop
+- **Fixed duplicate appointment rendering in Day view**: Resolved critical bug where appointments were being rendered 18 times
+  - **Root Cause**: TimeGrid component was rendering its children inside each of the 18 time slot divs (9 AM to 6 PM with 30-minute intervals), causing all appointments to render once per time slot
+  - **Solution**: Restructured DayView architecture to isolate TimeGrid to the left column for time labels only, with staff columns and appointments rendered independently
+  - **Additional Safeguards**: Added store-level deduplication in `initializeData` and `addAppointment` to prevent duplicate appointments by ID
+  - This fix ensures each appointment renders exactly once while preserving drag-and-drop functionality and time slot interactions
 - **Fixed incorrect type imports**: Updated imports across calendar components to use individual type files instead of non-existent '@/types/calendar' exports
 - **Added missing client names in mock data**: Updated mock client data to include required `name` field along with firstName and lastName
 
