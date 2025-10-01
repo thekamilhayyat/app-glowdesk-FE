@@ -236,10 +236,21 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   // Data initialization
   initializeData: (data) => {
+    console.log('initializeData called with:', {
+      appointmentCount: data.appointments.length,
+      appointmentIds: data.appointments.map(a => a.id),
+      duplicateCheck: data.appointments.length - new Set(data.appointments.map(a => a.id)).size
+    });
+    
     // Deduplicate appointments by ID to prevent duplicate entries
     const uniqueAppointments = Array.from(
       new Map(data.appointments.map(apt => [apt.id, apt])).values()
     );
+    
+    console.log('After deduplication:', {
+      uniqueCount: uniqueAppointments.length,
+      uniqueIds: uniqueAppointments.map(a => a.id)
+    });
     
     set({
       appointments: uniqueAppointments,

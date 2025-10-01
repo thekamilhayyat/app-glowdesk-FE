@@ -50,6 +50,20 @@ export function DayView({
     return acc;
   }, {} as Record<string, Appointment[]>);
 
+  console.log('DayView rendering:', {
+    date: date.toDateString(),
+    totalAppointments: appointments.length,
+    dayAppointments: dayAppointments.length,
+    dayAppointmentIds: dayAppointments.map(a => a.id),
+    displayStaffCount: displayStaff.length,
+    displayStaffIds: displayStaff.map(s => s.id),
+    appointmentsByStaff: Object.entries(appointmentsByStaff).map(([staffId, apts]) => ({
+      staffId,
+      count: apts.length,
+      appointmentIds: apts.map(a => a.id)
+    }))
+  });
+
   // Calculate position for appointments in the grid
   const getAppointmentPosition = (appointment: Appointment) => {
     const startHour = 9;
