@@ -2,7 +2,10 @@ import { useDraggable } from '@dnd-kit/core';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, User, Star, MessageCircle, Repeat, DollarSign } from 'lucide-react';
-import { Appointment, AppointmentStatus, Client, Service, StaffMember } from '@/types/calendar';
+import { Appointment, AppointmentStatus } from '@/types/appointment';
+import { Client } from '@/types/client';
+import { Service } from '@/types/service';
+import { StaffMember } from '@/types/staff';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 

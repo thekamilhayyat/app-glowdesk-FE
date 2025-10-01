@@ -1,4 +1,7 @@
-import { Appointment, StaffMember, Service, Client, AppointmentStatus, ServiceCategory } from '@/types/calendar';
+import { Appointment, AppointmentStatus } from '@/types/appointment';
+import { StaffMember } from '@/types/staff';
+import { Service, ServiceCategory } from '@/types/service';
+import { Client } from '@/types/client';
 import { addDays, addHours, setHours, setMinutes } from 'date-fns';
 
 export function generateMockData() {
@@ -87,6 +90,7 @@ export function generateMockData() {
   const clients: Client[] = [
     {
       id: 'client-1',
+      name: 'Jessica Williams',
       firstName: 'Jessica',
       lastName: 'Williams',
       email: 'jessica@example.com',
@@ -97,6 +101,7 @@ export function generateMockData() {
     },
     {
       id: 'client-2',
+      name: 'David Brown',
       firstName: 'David',
       lastName: 'Brown',
       email: 'david@example.com',
@@ -106,6 +111,7 @@ export function generateMockData() {
     },
     {
       id: 'client-3',
+      name: 'Maria Garcia',
       firstName: 'Maria',
       lastName: 'Garcia',
       email: 'maria@example.com',
@@ -116,6 +122,7 @@ export function generateMockData() {
     },
     {
       id: 'client-4',
+      name: 'John Smith',
       firstName: 'John',
       lastName: 'Smith',
       email: 'john@example.com',
@@ -126,6 +133,7 @@ export function generateMockData() {
     },
     {
       id: 'client-5',
+      name: 'Lisa Anderson',
       firstName: 'Lisa',
       lastName: 'Anderson',
       email: 'lisa@example.com',

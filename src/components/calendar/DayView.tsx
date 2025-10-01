@@ -1,4 +1,7 @@
-import { Appointment, StaffMember, Client, Service } from '@/types/calendar';
+import { Appointment } from '@/types/appointment';
+import { StaffMember } from '@/types/staff';
+import { Client } from '@/types/client';
+import { Service } from '@/types/service';
 import { AppointmentCard } from './AppointmentCard';
 import { TimeGrid, TimeSlot } from './TimeGrid';
 import { cn } from '@/lib/utils';
