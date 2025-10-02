@@ -2,9 +2,19 @@
 
 This is a salon management system called "Glowdesk" built with React, TypeScript, and Vite. The application provides a comprehensive solution for managing salon operations including client management, staff scheduling, service offerings, appointments, and inventory tracking. It features a modern, responsive interface with authentication, dashboard analytics, and complete CRUD operations for all business entities.
 
-# Recent Changes (October 1, 2025)
+# Recent Changes
 
-## Bug Fixes
+## October 2, 2025
+### UI Improvements
+- **Updated AppointmentCard design**: Completely redesigned appointment card UI to match new design specifications
+  - **Header Section**: Color-coded background based on appointment status with prominent multi-line time display, duration indicator, and status badge
+  - **Body Section**: White background with larger typography, user icon, client name in blue, NEW badge for new clients, service name display
+  - **Enhanced Icons**: Increased icon sizes (h-5 w-5) for better visibility of messages, recurring appointments, deposits, and VIP status
+  - **Updated Buttons**: Edit button with ghost variant and blue text, Checkout button with solid orange background and rounded-full style
+  - Maintained all functionality including drag-and-drop, click handlers, and conditional rendering
+
+## October 1, 2025
+### Bug Fixes
 - **Fixed duplicate appointment rendering in Day view**: Resolved critical bug where appointments were being rendered 18 times
   - **Root Cause**: TimeGrid component was rendering its children inside each of the 18 time slot divs (9 AM to 6 PM with 30-minute intervals), causing all appointments to render once per time slot
   - **Solution**: Restructured DayView architecture to isolate TimeGrid to the left column for time labels only, with staff columns and appointments rendered independently
