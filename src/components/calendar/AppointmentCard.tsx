@@ -1,7 +1,6 @@
 import { useDraggable } from '@dnd-kit/core';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, User, Star, MessageCircle, Repeat, DollarSign } from 'lucide-react';
+import { Star, MessageCircle, Repeat } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/types/appointment';
 import { Client } from '@/types/client';
 import { Service } from '@/types/service';
@@ -66,7 +65,6 @@ export function AppointmentCard({
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
   } : undefined;
 
-  const duration = Math.round((appointment.endTime.getTime() - appointment.startTime.getTime()) / (1000 * 60));
   const appointmentServices = services.filter(s => appointment.serviceIds.includes(s.id));
   
   const canCheckout = ['confirmed', 'checked-in', 'in-progress'].includes(appointment.status);
@@ -77,139 +75,90 @@ export function AppointmentCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'rounded-lg border shadow-sm hover:shadow-md transition-shadow overflow-hidden bg-white',
+        'rounded-md p-2 text-white shadow-sm hover:shadow-md transition-shadow',
+        statusColors[appointment.status],
         isDragging && 'opacity-50',
-        appointment.status === 'canceled' && 'opacity-60',
+        appointment.status === 'canceled' && 'line-through opacity-60',
         className
       )}
       data-testid={`appointment-card-${appointment.id}`}
     >
-      {/* Header with time and status */}
-      <div 
-        className={cn(
-          'p-3 flex justify-between items-start cursor-grab',
-          statusColors[appointment.status]
-        )}
+      <div
+        className="cursor-grab"
         {...listeners}
         {...attributes}
       >
-        <div className="flex items-start gap-2">
-          <Clock className="h-4 w-4 mt-0.5" />
-          <div className="flex flex-col leading-tight">
-            <span className="text-lg font-bold">
-              {format(appointment.startTime, 'h:mm')}
-            </span>
-            <span className="text-lg font-bold">
-              {format(appointment.startTime, 'a').toUpperCase()} -
-            </span>
-            <span className="text-lg font-bold">
-              {format(appointment.endTime, 'h:mm')}
-            </span>
-            <span className="text-lg font-bold">
-              {format(appointment.endTime, 'a').toUpperCase()}
-            </span>
-            <span className="text-xs text-gray-600 mt-0.5">({duration}m)</span>
+        {/* Line 1: Client name (title) - can wrap to 2 lines */}
+        <div className="flex items-start gap-1 mb-0.5">
+          <span className="font-semibold text-sm line-clamp-2 flex-1">
+            {client.firstName} {client.lastName}
+            {client.isNew && ' (NEW)'}
+          </span>
+          <div className="flex items-center gap-0.5 flex-shrink-0">
+            {client.isMember && (
+              <div title="VIP">
+                <Star className="h-3 w-3" />
+              </div>
+            )}
+            {appointment.hasUnreadMessages && (
+              <div title="Unread messages">
+                <MessageCircle className="h-3 w-3" />
+              </div>
+            )}
+            {appointment.isRecurring && (
+              <div title="Recurring">
+                <Repeat className="h-3 w-3" />
+              </div>
+            )}
           </div>
         </div>
-        <Badge 
-          variant="outline" 
-          className="text-xs bg-white border-gray-300 whitespace-nowrap"
-          data-testid={`status-${appointment.status}`}
-        >
+
+        {/* Line 2: Time */}
+        <div className="text-xs mb-0.5">
+          {format(appointment.startTime, 'h:mm a')} - {format(appointment.endTime, 'h:mm a')}
+        </div>
+
+        {/* Line 3: Status */}
+        <div className="text-xs font-medium" data-testid={`status-${appointment.status}`}>
           {statusLabels[appointment.status]}
-        </Badge>
+        </div>
+
+        {/* Service name - subtle */}
+        {appointmentServices.length > 0 && (
+          <div className="text-xs opacity-90 mt-1 truncate">
+            {appointmentServices.map(s => s.name).join(', ')}
+          </div>
+        )}
       </div>
 
-      {/* Body with client, services, and actions */}
-      <div className="p-3">
-        {/* Client info */}
-        <div className="flex items-center gap-2 mb-2">
-          <User className="h-5 w-5 text-gray-600" />
-          <span className="font-bold text-lg text-blue-700">
-            {client.firstName} {client.lastName}
-          </span>
-          {client.isNew && (
-            <Badge variant="secondary" className="text-sm font-bold bg-blue-100 text-blue-700" data-testid="new-client-badge">
-              NEW
-            </Badge>
-          )}
-        </div>
-
-        {/* Services */}
-        <div className="mb-3 text-lg font-medium text-gray-700">
-          {appointmentServices.map((service, index) => (
-            <div key={service.id}>
-              {index > 0 && <span className="text-gray-400"> + </span>}
-              <span>{service.name}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Icons for special attributes */}
-        <div className="flex items-center gap-2 mb-3">
-          {client.preferredStaff === staff.id && (
-            <div title="Preferred stylist">
-              <Star className="h-5 w-5 text-yellow-500" />
-            </div>
-          )}
-          {appointment.hasUnreadMessages && (
-            <div title="Unread messages">
-              <MessageCircle className="h-5 w-5 text-blue-500" />
-            </div>
-          )}
-          {appointment.isRecurring && (
-            <div title="Recurring appointment">
-              <Repeat className="h-5 w-5 text-green-500" />
-            </div>
-          )}
-          {appointment.depositPaid && (
-            <div title="Deposit paid">
-              <DollarSign className="h-5 w-5 text-green-600" />
-            </div>
-          )}
-          {client.isMember && (
-            <Badge variant="outline" className="text-sm h-5 px-2">
-              VIP
-            </Badge>
-          )}
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex gap-2 mt-3">
-          {onEdit && (
-            <Button
-              variant="ghost"
-              size="lg"
-              className="text-lg font-bold text-blue-700 hover:text-blue-800 hover:bg-transparent px-0"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}
-              data-testid="button-edit-appointment"
-            >
-              Edit
-            </Button>
-          )}
-          {showCheckoutButton && (
-            <Button
-              size="lg"
-              className="text-lg font-bold bg-orange-500 hover:bg-orange-600 text-white px-8 rounded-full ml-auto"
-              onClick={(e) => {
-                e.stopPropagation();
-                onCheckout();
-              }}
-              data-testid="button-checkout-appointment"
-            >
-              Checkout
-            </Button>
-          )}
-        </div>
-
-        {/* Notes if any */}
-        {appointment.notes && (
-          <div className="mt-3 text-sm text-gray-600 italic border-t pt-2" data-testid="appointment-notes">
-            {appointment.notes}
-          </div>
+      {/* Action buttons - compact at bottom */}
+      <div className="flex gap-1 mt-2 pt-1 border-t border-white/20">
+        {onEdit && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 text-xs text-white hover:bg-white/20 hover:text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+            data-testid="button-edit-appointment"
+          >
+            Edit
+          </Button>
+        )}
+        {showCheckoutButton && (
+          <Button
+            size="sm"
+            className="h-6 px-2 text-xs bg-white/90 text-gray-900 hover:bg-white ml-auto"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCheckout();
+            }}
+            data-testid="button-checkout-appointment"
+          >
+            Checkout
+          </Button>
         )}
       </div>
     </div>
