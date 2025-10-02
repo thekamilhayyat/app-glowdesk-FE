@@ -94,26 +94,26 @@ export function AppointmentCard({
         {...attributes}
       >
         <div className="flex items-start gap-2">
-          <Clock className="h-4 w-4 mt-1" />
+          <Clock className="h-4 w-4 mt-0.5" />
           <div className="flex flex-col leading-tight">
-            <span className="text-2xl font-bold">
+            <span className="text-lg font-bold">
               {format(appointment.startTime, 'h:mm')}
             </span>
-            <span className="text-2xl font-bold">
+            <span className="text-lg font-bold">
               {format(appointment.startTime, 'a').toUpperCase()} -
             </span>
-            <span className="text-2xl font-bold">
+            <span className="text-lg font-bold">
               {format(appointment.endTime, 'h:mm')}
             </span>
-            <span className="text-2xl font-bold">
+            <span className="text-lg font-bold">
               {format(appointment.endTime, 'a').toUpperCase()}
             </span>
-            <span className="text-sm text-gray-600 mt-1">({duration}m)</span>
+            <span className="text-xs text-gray-600 mt-0.5">({duration}m)</span>
           </div>
         </div>
         <Badge 
           variant="outline" 
-          className="text-sm bg-white border-gray-300"
+          className="text-xs bg-white border-gray-300 whitespace-nowrap"
           data-testid={`status-${appointment.status}`}
         >
           {statusLabels[appointment.status]}
