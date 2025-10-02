@@ -7,7 +7,7 @@ This is a salon management system called "Glowdesk" built with React, TypeScript
 ## October 2, 2025
 ### UI Improvements
 - **Updated AppointmentCard design**: Completely redesigned appointment card UI to match new design specifications
-  - **Header Section**: Color-coded background based on appointment status with prominent multi-line time display, duration indicator, and status badge
+  - **Header Section**: Color-coded background based on appointment status with compact multi-line time display (text-lg), duration indicator (text-xs), and status badge that fits properly on the right
   - **Body Section**: White background with larger typography, user icon, client name in blue, NEW badge for new clients, service name display
   - **Enhanced Icons**: Increased icon sizes (h-5 w-5) for better visibility of messages, recurring appointments, deposits, and VIP status
   - **Updated Buttons**: Edit button with ghost variant and blue text, Checkout button with solid orange background and rounded-full style
