@@ -6,12 +6,15 @@ This is a salon management system called "Glowdesk" built with React, TypeScript
 
 ## October 2, 2025
 ### UI Improvements
-- **Updated AppointmentCard design**: Completely redesigned appointment card UI to match new design specifications
-  - **Header Section**: Color-coded background based on appointment status with compact multi-line time display (text-lg), duration indicator (text-xs), and status badge that fits properly on the right
-  - **Body Section**: White background with larger typography, user icon, client name in blue, NEW badge for new clients, service name display
-  - **Enhanced Icons**: Increased icon sizes (h-5 w-5) for better visibility of messages, recurring appointments, deposits, and VIP status
-  - **Updated Buttons**: Edit button with ghost variant and blue text, Checkout button with solid orange background and rounded-full style
-  - Maintained all functionality including drag-and-drop, click handlers, and conditional rendering
+- **Redesigned AppointmentCard with Google Calendar style**: Completely redesigned appointment card to follow Google Calendar's compact, simple layout
+  - **Line 1**: Client name as title with line-clamp-2 (wraps to 2 lines if long), NEW indicator inline, status icons (VIP, messages, recurring) on right
+  - **Line 2**: Time range in simple format (e.g., "10:00 am - 10:45 am")
+  - **Line 3**: Status label (Confirmed, In Progress, etc.)
+  - **Line 4**: Service name with subtle styling (reduced opacity)
+  - **Bottom Section**: Compact action buttons (Edit and Checkout) with subtle border-top separator
+  - **Styling**: White text on status-colored background, small text sizes (text-xs, text-sm), compact padding
+  - **Functionality**: Preserved drag-and-drop, edit dialog, checkout flow, and all conditional rendering
+  - **Code Quality**: Removed unused imports (Badge, Clock, User, DollarSign) and variables (duration)
 
 ## October 1, 2025
 ### Bug Fixes
