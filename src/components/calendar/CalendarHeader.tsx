@@ -60,12 +60,12 @@ export function CalendarHeader({
   const activeStaff = staff.filter(s => s.isActive);
 
   return (
-    <div className="border-b bg-white p-4 md:p-5 lg:p-6">
+    <div className="border-b border-border bg-card p-4 md:p-5 lg:p-6">
       {/* Top row - View toggles and actions */}
       <div className="flex items-center justify-between mb-4 md:mb-5">
         <div className="flex items-center gap-2 md:gap-3">
           {/* View toggle buttons */}
-          <div className="flex rounded-lg border">
+          <div className="flex rounded-lg border border-border bg-background">
             {(['day', 'week', 'month'] as CalendarView[]).map((view) => (
               <Button
                 key={view}
@@ -84,6 +84,7 @@ export function CalendarHeader({
         <div className="flex items-center gap-2">
           {onNewAppointment && (
             <Button
+              variant="gradient"
               onClick={onNewAppointment}
               className="flex items-center gap-2"
               data-testid="button-new-appointment"
@@ -130,8 +131,8 @@ export function CalendarHeader({
 
           {/* Current date/range display */}
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-gray-500" />
-            <span className="font-semibold text-lg" data-testid="date-range-label">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="font-semibold text-lg text-foreground" data-testid="date-range-label">
               {getDateRangeLabel()}
             </span>
           </div>
@@ -139,7 +140,7 @@ export function CalendarHeader({
 
         {/* Staff filter */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Staff:</span>
+          <span className="text-sm text-muted-foreground">Staff:</span>
           
           {/* Show all/none toggle */}
           <Button
@@ -165,7 +166,7 @@ export function CalendarHeader({
                 <Badge
                   key={member.id}
                   variant={isSelected ? 'default' : 'outline'}
-                  className="cursor-pointer hover:bg-gray-100"
+                  className="cursor-pointer hover:bg-accent"
                   style={{
                     backgroundColor: isSelected ? member.color : undefined,
                     borderColor: member.color,

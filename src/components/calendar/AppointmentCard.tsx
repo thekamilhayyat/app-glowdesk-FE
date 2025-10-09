@@ -18,14 +18,24 @@ interface AppointmentCardProps {
   className?: string;
 }
 
-const statusColors: Record<AppointmentStatus, string> = {
-  'pending': 'bg-orange-100 border-orange-300 text-orange-800',
-  'confirmed': 'bg-blue-100 border-blue-300 text-blue-800',
-  'checked-in': 'bg-purple-100 border-purple-300 text-purple-800',
-  'in-progress': 'bg-pink-100 border-pink-300 text-pink-800',
-  'completed': 'bg-gray-100 border-gray-300 text-gray-600',
-  'canceled': 'bg-red-100 border-red-300 text-red-600 opacity-60',
-  'no-show': 'bg-yellow-100 border-yellow-300 text-yellow-700 opacity-70',
+/**
+ * Get status-based CSS classes using CSS variables
+ * These variables adapt automatically to light/dark theme
+ */
+const getStatusClasses = (status: AppointmentStatus): string => {
+  const baseClasses = 'border-2';
+  
+  const statusMap: Record<AppointmentStatus, string> = {
+    'pending': 'bg-[hsl(var(--status-pending-bg))] border-[hsl(var(--status-pending-border))] text-[hsl(var(--status-pending-text))]',
+    'confirmed': 'bg-[hsl(var(--status-confirmed-bg))] border-[hsl(var(--status-confirmed-border))] text-[hsl(var(--status-confirmed-text))]',
+    'checked-in': 'bg-[hsl(var(--status-checked-in-bg))] border-[hsl(var(--status-checked-in-border))] text-[hsl(var(--status-checked-in-text))]',
+    'in-progress': 'bg-[hsl(var(--status-in-progress-bg))] border-[hsl(var(--status-in-progress-border))] text-[hsl(var(--status-in-progress-text))]',
+    'completed': 'bg-[hsl(var(--status-completed-bg))] border-[hsl(var(--status-completed-border))] text-[hsl(var(--status-completed-text))]',
+    'canceled': 'bg-[hsl(var(--status-canceled-bg))] border-[hsl(var(--status-canceled-border))] text-[hsl(var(--status-canceled-text))] opacity-70',
+    'no-show': 'bg-[hsl(var(--status-no-show-bg))] border-[hsl(var(--status-no-show-border))] text-[hsl(var(--status-no-show-text))] opacity-75',
+  };
+
+  return cn(baseClasses, statusMap[status]);
 };
 
 const statusLabels: Record<AppointmentStatus, string> = {
@@ -75,10 +85,10 @@ export function AppointmentCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'rounded-md p-2 text-white shadow-sm hover:shadow-md transition-shadow',
-        statusColors[appointment.status],
-        isDragging && 'opacity-50',
-        appointment.status === 'canceled' && 'line-through opacity-60',
+        'rounded-md p-2 shadow-sm hover:shadow-md transition-all duration-200',
+        getStatusClasses(appointment.status),
+        isDragging && 'opacity-50 scale-95',
+        appointment.status === 'canceled' && 'line-through',
         className
       )}
       data-testid={`appointment-card-${appointment.id}`}
@@ -132,12 +142,12 @@ export function AppointmentCard({
       </div>
 
       {/* Action buttons - compact at bottom */}
-      <div className="flex gap-1 mt-2 pt-1 border-t border-white/20">
+      <div className="flex gap-1 mt-2 pt-1 border-t border-current/20">
         {onEdit && (
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 px-2 text-xs text-white hover:bg-white/20 hover:text-white"
+            className="h-6 px-2 text-xs hover:bg-foreground/10 hover:text-foreground"
             onClick={(e) => {
               e.stopPropagation();
               onEdit();
@@ -150,7 +160,7 @@ export function AppointmentCard({
         {showCheckoutButton && (
           <Button
             size="sm"
-            className="h-6 px-2 text-xs bg-white/90 text-gray-900 hover:bg-white ml-auto"
+            className="h-6 px-2 text-xs bg-primary text-primary-foreground hover:bg-primary-hover ml-auto"
             onClick={(e) => {
               e.stopPropagation();
               onCheckout();

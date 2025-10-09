@@ -63,10 +63,10 @@ export function WeekView({
     <div className={cn('flex flex-col h-full', className)} data-testid="week-view">
       {/* Staff selector if multiple staff */}
       {displayStaff.length > 1 && (
-        <div className="p-4 border-b bg-gray-50">
-          <span className="text-sm font-medium text-gray-600 mr-2">Viewing:</span>
+        <div className="p-4 border-b border-border bg-[hsl(var(--calendar-header-bg))]">
+          <span className="text-sm font-medium text-muted-foreground mr-2">Viewing:</span>
           <select 
-            className="text-sm border rounded px-2 py-1"
+            className="text-sm border border-border rounded px-2 py-1 bg-background text-foreground"
             value={currentStaff?.id || ''}
             onChange={(e) => {
               // This would typically update the staff filter
@@ -84,7 +84,7 @@ export function WeekView({
       )}
 
       {/* Week header with days */}
-      <div className="grid grid-cols-7 border-b bg-gray-50">
+      <div className="grid grid-cols-7 border-b border-border bg-[hsl(var(--calendar-header-bg))]">
         {weekDays.map((day) => {
           const isToday = isSameDay(day, new Date());
           const dayAppointments = appointmentsByDay[day.toDateString()] || [];
@@ -93,23 +93,23 @@ export function WeekView({
             <div
               key={day.toDateString()}
               className={cn(
-                'p-3 md:p-4 lg:p-5 border-r last:border-r-0 cursor-pointer hover:bg-gray-100 transition-colors',
-                isToday && 'bg-blue-50 border-blue-200'
+                'p-3 md:p-4 lg:p-5 border-r border-border last:border-r-0 cursor-pointer hover:bg-accent transition-colors',
+                isToday && 'bg-primary/10 border-primary/30'
               )}
               onClick={() => onDayClick?.(day)}
               data-testid={`week-day-${format(day, 'yyyy-MM-dd')}`}
             >
               <div className="text-center">
-                <div className="text-xs md:text-sm text-gray-500 uppercase tracking-wide">
+                <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-wide">
                   {format(day, 'EEE')}
                 </div>
                 <div className={cn(
-                  'text-lg md:text-xl lg:text-2xl font-semibold mt-1',
-                  isToday && 'text-blue-600'
+                  'text-lg md:text-xl lg:text-2xl font-semibold mt-1 text-foreground',
+                  isToday && 'text-primary'
                 )}>
                   {format(day, 'd')}
                 </div>
-                <div className="text-xs md:text-sm text-gray-400 mt-1">
+                <div className="text-xs md:text-sm text-muted-foreground mt-1">
                   {dayAppointments.length} apt{dayAppointments.length !== 1 ? 's' : ''}
                 </div>
               </div>
@@ -119,7 +119,7 @@ export function WeekView({
       </div>
 
       {/* Week content with appointments */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto bg-card">
         <div className="grid grid-cols-7 h-full">
           {weekDays.map((day) => {
             const dayAppointments = appointmentsByDay[day.toDateString()] || [];
@@ -129,8 +129,8 @@ export function WeekView({
               <div
                 key={day.toDateString()}
                 className={cn(
-                  'border-r last:border-r-0 p-2 space-y-1',
-                  isToday && 'bg-blue-50/30'
+                  'border-r border-border last:border-r-0 p-2 space-y-1',
+                  isToday && 'bg-primary/5'
                 )}
                 data-testid={`week-day-content-${format(day, 'yyyy-MM-dd')}`}
               >
@@ -160,7 +160,7 @@ export function WeekView({
                 {/* Empty state for days with no appointments */}
                 {dayAppointments.length === 0 && (
                   <div 
-                    className="text-center text-gray-400 text-xs py-4 cursor-pointer hover:bg-gray-50 rounded"
+                    className="text-center text-muted-foreground text-xs py-4 cursor-pointer hover:bg-accent rounded transition-colors"
                     onClick={() => onDayClick?.(day)}
                     data-testid={`empty-day-${format(day, 'yyyy-MM-dd')}`}
                   >

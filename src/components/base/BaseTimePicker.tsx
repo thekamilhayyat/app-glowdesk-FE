@@ -95,16 +95,16 @@ export function BaseTimePicker({
           data-testid={testId}
           className="pr-10"
         />
-        <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+        <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
       </div>
 
       {showSuggestions && filteredSuggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-white border border-gray-200 rounded-md shadow-lg">
+        <div className="absolute z-50 w-full mt-1 max-h-60 overflow-auto bg-popover border border-border rounded-md shadow-lg">
           {filteredSuggestions.map((time, index) => (
             <button
               key={index}
               type="button"
-              className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-sm"
+              className="w-full text-left px-4 py-2 text-foreground hover:bg-accent focus:bg-accent focus:outline-none text-sm transition-colors"
               onClick={() => handleSuggestionClick(time)}
               data-testid={`time-option-${time.replace(/[:\s]/g, '-')}`}
             >

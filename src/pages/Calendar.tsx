@@ -20,7 +20,7 @@ export default function CalendarPage() {
 
   return (
     <AppLayout>
-      <div className="h-screen flex flex-col" data-testid="calendar-page">
+      <div className="h-screen flex flex-col bg-background" data-testid="calendar-page">
         <Calendar className="flex-1 flex flex-col" />
         
         {/* Checkout Dialog */}

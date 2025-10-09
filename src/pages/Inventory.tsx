@@ -363,7 +363,7 @@ const Inventory: React.FC = () => {
         </div>
 
         {/* Search Section */}
-        <div className="bg-white rounded-lg border shadow-sm p-6 mb-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6 mb-6">
           <BaseInput
             placeholder="Search inventory or types..."
             value={searchTerm}
@@ -372,7 +372,7 @@ const Inventory: React.FC = () => {
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-lg border shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <BaseTable
             data={filteredInventoryItems}
             columns={tableColumns}

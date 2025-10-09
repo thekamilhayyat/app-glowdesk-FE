@@ -4,6 +4,7 @@
 
 /* Design System - Beautiful, consistent styling foundation
 All colors MUST be HSL for consistency.
+Theme colors are now managed centrally in src/theme/colors.ts
 */
 
 @layer base {
@@ -77,6 +78,43 @@ All colors MUST be HSL for consistency.
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Calendar-specific colors for light theme */
+    --calendar-header-bg: 0 0% 98%;
+    --calendar-header-text: 225 9% 9%;
+    --calendar-grid-border: 214 32% 91%;
+    --calendar-time-bg: 0 0% 100%;
+    --calendar-time-text: 215 16% 47%;
+    --calendar-slot-hover: 210 40% 98%;
+    
+    /* Appointment Status Colors - Light Theme */
+    --status-pending-bg: 38 92% 95%;
+    --status-pending-border: 38 92% 50%;
+    --status-pending-text: 38 92% 25%;
+    
+    --status-confirmed-bg: 217 91% 95%;
+    --status-confirmed-border: 217 91% 60%;
+    --status-confirmed-text: 217 91% 25%;
+    
+    --status-checked-in-bg: 271 81% 95%;
+    --status-checked-in-border: 271 81% 56%;
+    --status-checked-in-text: 271 81% 25%;
+    
+    --status-in-progress-bg: 340 82% 95%;
+    --status-in-progress-border: 340 82% 62%;
+    --status-in-progress-text: 340 82% 25%;
+    
+    --status-completed-bg: 210 40% 96%;
+    --status-completed-border: 220 13% 60%;
+    --status-completed-text: 220 13% 30%;
+    
+    --status-canceled-bg: 0 84% 95%;
+    --status-canceled-border: 0 84% 60%;
+    --status-canceled-text: 0 84% 30%;
+    
+    --status-no-show-bg: 45 93% 95%;
+    --status-no-show-border: 45 93% 47%;
+    --status-no-show-text: 45 93% 25%;
   }
 
   .dark {
@@ -103,11 +141,11 @@ All colors MUST be HSL for consistency.
     --accent: 222 47% 12%;
     --accent-foreground: 210 40% 98%;
 
-    --success: 142 76% 36%;
+    --success: 142 76% 45%;
     --success-foreground: 210 40% 98%;
-    --warning: 38 92% 50%;
+    --warning: 38 92% 60%;
     --warning-foreground: 0 0% 9%;
-    --destructive: 0 63% 50%;
+    --destructive: 0 63% 60%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 222 47% 15%;
@@ -115,6 +153,10 @@ All colors MUST be HSL for consistency.
     --ring: 222 84% 65%;
 
     /* Dark theme shadows with adjusted opacity */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -1px hsl(0 0% 0% / 0.2);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.4), 0 4px 6px -2px hsl(0 0% 0% / 0.3);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.5), 0 10px 10px -5px hsl(0 0% 0% / 0.4);
     --shadow-glow: 0 0 30px hsl(222 84% 65% / 0.4);
 
     /* Sidebar Dark Theme */
@@ -126,6 +168,43 @@ All colors MUST be HSL for consistency.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Calendar-specific colors for dark theme */
+    --calendar-header-bg: 222 47% 8%;
+    --calendar-header-text: 210 40% 98%;
+    --calendar-grid-border: 222 47% 15%;
+    --calendar-time-bg: 222 47% 7%;
+    --calendar-time-text: 215 20% 65%;
+    --calendar-slot-hover: 222 47% 10%;
+    
+    /* Appointment Status Colors - Dark Theme */
+    --status-pending-bg: 38 92% 15%;
+    --status-pending-border: 38 92% 60%;
+    --status-pending-text: 38 92% 85%;
+    
+    --status-confirmed-bg: 217 91% 15%;
+    --status-confirmed-border: 217 91% 65%;
+    --status-confirmed-text: 217 91% 85%;
+    
+    --status-checked-in-bg: 271 81% 15%;
+    --status-checked-in-border: 271 81% 65%;
+    --status-checked-in-text: 271 81% 85%;
+    
+    --status-in-progress-bg: 340 82% 15%;
+    --status-in-progress-border: 340 82% 70%;
+    --status-in-progress-text: 340 82% 85%;
+    
+    --status-completed-bg: 222 47% 12%;
+    --status-completed-border: 215 20% 50%;
+    --status-completed-text: 215 20% 75%;
+    
+    --status-canceled-bg: 0 63% 15%;
+    --status-canceled-border: 0 63% 60%;
+    --status-canceled-text: 0 63% 80%;
+    
+    --status-no-show-bg: 45 93% 15%;
+    --status-no-show-border: 45 93% 60%;
+    --status-no-show-text: 45 93% 85%;
   }
 }
 
@@ -149,7 +228,12 @@ All colors MUST be HSL for consistency.
   /* Component utilities for consistent styling */
   .btn-gradient {
     background: var(--gradient-primary);
-    @apply text-primary-foreground border-0;
+    @apply text-white border-0;
+    
+    /* Ensure all child elements are also white */
+    * {
+      color: white !important;
+    }
 
     &:hover {
       background: var(--gradient-hero);

@@ -79,17 +79,17 @@ export function BaseCombobox({
 
   return (
     <div ref={containerRef} className={cn('space-y-2', className)}>
-      {label && <BaseLabel>{label} {required && <span className="text-red-500">*</span>}</BaseLabel>}
+      {label && <BaseLabel>{label} {required && <span className="text-destructive">*</span>}</BaseLabel>}
       
       <div className="relative">
         <button
           type="button"
           onClick={() => !disabled && setIsOpen(!isOpen)}
           className={cn(
-            'w-full flex items-center justify-between px-3 py-2 text-sm border rounded-md',
-            'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
-            disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white hover:border-gray-400',
-            !selectedOption && 'text-gray-400'
+            'w-full flex items-center justify-between px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground',
+            'focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent',
+            disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-ring',
+            !selectedOption && 'text-muted-foreground'
           )}
           disabled={disabled}
           data-testid={testId}
@@ -97,12 +97,12 @@ export function BaseCombobox({
           <span className="truncate">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <ChevronDown className={cn('w-4 h-4 transition-transform', isOpen && 'transform rotate-180')} />
+          <ChevronDown className={cn('w-4 h-4 transition-transform text-muted-foreground', isOpen && 'transform rotate-180')} />
         </button>
 
         {isOpen && !disabled && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
-            <div className="p-2 border-b">
+          <div className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg">
+            <div className="p-2 border-b border-border">
               <BaseInput
                 type="text"
                 value={searchTerm}
@@ -118,7 +118,7 @@ export function BaseCombobox({
                 <button
                   type="button"
                   onClick={handleAddNew}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2 border-b text-blue-600 font-medium"
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-accent flex items-center gap-2 border-b border-border text-primary font-medium"
                   data-testid={`${testId}-add-new`}
                 >
                   <Plus className="h-4 w-4" />
@@ -127,7 +127,7 @@ export function BaseCombobox({
               )}
 
               {filteredOptions.length === 0 ? (
-                <div className="px-4 py-3 text-sm text-gray-500">No results found</div>
+                <div className="px-4 py-3 text-sm text-muted-foreground">No results found</div>
               ) : (
                 filteredOptions.map((option) => (
                   <button
@@ -135,14 +135,14 @@ export function BaseCombobox({
                     type="button"
                     onClick={() => handleSelect(option.id)}
                     className={cn(
-                      'w-full text-left px-4 py-2 hover:bg-gray-100',
-                      value === option.id && 'bg-blue-50 font-medium'
+                      'w-full text-left px-4 py-2 text-foreground hover:bg-accent transition-colors',
+                      value === option.id && 'bg-accent/50 font-medium'
                     )}
                     data-testid={`${testId}-option-${option.id}`}
                   >
                     <div className="text-sm">{option.label}</div>
                     {option.sublabel && (
-                      <div className="text-xs text-gray-500">{option.sublabel}</div>
+                      <div className="text-xs text-muted-foreground">{option.sublabel}</div>
                     )}
                   </button>
                 ))

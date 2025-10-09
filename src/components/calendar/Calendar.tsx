@@ -9,6 +9,7 @@ import { AppointmentDialog } from './AppointmentDialog';
 import { useCheckoutStore } from '@/stores/checkoutStore';
 import { Appointment } from '@/types/appointment';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface CalendarProps {
   className?: string;
@@ -145,7 +146,7 @@ export function Calendar({ className }: CalendarProps) {
   };
 
   return (
-    <div className={className} data-testid="calendar-container">
+    <div className={cn('bg-background', className)} data-testid="calendar-container">
       <CalendarHeader
         currentView={currentView}
         currentDate={currentDate}
@@ -161,7 +162,7 @@ export function Calendar({ className }: CalendarProps) {
       />
       
       <CalendarDropzone onAppointmentMove={handleAppointmentMove}>
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden bg-background">
           {renderCalendarView()}
         </div>
       </CalendarDropzone>

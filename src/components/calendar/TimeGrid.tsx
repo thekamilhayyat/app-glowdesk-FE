@@ -37,7 +37,7 @@ export function TimeGrid({
       {timeSlots.map(({ hour, minute }) => (
         <div
           key={`${hour}-${minute}`}
-          className="border-b border-gray-100 min-h-[60px] p-2 text-sm text-gray-500"
+          className="border-b border-[hsl(var(--calendar-grid-border))] min-h-[60px] p-2 text-sm text-[hsl(var(--calendar-time-text))]"
           data-testid={`time-slot-${hour}-${minute}`}
         >
           {/* Time label */}
@@ -87,8 +87,8 @@ export function TimeSlot({
     <div
       ref={setNodeRef}
       className={cn(
-        'w-full h-full p-1 hover:bg-gray-50 cursor-pointer transition-colors',
-        isOver && 'bg-blue-50 border border-blue-200',
+        'w-full h-full p-1 hover:bg-[hsl(var(--calendar-slot-hover))] cursor-pointer transition-colors',
+        isOver && 'bg-accent/50 border border-primary/40',
         className
       )}
       onClick={handleClick}

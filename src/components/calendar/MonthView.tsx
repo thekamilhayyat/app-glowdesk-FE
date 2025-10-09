@@ -63,11 +63,11 @@ export function MonthView({
   return (
     <div className={cn('flex flex-col h-full', className)} data-testid="month-view">
       {/* Month header with day names */}
-      <div className="grid grid-cols-7 border-b bg-gray-50">
+      <div className="grid grid-cols-7 border-b border-border bg-[hsl(var(--calendar-header-bg))]">
         {weekDays.map((dayName) => (
           <div
             key={dayName}
-            className="p-3 md:p-4 lg:p-5 text-center text-sm md:text-base font-medium text-gray-600 border-r last:border-r-0"
+            className="p-3 md:p-4 lg:p-5 text-center text-sm md:text-base font-medium text-[hsl(var(--calendar-header-text))] border-r border-border last:border-r-0"
             data-testid={`month-header-${dayName.toLowerCase()}`}
           >
             {dayName}
@@ -87,10 +87,10 @@ export function MonthView({
             <div
               key={day.toDateString()}
               className={cn(
-                'border-r border-b last:border-r-0 p-2 md:p-3 lg:p-4 cursor-pointer hover:bg-gray-50 transition-colors min-h-[120px] md:min-h-[150px] lg:min-h-[180px]',
-                !isCurrentMonth && 'bg-gray-50 text-gray-400',
-                isToday && 'bg-blue-50',
-                hasAppointments && 'bg-green-50/30'
+                'border-r border-b border-border last:border-r-0 p-2 md:p-3 lg:p-4 cursor-pointer hover:bg-accent transition-colors min-h-[120px] md:min-h-[150px] lg:min-h-[180px] bg-card',
+                !isCurrentMonth && 'opacity-50 bg-muted',
+                isToday && 'bg-primary/10 ring-2 ring-primary/30',
+                hasAppointments && 'bg-success/5'
               )}
               onClick={() => onDayClick?.(day)}
               data-testid={`month-day-${format(day, 'yyyy-MM-dd')}`}
@@ -98,9 +98,9 @@ export function MonthView({
               {/* Day number */}
               <div className="flex justify-between items-start mb-1">
                 <span className={cn(
-                  'text-sm font-medium',
-                  isToday && 'bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center',
-                  !isCurrentMonth && 'text-gray-400'
+                  'text-sm font-medium text-foreground',
+                  isToday && 'bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center',
+                  !isCurrentMonth && 'text-muted-foreground'
                 )}>
                   {format(day, 'd')}
                 </span>
@@ -108,7 +108,7 @@ export function MonthView({
                 {/* Appointment count badge */}
                 {dayAppointments.length > 0 && (
                   <span 
-                    className="text-xs bg-blue-100 text-blue-800 px-1 rounded"
+                    className="text-xs bg-primary/20 text-primary px-1 rounded"
                     data-testid={`appointment-count-${format(day, 'yyyy-MM-dd')}`}
                   >
                     {dayAppointments.length}
@@ -130,13 +130,13 @@ export function MonthView({
                       key={appointment.id}
                       className={cn(
                         'text-xs p-1 rounded cursor-pointer hover:shadow-sm transition-shadow group',
-                        'bg-white border border-gray-200'
+                        'bg-background border border-border'
                       )}
                       style={{ borderLeftColor: appointmentStaff.color, borderLeftWidth: '3px' }}
                       data-testid={`month-appointment-${appointment.id}`}
                     >
                       <div 
-                        className="font-medium truncate"
+                        className="font-medium truncate text-foreground"
                         onClick={(e) => {
                           e.stopPropagation();
                           onAppointmentEdit?.(appointment);
@@ -145,11 +145,11 @@ export function MonthView({
                         {format(appointment.startTime, 'h:mm a')} - {client.firstName}
                       </div>
                       {primaryService && (
-                        <div className="text-gray-500 truncate flex justify-between items-center">
+                        <div className="text-muted-foreground truncate flex justify-between items-center">
                           <span>{primaryService.name}</span>
                           {(['confirmed', 'checked-in', 'in-progress'].includes(appointment.status)) && (
                             <button
-                              className="text-blue-600 hover:text-blue-800 text-xs md:text-sm font-medium opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity px-1 py-1 rounded touch-manipulation"
+                              className="text-primary hover:text-primary-hover text-xs md:text-sm font-medium opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity px-1 py-1 rounded touch-manipulation"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onAppointmentCheckout?.(appointment);
@@ -168,7 +168,7 @@ export function MonthView({
                 {/* Show "+X more" if there are more appointments */}
                 {dayAppointments.length > 3 && (
                   <div 
-                    className="text-xs text-blue-600 font-medium cursor-pointer hover:underline"
+                    className="text-xs text-primary font-medium cursor-pointer hover:underline"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDayClick?.(day);

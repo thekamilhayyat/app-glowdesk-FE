@@ -66,21 +66,21 @@ export function DayView({
   return (
     <div className={cn('flex flex-col h-full', className)} data-testid="day-view">
       {/* Staff header row */}
-      <div className="flex border-b bg-gray-50">
-        <div className="w-20 md:w-24 lg:w-28 p-2 md:p-3 border-r">
-          <span className="text-sm md:text-base font-medium text-gray-600">Time</span>
+      <div className="flex border-b border-border bg-[hsl(var(--calendar-header-bg))]">
+        <div className="w-20 md:w-24 lg:w-28 p-2 md:p-3 border-r border-border">
+          <span className="text-sm md:text-base font-medium text-[hsl(var(--calendar-time-text))]">Time</span>
         </div>
         {displayStaff.map((staffMember) => (
           <div
             key={staffMember.id}
-            className="flex-1 p-2 md:p-3 lg:p-4 border-r last:border-r-0 text-center"
+            className="flex-1 p-2 md:p-3 lg:p-4 border-r border-border last:border-r-0 text-center"
             style={{ borderLeftColor: staffMember.color, borderLeftWidth: '3px' }}
             data-testid={`staff-column-${staffMember.id}`}
           >
-            <div className="font-medium text-sm md:text-base">
+            <div className="font-medium text-sm md:text-base text-[hsl(var(--calendar-header-text))]">
               {staffMember.firstName} {staffMember.lastName}
             </div>
-            <div className="text-xs md:text-sm text-gray-500">
+            <div className="text-xs md:text-sm text-muted-foreground">
               {appointmentsByStaff[staffMember.id]?.length || 0} appointments
             </div>
           </div>
@@ -91,7 +91,7 @@ export function DayView({
       <div className="flex-1 overflow-auto">
         <div className="flex relative">
           {/* Time column */}
-          <div className="w-20 md:w-24 lg:w-28 border-r">
+          <div className="w-20 md:w-24 lg:w-28 border-r border-border bg-[hsl(var(--calendar-time-bg))]">
             <TimeGrid startHour={9} endHour={18} intervalMinutes={30} />
           </div>
           
@@ -100,7 +100,7 @@ export function DayView({
             {displayStaff.map((staffMember, staffIndex) => (
               <div
                 key={staffMember.id}
-                className="flex-1 relative border-r last:border-r-0"
+                className="flex-1 relative border-r border-border last:border-r-0 bg-card"
                 data-testid={`staff-time-column-${staffMember.id}`}
                 style={{ minHeight: '1080px' }} // 18 slots * 60px
               >
@@ -111,7 +111,7 @@ export function DayView({
                   return (
                     <div
                       key={`${hour}-${minute}`}
-                      className="absolute w-full h-[60px] border-b border-gray-100"
+                      className="absolute w-full h-[60px] border-b border-[hsl(var(--calendar-grid-border))]"
                       style={{ top: slotIndex * 60 }}
                     >
                       <TimeSlot
