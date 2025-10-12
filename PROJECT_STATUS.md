@@ -6,7 +6,7 @@
 
 **Project URL**: https://lovable.dev/projects/e9d2efa7-b5d2-41ab-b07c-44e1d62ee06a
 
-**Repository Status**: Working tree clean, branch `pos`
+**Repository Status**: Branch `pos-enhancement`
 
 ---
 
@@ -276,7 +276,82 @@ The application follows a **component-based architecture** with clear separation
 
 ✅ **Documentation**: `src/pages/inventory/README.md`
 
-### 7. Dashboard
+### 7. Point of Sale (POS) & Sales Management
+
+✅ **Standalone POS Page** (`/sales`)
+  - Tabbed interface with "New Sale" and "Sales History"
+  - Complete transaction management system
+  - Integrated with client and service management
+
+✅ **POS Checkout Features**
+  - **Manual Client Selection**: Choose any client for walk-in sales
+  - **Service/Product Selection**: Add multiple items to cart
+  - **Staff Assignment**: Assign staff members to each service/item
+  - **Item Management**:
+    - Adjust quantities
+    - Apply item-level discounts (percentage or fixed)
+    - Remove items from cart
+  - **Discount System**:
+    - Per-item discounts
+    - Percentage or fixed amount discounts
+  - **Payment Processing**:
+    - Multiple payment methods support (Cash, Credit Card, Gift Card, Check, Online)
+    - Split payments across multiple methods
+    - Payment reference tracking (last 4 digits, check numbers)
+  - **Tip Calculation**:
+    - Quick tip presets (15%, 18%, 20%, 25%)
+    - Custom tip amounts
+  - **Tax Calculation**: Automatic 8.25% tax on taxable amount
+  - **Real-time Totals**: Live calculation of subtotal, discounts, tax, tip, and total
+  - **Payment Validation**: Ensures full balance is paid before completion
+
+✅ **Sales History**
+  - Complete transaction list with detailed information
+  - **Statistics Dashboard**:
+    - Total revenue (filtered)
+    - Total sales count
+    - Average ticket value
+  - **Advanced Filtering**:
+    - Quick date filters (Today, Last 7/30/90 days, All Time)
+    - Custom date range (start and end date)
+    - Payment method filter
+    - Staff filter
+    - Search by client name or transaction ID
+  - **Table Display**:
+    - Transaction ID, Date/Time, Client, Items, Payment Methods, Total
+    - Pagination with configurable page size
+    - Sort and search capabilities
+
+✅ **Transaction Detail View**
+  - **Detailed Receipt Layout**:
+    - Transaction ID and timestamp
+    - Client information
+    - Completed by (staff/user name)
+    - Itemized list with prices and quantities
+    - Staff assignments per item
+    - Discount breakdown
+    - Subtotal, tax, tip, and total
+    - Payment methods used
+  - **Actions**:
+    - Print receipt
+    - Email receipt (prepared)
+    - Download PDF (prepared)
+    - Refund (prepared for future)
+  - Professional receipt design suitable for printing
+
+✅ **Sales Store** (`src/stores/salesStore.ts`)
+  - Centralized sales history management
+  - Advanced filtering and search
+  - Statistics calculations (revenue, count, average)
+  - Sale record persistence
+
+✅ **Integration Features**
+  - Automatic sale creation when checkout is completed from appointments
+  - Sales linked to appointments when applicable
+  - Client purchase history tracking
+  - Transaction ID generation for all sales
+
+### 8. Dashboard
 
 ✅ **Dashboard Analytics**
   - Daily revenue overview
@@ -526,6 +601,43 @@ Topbar.tsx            → Top bar utilities
 ---
 
 ## Recent Changes & Bug Fixes
+
+### October 12, 2025 - POS Enhancement (Branch: pos-enhancement)
+
+✅ **Complete Point of Sale System Implemented**
+- **New Features**:
+  - Standalone POS page at `/sales` with tabbed interface
+  - Full checkout functionality independent of appointments
+  - Sales history with advanced filtering and statistics
+  - Detailed transaction view with receipt layout
+  - Sales store for persistent transaction history
+  
+- **Components Created**:
+  - `POSCheckout.tsx`: Standalone checkout with manual client/service selection
+  - `SalesHistory.tsx`: Transaction list with filtering (date, payment, staff, search)
+  - `TransactionDetail.tsx`: Detailed receipt drawer with print/email/download actions
+  - `Sales.tsx`: Main POS page integrating all components
+  
+- **Store Enhancement**:
+  - Created `salesStore.ts` for sales history management
+  - Integrated checkout completion with automatic sale creation
+  - Added filtering, search, and statistics calculations
+  
+- **Type Definitions**:
+  - Added `Sale` interface for completed transactions
+  - Added `SaleFilters` interface for history filtering
+  - Extended `CheckoutItem` with serviceId/productId fields
+  - Made `appointmentId` optional in CheckoutSession for standalone sales
+  
+- **Features**:
+  - Multi-payment method support with split payments
+  - Item-level discount application (percentage/fixed)
+  - Real-time calculation of subtotal, tax (8.25%), tip, and total
+  - Payment validation ensuring full balance is paid
+  - Transaction ID generation for all sales
+  - Statistics dashboard (revenue, sales count, average ticket)
+  - Quick date filters and custom date range selection
+  - Professional receipt layout suitable for printing
 
 ### October 2, 2025 - UI Improvements
 
