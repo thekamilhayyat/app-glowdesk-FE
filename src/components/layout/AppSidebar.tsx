@@ -34,7 +34,7 @@ const navigationItems = [
   { title: "Clients", url: "/clients", icon: IconUsers },
   { title: "Services", url: "/services", icon: IconShoppingBag },
   { title: "Staff", url: "/staff", icon: IconUser },
-  { title: "POS", url: "/pos", icon: IconCash },
+  { title: "Sales (POS)", url: "/sales", icon: IconCash },
   { title: "Inventory", url: "/inventory", icon: IconBoxSeam },
   { title: "Reports", url: "/reports", icon: IconChartBar },
   { title: "Settings", url: "/settings", icon: IconSettings },
