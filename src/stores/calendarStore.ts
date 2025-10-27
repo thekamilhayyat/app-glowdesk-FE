@@ -48,6 +48,7 @@ interface CalendarState {
   getAppointmentsForDay: (date: Date, staffId?: string) => Appointment[];
   getAppointmentsForWeek: (startDate: Date, staffId?: string) => Appointment[];
   getAppointmentsForMonth: (date: Date) => Appointment[];
+  getAppointmentsByClient: (clientId: string) => Appointment[];
   getAvailableTimeSlots: (date: Date, staffId: string, duration: number) => Date[];
   
   // Overlap validation
@@ -282,6 +283,13 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       const aptDate = new Date(apt.startTime);
       return aptDate >= startOfMonth && aptDate <= endOfMonth;
     });
+  },
+
+  getAppointmentsByClient: (clientId) => {
+    const { appointments } = get();
+    return appointments
+      .filter((apt) => apt.clientId === clientId)
+      .sort((a, b) => b.startTime.getTime() - a.startTime.getTime()); // Most recent first
   },
 
   getAvailableTimeSlots: (date, staffId, duration) => {

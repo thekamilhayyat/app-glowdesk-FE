@@ -1,6 +1,8 @@
 import { create } from 'zustand';
-import { CheckoutSession, CheckoutItem, PaymentMethod, Appointment } from '@/types/calendar';
+import { CheckoutSession, CheckoutItem, PaymentMethod, Sale } from '@/types/checkout';
+import { Appointment } from '@/types/appointment';
 import { useCalendarStore } from './calendarStore';
+import { useSalesStore } from './salesStore';
 
 interface CheckoutState {
   // Current checkout session
@@ -327,25 +329,61 @@ export const useCheckoutStore = create<CheckoutState>((set, get) => ({
       return;
     }
 
+    // Get client name from calendar store
+    const calendarState = useCalendarStore.getState();
+    const client = calendarState.clients.find((c) => c.id === state.currentSession!.clientId);
+    const clientName = client ? (client.name || `${client.firstName} ${client.lastName}`) : 'Unknown Client';
+
+    // Create transaction ID
+    const transactionId = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+
+    // Calculate final amounts
+    const subtotal = state.calculateSubtotal();
+    const totalDiscount = state.calculateTotalDiscount();
+    const tax = state.calculateTax();
+    const total = state.calculateTotal();
+
     // Update session status to completed
     set({
       currentSession: {
         ...state.currentSession,
         status: 'completed',
-        subtotal: state.calculateSubtotal(),
-        totalDiscount: state.calculateTotalDiscount(),
-        tax: state.calculateTax(),
+        subtotal,
+        totalDiscount,
+        tax,
         tip: state.tipAmount,
-        total: state.calculateTotal(),
+        total,
         paymentMethods: state.selectedPaymentMethods,
       },
       currentStep: 'confirmation',
       error: null,
     });
 
+    // Create sale record
+    const sale: Sale = {
+      id: `sale_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      transactionId,
+      appointmentId: state.currentSession.appointmentId,
+      clientId: state.currentSession.clientId,
+      clientName,
+      items: state.currentSession.items,
+      subtotal,
+      totalDiscount,
+      tax,
+      tip: state.tipAmount,
+      total,
+      paymentMethods: state.selectedPaymentMethods,
+      status: 'completed',
+      completedAt: new Date(),
+      createdAt: new Date(),
+    };
+
+    // Add to sales store
+    const salesState = useSalesStore.getState();
+    salesState.addSale(sale);
+
     // Mark appointment as completed in calendar store
     if (state.currentSession.appointmentId) {
-      const calendarState = useCalendarStore.getState();
       calendarState.updateAppointment(state.currentSession.appointmentId, {
         status: 'completed',
       });

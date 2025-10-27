@@ -9,6 +9,7 @@ import { BaseTable, createColumn } from "@/components/base/BaseTable";
 import { BaseDrawer } from "@/components/base/BaseDrawer";
 import { BaseSelect, BaseSelectItem } from "@/components/base/BaseSelect";
 import { BaseLabel } from "@/components/base/BaseLabel";
+import { ClientDetailDrawer } from "@/components/clients/ClientDetailDrawer";
 import { Plus, Search, Filter, Phone, Mail, Calendar, DollarSign } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { notify } from "@/lib/notification";
@@ -55,6 +56,8 @@ const formatDate = (dateString: string) => {
 export function Clients() {
   const [clients, setClients] = useState<Client[]>(clientsData.clients);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [formData, setFormData] = useState({
@@ -346,7 +349,23 @@ export function Clients() {
                       ))}
                     </div>
                   )
-                })
+                }),
+                {
+                  id: 'actions',
+                  header: 'Actions',
+                  cell: (client: Client) => (
+                    <BaseButton
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedClient(client);
+                        setIsDetailOpen(true);
+                      }}
+                    >
+                      View Details
+                    </BaseButton>
+                  ),
+                }
               ]}
               emptyMessage={searchTerm || selectedFilter !== "all" 
                 ? "No clients found matching your criteria" 
@@ -355,6 +374,28 @@ export function Clients() {
             />
           </CardContent>
         </BaseCard>
+
+        {/* Client Detail Drawer */}
+        <ClientDetailDrawer
+          client={selectedClient}
+          isOpen={isDetailOpen}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setSelectedClient(null);
+          }}
+          onEdit={(client) => {
+            // TODO: Implement edit functionality
+            console.log('Edit client:', client);
+          }}
+          onNewAppointment={(client) => {
+            // TODO: Navigate to calendar with pre-selected client
+            console.log('New appointment for:', client);
+          }}
+          onNewSale={(client) => {
+            // TODO: Navigate to sales page with pre-selected client
+            console.log('New sale for:', client);
+          }}
+        />
       </Container>
     </AppLayout>
   );
