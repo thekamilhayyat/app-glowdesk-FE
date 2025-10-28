@@ -1,12 +1,18 @@
 import { useDraggable } from '@dnd-kit/core';
 import { Button } from '@/components/ui/button';
-import { Star, MessageCircle, Repeat } from 'lucide-react';
+import { Star, MessageCircle, Repeat, Pencil } from 'lucide-react';
 import { Appointment, AppointmentStatus } from '@/types/appointment';
 import { Client } from '@/types/client';
 import { Service } from '@/types/service';
 import { StaffMember } from '@/types/staff';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface AppointmentCardProps {
   appointment: Appointment;
@@ -80,12 +86,17 @@ export function AppointmentCard({
   const canCheckout = ['confirmed', 'checked-in', 'in-progress'].includes(appointment.status);
   const showCheckoutButton = canCheckout && onCheckout;
 
+  // Calculate duration in minutes
+  const durationInMinutes = (appointment.endTime.getTime() - appointment.startTime.getTime()) / (1000 * 60);
+  const isShortAppointment = durationInMinutes <= 30;
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        'rounded-md p-2 shadow-sm hover:shadow-md transition-all duration-200',
+        'rounded-md shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col',
+        isShortAppointment ? 'p-1.5' : 'p-2',
         getStatusClasses(appointment.status),
         isDragging && 'opacity-50 scale-95',
         appointment.status === 'canceled' && 'line-through',
@@ -94,13 +105,16 @@ export function AppointmentCard({
       data-testid={`appointment-card-${appointment.id}`}
     >
       <div
-        className="cursor-grab"
+        className="cursor-grab flex-1 min-h-0"
         {...listeners}
         {...attributes}
       >
-        {/* Line 1: Client name (title) - can wrap to 2 lines */}
+        {/* Line 1: Client name with icons and staff avatar */}
         <div className="flex items-start gap-1 mb-0.5">
-          <span className="font-semibold text-sm line-clamp-2 flex-1">
+          <span className={cn(
+            "font-semibold flex-1 truncate",
+            isShortAppointment ? "text-xs" : "text-sm"
+          )}>
             {client.firstName} {client.lastName}
             {client.isNew && ' (NEW)'}
           </span>
@@ -120,47 +134,85 @@ export function AppointmentCard({
                 <Repeat className="h-3 w-3" />
               </div>
             )}
+            {/* Staff avatar */}
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div 
+                    className={cn(
+                      "rounded-full flex items-center justify-center font-semibold text-white flex-shrink-0 cursor-help",
+                      isShortAppointment ? "w-4 h-4 text-[8px]" : "w-5 h-5 text-[9px]"
+                    )}
+                    style={{ backgroundColor: staff.color }}
+                  >
+                    {staff.firstName.charAt(0).toUpperCase()}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{staff.firstName} {staff.lastName}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
-        {/* Line 2: Time */}
-        <div className="text-xs mb-0.5">
-          {format(appointment.startTime, 'h:mm a')} - {format(appointment.endTime, 'h:mm a')}
-        </div>
-
-        {/* Line 3: Status */}
-        <div className="text-xs font-medium" data-testid={`status-${appointment.status}`}>
-          {statusLabels[appointment.status]}
-        </div>
-
-        {/* Service name - subtle */}
-        {appointmentServices.length > 0 && (
-          <div className="text-xs opacity-90 mt-1 truncate">
-            {appointmentServices.map(s => s.name).join(', ')}
+        {/* Line 2: Time and Status combined for short appointments */}
+        {isShortAppointment ? (
+          <div className="text-[10px] leading-tight">
+            {format(appointment.startTime, 'h:mm a')} • {statusLabels[appointment.status]}
           </div>
+        ) : (
+          <>
+            {/* Line 2: Time */}
+            <div className="text-xs mb-0.5">
+              {format(appointment.startTime, 'h:mm a')} - {format(appointment.endTime, 'h:mm a')}
+            </div>
+
+            {/* Line 3: Status */}
+            <div className="text-xs font-medium" data-testid={`status-${appointment.status}`}>
+              {statusLabels[appointment.status]}
+            </div>
+
+            {/* Service name - only show for longer appointments */}
+            {appointmentServices.length > 0 && (
+              <div className="text-xs opacity-90 mt-1 truncate">
+                {appointmentServices.map(s => s.name).join(', ')}
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* Action buttons - compact at bottom */}
-      <div className="flex gap-1 mt-2 pt-1 border-t border-current/20">
+      {/* Action buttons - always visible with increased cell height */}
+      <div className={cn(
+        "flex gap-1 flex-shrink-0",
+        isShortAppointment ? "mt-1" : "mt-2 pt-1 border-t border-current/20"
+      )}>
         {onEdit && (
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 px-2 text-xs hover:bg-foreground/10 hover:text-foreground"
+            className={cn(
+              "hover:bg-foreground/10 hover:text-foreground cursor-pointer",
+              isShortAppointment ? "h-5 w-5 p-0" : "h-6 w-6 p-0"
+            )}
             onClick={(e) => {
               e.stopPropagation();
               onEdit();
             }}
             data-testid="button-edit-appointment"
+            title="Edit appointment"
           >
-            Edit
+            <Pencil className="h-3.5 w-3.5" style={{ width: '14px', height: '14px' }} />
           </Button>
         )}
         {showCheckoutButton && (
           <Button
             size="sm"
-            className="h-6 px-2 text-xs bg-primary text-primary-foreground hover:bg-primary-hover ml-auto"
+            className={cn(
+              "bg-primary text-primary-foreground hover:bg-primary-hover",
+              isShortAppointment ? "h-5 px-1.5 text-[10px] flex-1" : "h-6 px-2 text-xs ml-auto"
+            )}
             onClick={(e) => {
               e.stopPropagation();
               onCheckout();

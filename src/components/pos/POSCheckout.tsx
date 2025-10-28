@@ -4,7 +4,7 @@ import { BaseButton } from '@/components/base/BaseButton';
 import { BaseSelect, BaseSelectItem } from '@/components/base/BaseSelect';
 import { BaseLabel } from '@/components/base/BaseLabel';
 import { BaseInput } from '@/components/base/BaseInput';
-import { Plus, Trash2, Percent, DollarSign, ShoppingCart } from 'lucide-react';
+import { Plus, Trash2, Percent, DollarSign, ShoppingCart, X } from 'lucide-react';
 import { CheckoutItem, PaymentMethod } from '@/types/checkout';
 import { Client } from '@/types/client';
 import { Service } from '@/types/service';
@@ -32,6 +32,9 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
   const [currentPaymentType, setCurrentPaymentType] = useState<PaymentMethod['type']>('cash');
   const [currentPaymentAmount, setCurrentPaymentAmount] = useState('');
   const [currentPaymentRef, setCurrentPaymentRef] = useState('');
+  const [activeDiscountItem, setActiveDiscountItem] = useState<string | null>(null);
+  const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
+  const [discountValue, setDiscountValue] = useState('');
 
   const taxRate = 0.0825; // 8.25%
 
@@ -118,6 +121,37 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
         return item;
       })
     );
+  };
+
+  // Show discount input for specific item
+  const handleShowDiscountInput = (itemId: string, type: 'percentage' | 'fixed') => {
+    setActiveDiscountItem(itemId);
+    setDiscountType(type);
+    setDiscountValue('');
+  };
+
+  // Apply the discount from the input field
+  const handleSubmitDiscount = () => {
+    if (activeDiscountItem && discountValue) {
+      const value = parseFloat(discountValue);
+      if (!isNaN(value) && value > 0) {
+        if (discountType === 'percentage' && value <= 100) {
+          handleApplyDiscount(activeDiscountItem, discountType, value);
+          setActiveDiscountItem(null);
+          setDiscountValue('');
+        } else if (discountType === 'fixed') {
+          handleApplyDiscount(activeDiscountItem, discountType, value);
+          setActiveDiscountItem(null);
+          setDiscountValue('');
+        }
+      }
+    }
+  };
+
+  // Cancel discount input
+  const handleCancelDiscount = () => {
+    setActiveDiscountItem(null);
+    setDiscountValue('');
   };
 
   // Handle tip quick buttons
@@ -326,7 +360,7 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
                         >
                           {staff.map((s) => (
                             <BaseSelectItem key={s.id} value={s.id}>
-                              {s.name}
+                              {s.firstName} {s.lastName}
                             </BaseSelectItem>
                           ))}
                         </BaseSelect>
@@ -346,17 +380,51 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
                           Remove
                         </BaseButton>
                       </div>
+                    ) : activeDiscountItem === item.id ? (
+                      <div className="relative flex items-center gap-2 bg-muted/50 p-2 rounded w-full">
+                        <BaseLabel className="text-sm whitespace-nowrap">
+                          {discountType === 'percentage' ? 'Discount %:' : 'Discount $:'}
+                        </BaseLabel>
+                        <BaseInput
+                          type="number"
+                          value={discountValue}
+                          onChange={(e) => setDiscountValue(e.target.value)}
+                          placeholder={discountType === 'percentage' ? '0-100' : 'Amount'}
+                          className="flex-1"
+                          min="0"
+                          max={discountType === 'percentage' ? 100 : undefined}
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleSubmitDiscount();
+                            } else if (e.key === 'Escape') {
+                              handleCancelDiscount();
+                            }
+                          }}
+                        />
+                        <BaseButton
+                          size="sm"
+                          onClick={handleSubmitDiscount}
+                          disabled={!discountValue}
+                        >
+                          Apply
+                        </BaseButton>
+                        <BaseButton
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleCancelDiscount}
+                          className="absolute -right-1.5 -top-1.5 h-[18px] w-[18px] bg-primary/80 hover:bg-primary/90 p-0 min-w-0 flex items-center justify-center cursor-pointer"
+                          style={{ borderRadius: '50%' }}
+                        >
+                          <X className="text-white" style={{ width: '12px', height: '12px' }} strokeWidth={2.5} />
+                        </BaseButton>
+                      </div>
                     ) : (
                       <div className="flex gap-2">
                         <BaseButton
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            const value = prompt('Enter discount percentage (e.g., 10 for 10%)');
-                            if (value) {
-                              handleApplyDiscount(item.id, 'percentage', parseFloat(value));
-                            }
-                          }}
+                          onClick={() => handleShowDiscountInput(item.id, 'percentage')}
                         >
                           <Percent className="h-3 w-3 mr-1" />
                           % Off
@@ -364,12 +432,7 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
                         <BaseButton
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            const value = prompt('Enter discount amount ($)');
-                            if (value) {
-                              handleApplyDiscount(item.id, 'fixed', parseFloat(value));
-                            }
-                          }}
+                          onClick={() => handleShowDiscountInput(item.id, 'fixed')}
                         >
                           <DollarSign className="h-3 w-3 mr-1" />
                           $ Off

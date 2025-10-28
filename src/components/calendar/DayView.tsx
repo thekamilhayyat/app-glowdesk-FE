@@ -58,8 +58,8 @@ export function DayView({
     const duration = (appointment.endTime.getTime() - appointment.startTime.getTime()) / (1000 * 60);
     
     return {
-      top: (minutesFromStart / 30) * 60, // 60px per 30-minute slot
-      height: (duration / 30) * 60,
+      top: (minutesFromStart / 30) * 80, // 80px per 30-minute slot
+      height: (duration / 30) * 80,
     };
   };
 
@@ -102,7 +102,7 @@ export function DayView({
                 key={staffMember.id}
                 className="flex-1 relative border-r border-border last:border-r-0 bg-card"
                 data-testid={`staff-time-column-${staffMember.id}`}
-                style={{ minHeight: '1080px' }} // 18 slots * 60px
+                style={{ minHeight: '1440px' }} // 18 slots * 80px
               >
                 {/* Time slots for drag and drop */}
                 {Array.from({ length: 18 }, (_, slotIndex) => {
@@ -111,8 +111,8 @@ export function DayView({
                   return (
                     <div
                       key={`${hour}-${minute}`}
-                      className="absolute w-full h-[60px] border-b border-[hsl(var(--calendar-grid-border))]"
-                      style={{ top: slotIndex * 60 }}
+                      className="absolute w-full h-[80px] border-b border-[hsl(var(--calendar-grid-border))]"
+                      style={{ top: slotIndex * 80 }}
                     >
                       <TimeSlot
                         hour={hour}

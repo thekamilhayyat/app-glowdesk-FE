@@ -24,6 +24,7 @@ const BaseInput = forwardRef<any, BaseInputProps>(
           error && "border-destructive focus-visible:ring-destructive",
           className
         )}
+        style={{ borderRadius: '6px', ...props.style }}
         {...props}
       />
     );

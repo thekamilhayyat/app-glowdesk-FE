@@ -37,7 +37,7 @@ export function TimeGrid({
       {timeSlots.map(({ hour, minute }) => (
         <div
           key={`${hour}-${minute}`}
-          className="border-b border-[hsl(var(--calendar-grid-border))] min-h-[60px] p-2 text-sm text-[hsl(var(--calendar-time-text))]"
+          className="border-b border-[hsl(var(--calendar-grid-border))] min-h-[80px] p-2 text-sm text-[hsl(var(--calendar-time-text))]"
           data-testid={`time-slot-${hour}-${minute}`}
         >
           {/* Time label */}

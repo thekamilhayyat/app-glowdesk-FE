@@ -330,15 +330,17 @@ export function AppointmentDialog({
                 Delete
               </BaseButton>
             )}
-            <BaseButton
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="flex-1"
-              data-testid="button-cancel-appointment"
-            >
-              Cancel
-            </BaseButton>
+            {mode !== 'edit' && (
+              <BaseButton
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="flex-1"
+                data-testid="button-cancel-appointment"
+              >
+                Cancel
+              </BaseButton>
+            )}
             <BaseButton
               type="submit"
               variant="gradient"

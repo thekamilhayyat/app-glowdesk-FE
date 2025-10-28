@@ -222,6 +222,47 @@ Theme colors are now managed centrally in src/theme/colors.ts
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
   }
+
+  /* Hide number input arrows globally */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  /* Ensure all inputs and interactive elements have 6px border radius */
+  input,
+  textarea,
+  select,
+  button,
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-select-selector,
+  .ant-picker,
+  .ant-btn,
+  input.ant-input,
+  textarea.ant-input,
+  :where(.css-dev-only-do-not-override-1n84i0k).ant-input,
+  :where(.ant-select-selector),
+  :where(.ant-input-affix-wrapper),
+  :where(.ant-picker),
+  :where(.ant-btn) {
+    border-radius: 6px !important;
+  }
+
+  /* Also apply to shadcn/ui components */
+  [role="combobox"],
+  [role="textbox"],
+  [data-radix-popper-content-wrapper],
+  .rounded-md,
+  .rounded-lg {
+    border-radius: 6px !important;
+  }
 }
 
 @layer components {

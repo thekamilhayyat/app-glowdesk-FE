@@ -4,9 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Minus, Trash2, Tag } from 'lucide-react';
+import { Plus, Minus, Trash2, Tag, X } from 'lucide-react';
 import { useCheckoutStore } from '@/stores/checkoutStore';
 import { CheckoutItem } from '@/types/calendar';
+import { useState } from 'react';
 
 export function CheckoutItems() {
   const {
@@ -20,6 +21,11 @@ export function CheckoutItems() {
     calculateTotalDiscount,
     calculateTax,
   } = useCheckoutStore();
+
+  const [showDiscountInput, setShowDiscountInput] = useState(false);
+  const [discountValue, setDiscountValue] = useState('');
+  const [activeItemDiscount, setActiveItemDiscount] = useState<string | null>(null);
+  const [itemDiscountValue, setItemDiscountValue] = useState('');
 
   if (!currentSession) return null;
 
@@ -57,14 +63,46 @@ export function CheckoutItems() {
   };
 
   const handleApplyDiscount = (itemId?: string) => {
-    // TODO: Open discount dialog
-    const discountPercent = prompt('Enter discount percentage (0-100):');
-    if (discountPercent && !isNaN(Number(discountPercent))) {
-      applyDiscount(itemId || null, {
-        type: 'percentage',
-        value: Number(discountPercent),
-      });
+    if (itemId) {
+      // For individual item discount
+      if (activeItemDiscount === itemId && itemDiscountValue) {
+        const value = Number(itemDiscountValue);
+        if (!isNaN(value) && value >= 0 && value <= 100) {
+          applyDiscount(itemId, {
+            type: 'percentage',
+            value: value,
+          });
+          setActiveItemDiscount(null);
+          setItemDiscountValue('');
+        }
+      } else {
+        setActiveItemDiscount(itemId);
+        setItemDiscountValue('');
+      }
+    } else {
+      // For entire order discount
+      if (discountValue) {
+        const value = Number(discountValue);
+        if (!isNaN(value) && value >= 0 && value <= 100) {
+          applyDiscount(null, {
+            type: 'percentage',
+            value: value,
+          });
+          setShowDiscountInput(false);
+          setDiscountValue('');
+        }
+      }
     }
+  };
+
+  const handleCancelItemDiscount = () => {
+    setActiveItemDiscount(null);
+    setItemDiscountValue('');
+  };
+
+  const handleCancelOrderDiscount = () => {
+    setShowDiscountInput(false);
+    setDiscountValue('');
   };
 
   return (
@@ -112,56 +150,98 @@ export function CheckoutItems() {
                     </Badge>
                   </div>
                   
-                  <div className="flex items-center gap-4 mt-2">
-                    <div className="flex items-center gap-2">
-                      <Label>Qty:</Label>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                          data-testid={`button-decrease-${item.id}`}
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <Input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => handleQuantityChange(item.id, Number(e.target.value))}
-                          className="w-16 text-center"
-                          min="1"
-                          data-testid={`input-quantity-${item.id}`}
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                          data-testid={`button-increase-${item.id}`}
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Label>Qty:</Label>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                            data-testid={`button-decrease-${item.id}`}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <Input
+                            type="number"
+                            value={item.quantity}
+                            onChange={(e) => handleQuantityChange(item.id, Number(e.target.value))}
+                            className="w-16 text-center"
+                            min="1"
+                            data-testid={`input-quantity-${item.id}`}
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                            data-testid={`button-increase-${item.id}`}
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleApplyDiscount(item.id)}
+                        data-testid={`button-discount-${item.id}`}
+                      >
+                        <Tag className="h-3 w-3 mr-1" />
+                        {item.discount ? `${item.discount.value}% off` : 'Discount'}
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-600 hover:text-red-700"
+                        data-testid={`button-remove-${item.id}`}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleApplyDiscount(item.id)}
-                      data-testid={`button-discount-${item.id}`}
-                    >
-                      <Tag className="h-3 w-3 mr-1" />
-                      {item.discount ? `${item.discount.value}% off` : 'Discount'}
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-600 hover:text-red-700"
-                      data-testid={`button-remove-${item.id}`}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    {/* Inline discount input for individual item */}
+                    {activeItemDiscount === item.id && (
+                      <div className="relative flex items-center gap-2 bg-muted/50 p-2 rounded w-full">
+                        <Label className="text-sm whitespace-nowrap">Discount %:</Label>
+                        <Input
+                          type="number"
+                          value={itemDiscountValue}
+                          onChange={(e) => setItemDiscountValue(e.target.value)}
+                          placeholder="0-100"
+                          className="flex-1"
+                          min="0"
+                          max="100"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleApplyDiscount(item.id);
+                            } else if (e.key === 'Escape') {
+                              handleCancelItemDiscount();
+                            }
+                          }}
+                        />
+                        <Button
+                          size="sm"
+                          onClick={() => handleApplyDiscount(item.id)}
+                          disabled={!itemDiscountValue}
+                        >
+                          Apply
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={handleCancelItemDiscount}
+                          className="absolute -right-1.5 -top-1.5 h-[18px] w-[18px] bg-primary/80 hover:bg-primary/90 p-0 flex items-center justify-center cursor-pointer"
+                          style={{ borderRadius: '50%' }}
+                        >
+                          <X className="text-white" style={{ width: '12px', height: '12px' }} strokeWidth={2.5} />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -211,10 +291,50 @@ export function CheckoutItems() {
             <span data-testid="total">${total.toFixed(2)}</span>
           </div>
 
-          <div className="pt-4">
+          <div className="pt-4 space-y-3">
+            {/* Inline discount input for entire order */}
+            {showDiscountInput && (
+              <div className="relative flex items-center gap-2 bg-muted/50 p-3 rounded w-full">
+                <Label className="text-sm whitespace-nowrap">Discount %:</Label>
+                <Input
+                  type="number"
+                  value={discountValue}
+                  onChange={(e) => setDiscountValue(e.target.value)}
+                  placeholder="0-100"
+                  className="flex-1"
+                  min="0"
+                  max="100"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleApplyDiscount();
+                    } else if (e.key === 'Escape') {
+                      handleCancelOrderDiscount();
+                    }
+                  }}
+                />
+                <Button
+                  size="sm"
+                  onClick={() => handleApplyDiscount()}
+                  disabled={!discountValue}
+                >
+                  Apply
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={handleCancelOrderDiscount}
+                  className="absolute -right-1.5 -top-1.5 h-[18px] w-[18px] bg-primary/80 hover:bg-primary/90 p-0 flex items-center justify-center cursor-pointer"
+                  style={{ borderRadius: '50%' }}
+                >
+                  <X className="text-white" style={{ width: '12px', height: '12px' }} strokeWidth={2.5} />
+                </Button>
+              </div>
+            )}
+            
             <Button
               variant="ghost"
-              onClick={() => handleApplyDiscount()}
+              onClick={() => setShowDiscountInput(!showDiscountInput)}
               className="w-full"
               data-testid="button-apply-discount-all"
             >
