@@ -205,7 +205,7 @@ export function CheckoutItems() {
 
                     {/* Inline discount input for individual item */}
                     {activeItemDiscount === item.id && (
-                      <div className="relative flex items-center gap-2 bg-muted/50 p-2 rounded w-full">
+                      <div className="relative flex items-center gap-2 bg-muted/50 p-2 rounded w-full z-0">
                         <Label className="text-sm whitespace-nowrap">Discount %:</Label>
                         <Input
                           type="number"
@@ -235,7 +235,7 @@ export function CheckoutItems() {
                           size="icon"
                           variant="ghost"
                           onClick={handleCancelItemDiscount}
-                          className="absolute -right-1.5 -top-1.5 h-[18px] w-[18px] bg-primary/80 hover:bg-primary/90 p-0 flex items-center justify-center cursor-pointer"
+                          className="absolute -right-1.5 -top-1.5 h-[18px] w-[18px] bg-primary/80 hover:bg-primary/90 p-0 flex items-center justify-center cursor-pointer z-10"
                           style={{ borderRadius: '50%' }}
                         >
                           <X className="text-white" style={{ width: '12px', height: '12px' }} strokeWidth={2.5} />
@@ -294,7 +294,7 @@ export function CheckoutItems() {
           <div className="pt-4 space-y-3">
             {/* Inline discount input for entire order */}
             {showDiscountInput && (
-              <div className="relative flex items-center gap-2 bg-muted/50 p-3 rounded w-full">
+              <div className="relative flex items-center gap-2 bg-muted/50 p-3 rounded w-full z-0">
                 <Label className="text-sm whitespace-nowrap">Discount %:</Label>
                 <Input
                   type="number"
@@ -324,7 +324,7 @@ export function CheckoutItems() {
                   size="icon"
                   variant="ghost"
                   onClick={handleCancelOrderDiscount}
-                  className="absolute -right-1.5 -top-1.5 h-[18px] w-[18px] bg-primary/80 hover:bg-primary/90 p-0 flex items-center justify-center cursor-pointer"
+                  className="absolute -right-1.5 -top-1.5 h-[18px] w-[18px] bg-primary/80 hover:bg-primary/90 p-0 flex items-center justify-center cursor-pointer z-10"
                   style={{ borderRadius: '50%' }}
                 >
                   <X className="text-white" style={{ width: '12px', height: '12px' }} strokeWidth={2.5} />
