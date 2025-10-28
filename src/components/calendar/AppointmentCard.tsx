@@ -185,7 +185,7 @@ export function AppointmentCard({
 
       {/* Action buttons - always visible with increased cell height */}
       <div className={cn(
-        "flex gap-1 flex-shrink-0",
+        "flex gap-1 flex-shrink-0 items-center",
         isShortAppointment ? "mt-1" : "mt-2 pt-1 border-t border-current/20"
       )}>
         {onEdit && (
@@ -210,8 +210,8 @@ export function AppointmentCard({
           <Button
             size="sm"
             className={cn(
-              "bg-primary text-primary-foreground hover:bg-primary-hover",
-              isShortAppointment ? "h-5 px-1.5 text-[10px] flex-1" : "h-6 px-2 text-xs ml-auto"
+              "bg-primary text-primary-foreground hover:bg-primary-hover ml-auto",
+              isShortAppointment ? "h-5 px-1.5 text-[10px]" : "h-6 px-2 text-xs"
             )}
             onClick={(e) => {
               e.stopPropagation();
