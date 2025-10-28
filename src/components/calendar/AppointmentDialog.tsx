@@ -43,6 +43,7 @@ export function AppointmentDialog({
     services,
     addAppointment,
     updateAppointment,
+    deleteAppointment,
     canSchedule,
   } = useCalendarStore();
 
@@ -309,6 +310,26 @@ export function AppointmentDialog({
         title={mode === 'edit' ? 'Edit Appointment' : 'New Appointment'}
         footer={
           <div className="flex gap-3 w-full">
+            {mode === 'edit' && appointment && (
+              <BaseButton
+                type="button"
+                variant="destructive"
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this appointment?')) {
+                    deleteAppointment(appointment.id);
+                    toast({
+                      title: 'Appointment Deleted',
+                      description: 'The appointment has been removed from the calendar.',
+                    });
+                    onOpenChange(false);
+                  }
+                }}
+                className="flex-1"
+                data-testid="button-delete-appointment"
+              >
+                Delete
+              </BaseButton>
+            )}
             <BaseButton
               type="button"
               variant="outline"
