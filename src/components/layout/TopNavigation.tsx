@@ -91,7 +91,7 @@ export function TopNavigation() {
           <div className="w-8 h-8 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg mr-3">
             G
           </div>
-          <span className="text-lg sm:text-xl font-bold text-foreground">GlowDesk</span>
+          <span className="text-lg sm:text-xl font-bold text-foreground">GlowFlowApp</span>
         </div>
 
         {/* Desktop Navigation Items */}

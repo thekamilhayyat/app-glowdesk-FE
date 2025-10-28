@@ -1,6 +1,6 @@
 import { HTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils";
-// import logoImage from "@/assets/glowdesk-logo.png"; // Fallback to gradient logo
+// import logoImage from "@/assets/glowflowapp-logo.png"; // Fallback to gradient logo
 
 export interface LogoProps extends HTMLAttributes<HTMLDivElement> {
   variant?: "full" | "icon" | "text";
@@ -46,7 +46,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
             size === "md" && "text-xl",
             size === "lg" && "text-2xl"
           )}>
-            Glowdesk
+            GlowFlowApp
           </span>
         </div>
       );
@@ -71,7 +71,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
           size === "md" && "text-xl", 
           size === "lg" && "text-2xl"
         )}>
-          Glowdesk
+          GlowFlowApp
         </span>
       </div>
     );

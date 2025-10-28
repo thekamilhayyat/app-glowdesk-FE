@@ -1,6 +1,6 @@
 # Overview
 
-This is a salon management system called "Glowdesk" built with React, TypeScript, and Vite. The application provides a comprehensive solution for managing salon operations including client management, staff scheduling, service offerings, appointments, and inventory tracking. It features a modern, responsive interface with authentication, dashboard analytics, and complete CRUD operations for all business entities.
+This is a salon management system called "GlowFlowApp" built with React, TypeScript, and Vite. The application provides a comprehensive solution for managing salon operations including client management, staff scheduling, service offerings, appointments, and inventory tracking. It features a modern, responsive interface with authentication, dashboard analytics, and complete CRUD operations for all business entities.
 
 # Recent Changes
 

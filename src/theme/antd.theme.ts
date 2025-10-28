@@ -1,7 +1,7 @@
 /**
  * Ant Design Theme Configuration
  * 
- * Integrates Ant Design components with GlowDesk theme system.
+ * Integrates Ant Design components with GlowFlowApp theme system.
  * Automatically syncs with light/dark mode.
  */
 

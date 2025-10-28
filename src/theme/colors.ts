@@ -1,5 +1,5 @@
 /**
- * Central Color Definitions for GlowDesk
+ * Central Color Definitions for GlowFlowApp
  * 
  * This file is the SINGLE SOURCE OF TRUTH for all colors in the application.
  * Update colors here to automatically propagate changes throughout the entire app.

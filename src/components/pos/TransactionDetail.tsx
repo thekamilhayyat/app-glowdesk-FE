@@ -60,7 +60,7 @@ export function TransactionDetail({ sale, isOpen, onClose }: TransactionDetailPr
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-full mb-4">
               <Receipt className="h-8 w-8 text-white" />
             </div>
-            <h2 className="text-2xl font-bold">Glowdesk</h2>
+            <h2 className="text-2xl font-bold">GlowFlowApp</h2>
             <p className="text-sm text-muted-foreground">Salon Management System</p>
           </div>
 

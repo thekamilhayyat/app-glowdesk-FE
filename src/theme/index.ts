@@ -1,7 +1,7 @@
 /**
  * Theme System - Main Export
  * 
- * Central theme management for GlowDesk application.
+ * Central theme management for GlowFlowApp application.
  * Import from here to access all theme utilities.
  */
 

@@ -15,7 +15,7 @@ export function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: "admin@glowdesk.com",
+    email: "admin@glowflowapp.com",
     password: "admin123",
     firstName: "",
     lastName: "",
@@ -85,7 +85,7 @@ export function Auth() {
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setFormData({
-      email: isSignUp ? "admin@glowdesk.com" : "",
+      email: isSignUp ? "admin@glowflowapp.com" : "",
       password: isSignUp ? "admin123" : "",
       firstName: "",
       lastName: "",
@@ -106,7 +106,7 @@ export function Auth() {
               </h1>
               <p className="text-muted-foreground">
                 {isSignUp 
-                  ? "Sign up to get started with Glowdesk" 
+                  ? "Sign up to get started with GlowFlowApp" 
                   : "Sign in to your account"
                 }
               </p>
@@ -223,9 +223,9 @@ export function Auth() {
                 <div className="mt-4 p-3 bg-muted/50 rounded-md">
                   <p className="text-xs text-muted-foreground mb-2">Demo Accounts:</p>
                   <div className="space-y-1 text-xs">
-                    <p><strong>Admin:</strong> admin@glowdesk.com / admin123</p>
-                    <p><strong>Staff:</strong> emma@glowdesk.com / emma123</p>
-                    <p><strong>User:</strong> demo@glowdesk.com / demo123</p>
+                    <p><strong>Admin:</strong> admin@glowflowapp.com / admin123</p>
+                    <p><strong>Staff:</strong> emma@glowflowapp.com / emma123</p>
+                    <p><strong>User:</strong> demo@glowflowapp.com / demo123</p>
                   </div>
                 </div>
               )}
