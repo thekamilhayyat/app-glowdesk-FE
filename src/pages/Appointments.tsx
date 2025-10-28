@@ -44,13 +44,13 @@ export function Appointments() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "confirmed":
-        return "bg-green-100 text-green-800";
+        return "bg-[hsl(var(--status-confirmed-bg))] text-[hsl(var(--status-confirmed-text))] border border-[hsl(var(--status-confirmed-border))]";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-[hsl(var(--status-pending-bg))] text-[hsl(var(--status-pending-text))] border border-[hsl(var(--status-pending-border))]";
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-[hsl(var(--status-canceled-bg))] text-[hsl(var(--status-canceled-text))] border border-[hsl(var(--status-canceled-border))]";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-muted-foreground";
     }
   };
 
@@ -74,8 +74,8 @@ export function Appointments() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <IconCalendar className="h-5 w-5 text-blue-600" />
+              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                <IconCalendar className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Today's Appointments</p>
@@ -86,8 +86,8 @@ export function Appointments() {
           
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                <IconClock className="h-5 w-5 text-green-600" />
+              <div className="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center">
+                <IconClock className="h-5 w-5 text-success" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Confirmed</p>
@@ -98,8 +98,8 @@ export function Appointments() {
           
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center">
-                <IconUser className="h-5 w-5 text-yellow-600" />
+              <div className="w-10 h-10 rounded-lg bg-warning/20 flex items-center justify-center">
+                <IconUser className="h-5 w-5 text-warning" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Pending</p>

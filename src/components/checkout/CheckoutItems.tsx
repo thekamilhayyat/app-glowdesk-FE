@@ -98,7 +98,7 @@ export function CheckoutItems() {
         </CardHeader>
         <CardContent className="space-y-4">
           {currentSession.items.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-muted-foreground">
               No items added yet. Add services or products to get started.
             </div>
           ) : (

@@ -118,7 +118,7 @@ export function CheckoutPayment() {
               className="w-24"
               data-testid="input-custom-tip"
             />
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-muted-foreground">
               Current tip: ${tipAmount.toFixed(2)}
             </span>
           </div>
@@ -137,7 +137,7 @@ export function CheckoutPayment() {
           </div>
           
           {totalDiscount > 0 && (
-            <div className="flex justify-between text-green-600">
+            <div className="flex justify-between text-success">
               <span>Discount:</span>
               <span>-${totalDiscount.toFixed(2)}</span>
             </div>
@@ -173,7 +173,7 @@ export function CheckoutPayment() {
             <div className="space-y-2">
               <Label>Applied Payments:</Label>
               {selectedPaymentMethods.map((payment) => (
-                <div key={payment.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <div key={payment.id} className="flex items-center justify-between p-2 bg-muted rounded">
                   <span className="capitalize">{payment.type.replace('-', ' ')}</span>
                   <div className="flex items-center gap-2">
                     <span>${payment.amount.toFixed(2)}</span>
@@ -193,7 +193,7 @@ export function CheckoutPayment() {
 
           {/* Remaining balance */}
           {remainingBalance > 0 && (
-            <div className="p-3 bg-blue-50 rounded-lg">
+            <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Remaining Balance:</span>
                 <span className="font-semibold text-lg" data-testid="remaining-balance">
@@ -253,7 +253,7 @@ export function CheckoutPayment() {
 
       {/* Error Display */}
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
           {error}
         </div>
       )}

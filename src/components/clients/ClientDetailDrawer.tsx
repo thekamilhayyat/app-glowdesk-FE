@@ -91,15 +91,15 @@ export function ClientDetailDrawer({
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      pending: 'bg-yellow-500',
-      confirmed: 'bg-blue-500',
-      'checked-in': 'bg-purple-500',
-      'in-progress': 'bg-pink-500',
-      completed: 'bg-green-500',
-      canceled: 'bg-gray-500',
-      'no-show': 'bg-red-500',
+      pending: 'bg-[hsl(var(--status-pending-border))]',
+      confirmed: 'bg-[hsl(var(--status-confirmed-border))]',
+      'checked-in': 'bg-[hsl(var(--status-checked-in-border))]',
+      'in-progress': 'bg-[hsl(var(--status-in-progress-border))]',
+      completed: 'bg-[hsl(var(--status-completed-border))]',
+      canceled: 'bg-[hsl(var(--status-canceled-border))]',
+      'no-show': 'bg-[hsl(var(--status-no-show-border))]',
     };
-    return colors[status] || 'bg-gray-500';
+    return colors[status] || 'bg-muted';
   };
 
   if (!client) return null;

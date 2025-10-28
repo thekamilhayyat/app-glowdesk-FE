@@ -54,7 +54,7 @@ export function TransactionDetail({ sale, isOpen, onClose }: TransactionDetailPr
         </div>
 
         {/* Receipt Container */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg border p-8 print:border-0 print:shadow-none">
+        <div className="bg-card rounded-lg border border-border p-8 print:border-0 print:shadow-none">
           {/* Business Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-full mb-4">

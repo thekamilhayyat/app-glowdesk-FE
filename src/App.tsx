@@ -62,10 +62,11 @@ const AppContent = () => {
                 <Route path="/staff" element={<ProtectedRoute><Staff /></ProtectedRoute>} />
                 <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
                 <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
-                <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
-                <Route path="/notification-demo" element={<ProtectedRoute><NotificationDemo /></ProtectedRoute>} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
+              <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+              <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
+              <Route path="/notification-demo" element={<ProtectedRoute><NotificationDemo /></ProtectedRoute>} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
           </AuthProvider>
@@ -77,30 +78,7 @@ const AppContent = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AntApp>
-      <TooltipProvider>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
-              <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
-              <Route path="/staff" element={<ProtectedRoute><Staff /></ProtectedRoute>} />
-              <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
-              <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
-              <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
-              <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
-              <Route path="/notification-demo" element={<ProtectedRoute><NotificationDemo /></ProtectedRoute>} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
-      </TooltipProvider>
-    </AntApp>
+    <AppContent />
   </QueryClientProvider>
 );
 

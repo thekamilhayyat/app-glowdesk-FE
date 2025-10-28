@@ -39,9 +39,9 @@ export function CheckoutConfirmation() {
     <div className="space-y-6" data-testid="checkout-confirmation">
       {/* Success Header */}
       <div className="text-center">
-        <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-semibold text-green-700">Payment Successful!</h2>
-        <p className="text-gray-600 mt-2">
+        <CheckCircle className="h-16 w-16 text-success mx-auto mb-4" />
+        <h2 className="text-2xl font-semibold text-success">Payment Successful!</h2>
+        <p className="text-muted-foreground mt-2">
           Transaction completed on {format(new Date(), 'MMMM d, yyyy \'at\' h:mm a')}
         </p>
       </div>
@@ -51,7 +51,7 @@ export function CheckoutConfirmation() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             Receipt #{currentSession.id.slice(-8).toUpperCase()}
-            <Badge variant="outline" className="text-green-700 border-green-700">
+            <Badge variant="outline" className="text-success border-success">
               PAID
             </Badge>
           </CardTitle>
@@ -65,7 +65,7 @@ export function CheckoutConfirmation() {
                 <div>
                   <span>{item.name}</span>
                   {item.quantity > 1 && (
-                    <span className="text-gray-500 ml-2">x{item.quantity}</span>
+                    <span className="text-muted-foreground ml-2">x{item.quantity}</span>
                   )}
                   {item.discount && (
                     <Badge variant="outline" className="ml-2 text-xs">
@@ -88,7 +88,7 @@ export function CheckoutConfirmation() {
             </div>
             
             {currentSession.totalDiscount > 0 && (
-              <div className="flex justify-between text-green-600">
+              <div className="flex justify-between text-success">
                 <span>Total Discount:</span>
                 <span>-${currentSession.totalDiscount.toFixed(2)}</span>
               </div>

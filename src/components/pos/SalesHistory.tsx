@@ -150,8 +150,8 @@ export function SalesHistory({ onViewDetails }: SalesHistoryProps) {
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
                 <p className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</p>
               </div>
-              <div className="h-12 w-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <div className="h-12 w-12 bg-success/20 rounded-full flex items-center justify-center">
+                <DollarSign className="h-6 w-6 text-success" />
               </div>
             </div>
           </div>
@@ -164,8 +164,8 @@ export function SalesHistory({ onViewDetails }: SalesHistoryProps) {
                 <p className="text-sm text-muted-foreground">Total Sales</p>
                 <p className="text-2xl font-bold">{stats.salesCount}</p>
               </div>
-              <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                <Receipt className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center">
+                <Receipt className="h-6 w-6 text-primary" />
               </div>
             </div>
           </div>

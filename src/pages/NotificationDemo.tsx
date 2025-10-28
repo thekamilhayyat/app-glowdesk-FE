@@ -183,7 +183,7 @@ export function NotificationDemo() {
             <div className="space-y-4">
               <div>
                 <h4 className="font-medium mb-2">Basic Usage:</h4>
-                <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+                <pre className="bg-muted p-3 rounded text-sm overflow-x-auto">
 {`import { notify } from "@/lib/notification";
 
 // Success notification
@@ -202,7 +202,7 @@ notify.error({
               
               <div>
                 <h4 className="font-medium mb-2">Convenience Methods:</h4>
-                <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+                <pre className="bg-muted p-3 rounded text-sm overflow-x-auto">
 {`// Common actions
 notify.created("User");
 notify.updated("Product");
@@ -213,7 +213,7 @@ notify.confirmDelete("Client");`}
 
               <div>
                 <h4 className="font-medium mb-2">Advanced Options:</h4>
-                <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+                <pre className="bg-muted p-3 rounded text-sm overflow-x-auto">
 {`notify.success({
   title: "Custom",
   message: "Custom message",
