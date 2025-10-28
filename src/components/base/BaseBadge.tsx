@@ -25,7 +25,7 @@ const badgeVariants = cva(
         default: "rounded-full",
         sm: "rounded-sm",
         md: "rounded-md",
-        lg: "rounded-lg",
+        lg: "rounded-md",
         none: "rounded-none",
       }
     },

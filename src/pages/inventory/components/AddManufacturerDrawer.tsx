@@ -38,23 +38,8 @@ export const AddManufacturerDrawer: React.FC<AddManufacturerDrawerProps> = ({
       open={open}
       onOpenChange={onOpenChange}
       title="Add New Manufacturer"
-    >
-      <form ref={formRef} onSubmit={(e) => e.preventDefault()}>
-        <div className="space-y-4">
-          <div>
-            <BaseLabel htmlFor="manufacturer_name">Manufacturer Name *</BaseLabel>
-            <BaseInput
-              id="manufacturer_name"
-              {...manufacturerForm.register('name')}
-              className={hasFieldError(manufacturerForm.formState.errors, 'name') ? 'border-red-500' : ''}
-            />
-            {getFieldError(manufacturerForm.formState.errors, 'name') && (
-              <p className="text-sm text-red-500 mt-1">{getFieldError(manufacturerForm.formState.errors, 'name')}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex gap-2 mt-6">
+      footer={
+        <div className="flex gap-2 w-full">
           <BaseButton
             type="button"
             variant="outline"
@@ -71,6 +56,22 @@ export const AddManufacturerDrawer: React.FC<AddManufacturerDrawerProps> = ({
           >
             Create Manufacturer
           </BaseButton>
+        </div>
+      }
+    >
+      <form ref={formRef} onSubmit={(e) => e.preventDefault()}>
+        <div className="space-y-4">
+          <div>
+            <BaseLabel htmlFor="manufacturer_name">Manufacturer Name *</BaseLabel>
+            <BaseInput
+              id="manufacturer_name"
+              {...manufacturerForm.register('name')}
+              className={hasFieldError(manufacturerForm.formState.errors, 'name') ? 'border-red-500' : ''}
+            />
+            {getFieldError(manufacturerForm.formState.errors, 'name') && (
+              <p className="text-sm text-red-500 mt-1">{getFieldError(manufacturerForm.formState.errors, 'name')}</p>
+            )}
+          </div>
         </div>
       </form>
     </BaseDrawer>

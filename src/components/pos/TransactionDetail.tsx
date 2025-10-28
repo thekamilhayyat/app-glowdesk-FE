@@ -54,7 +54,7 @@ export function TransactionDetail({ sale, isOpen, onClose }: TransactionDetailPr
         </div>
 
         {/* Receipt Container */}
-        <div className="bg-card rounded-lg border border-border p-8 print:border-0 print:shadow-none">
+        <div className="bg-card rounded-md border border-border p-8 print:border-0 print:shadow-none">
           {/* Business Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-full mb-4">
@@ -96,7 +96,7 @@ export function TransactionDetail({ sale, isOpen, onClose }: TransactionDetailPr
               <User className="h-4 w-4 text-muted-foreground" />
               <h3 className="font-semibold">Client Information</h3>
             </div>
-            <div className="bg-muted rounded-lg p-4">
+            <div className="bg-muted rounded-md p-4">
               <p className="font-medium text-lg">{sale.clientName}</p>
               {sale.notes && (
                 <p className="text-sm text-muted-foreground mt-1">{sale.notes}</p>
@@ -222,7 +222,7 @@ export function TransactionDetail({ sale, isOpen, onClose }: TransactionDetailPr
               {sale.paymentMethods.map((pm, index) => (
                 <div
                   key={pm.id || index}
-                  className="flex justify-between items-center bg-muted rounded-lg p-3"
+                  className="flex justify-between items-center bg-muted rounded-md p-3"
                 >
                   <div>
                     <p className="font-medium capitalize">

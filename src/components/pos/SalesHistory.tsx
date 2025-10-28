@@ -144,43 +144,37 @@ export function SalesHistory({ onViewDetails }: SalesHistoryProps) {
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <BaseCard>
-          <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Revenue</p>
-                <p className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</p>
-              </div>
-              <div className="h-12 w-12 bg-success/20 rounded-full flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-success" />
-              </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <p className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</p>
+            </div>
+            <div className="h-12 w-12 bg-success/20 rounded-full flex items-center justify-center">
+              <DollarSign className="h-6 w-6 text-success" />
             </div>
           </div>
         </BaseCard>
 
         <BaseCard>
-          <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Sales</p>
-                <p className="text-2xl font-bold">{stats.salesCount}</p>
-              </div>
-              <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center">
-                <Receipt className="h-6 w-6 text-primary" />
-              </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Total Sales</p>
+              <p className="text-2xl font-bold">{stats.salesCount}</p>
+            </div>
+            <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center">
+              <Receipt className="h-6 w-6 text-primary" />
             </div>
           </div>
         </BaseCard>
 
         <BaseCard>
-          <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Average Ticket</p>
-                <p className="text-2xl font-bold">${stats.averageTicket.toFixed(2)}</p>
-              </div>
-              <div className="h-12 w-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-              </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Average Ticket</p>
+              <p className="text-2xl font-bold">${stats.averageTicket.toFixed(2)}</p>
+            </div>
+            <div className="h-12 w-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+              <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
         </BaseCard>
@@ -188,7 +182,7 @@ export function SalesHistory({ onViewDetails }: SalesHistoryProps) {
 
       {/* Search and Filters */}
       <BaseCard>
-        <div className="p-6 space-y-4">
+        <div className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -313,33 +307,32 @@ export function SalesHistory({ onViewDetails }: SalesHistoryProps) {
 
       {/* Sales Table */}
       <BaseCard>
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">
-              Sales History ({filteredSales.length})
-            </h3>
-          </div>
-
-          {filteredSales.length === 0 ? (
-            <div className="text-center py-12">
-              <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">
-                {searchTerm || Object.keys(filters).length > 0
-                  ? 'No sales found matching your filters'
-                  : 'No sales recorded yet'}
-              </p>
-            </div>
-          ) : (
-            <BaseTable
-              data={filteredSales}
-              columns={columns}
-              pagination={{
-                pageSize: 10,
-                showSizeChanger: true,
-              }}
-            />
-          )}
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">
+            Sales History ({filteredSales.length})
+          </h3>
         </div>
+
+        {filteredSales.length === 0 ? (
+          <div className="text-center py-12">
+            <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">
+              {searchTerm || Object.keys(filters).length > 0
+                ? 'No sales found matching your filters'
+                : 'No sales recorded yet'}
+            </p>
+          </div>
+        ) : (
+          <BaseTable
+            data={filteredSales}
+            columns={columns}
+            pagination={{
+              currentPage: 1,
+              itemsPerPage: 10,
+              totalItems: filteredSales.length,
+            }}
+          />
+        )}
       </BaseCard>
     </div>
   );

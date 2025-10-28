@@ -70,8 +70,7 @@ export const ViewTypesDrawer: React.FC<ViewTypesDrawerProps> = ({
       open={open}
       onOpenChange={onOpenChange}
       title="View Types"
-    >
-      <div className="space-y-4">
+      footer={
         <BaseButton
           variant="gradient"
           onClick={onAddType}
@@ -79,7 +78,9 @@ export const ViewTypesDrawer: React.FC<ViewTypesDrawerProps> = ({
         >
           Add Type
         </BaseButton>
-
+      }
+    >
+      <div className="space-y-4">
         <div className="space-y-2">
           {types.map((type) => (
             <BaseCard

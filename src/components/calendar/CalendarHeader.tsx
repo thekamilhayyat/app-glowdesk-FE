@@ -60,12 +60,12 @@ export function CalendarHeader({
   const activeStaff = staff.filter(s => s.isActive);
 
   return (
-    <div className="border-b border-border bg-card p-4 md:p-5 lg:p-6">
+    <div className="border-b border-border bg-card p-4">
       {/* Top row - View toggles and actions */}
       <div className="flex items-center justify-between mb-4 md:mb-5">
         <div className="flex items-center gap-2 md:gap-3">
           {/* View toggle buttons */}
-          <div className="flex rounded-lg border border-border bg-background">
+          <div className="flex rounded-md border border-border bg-background">
             {(['day', 'week', 'month'] as CalendarView[]).map((view) => (
               <Button
                 key={view}

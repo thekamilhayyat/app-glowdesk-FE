@@ -660,7 +660,7 @@ export function Services() {
   if (data.data.services.length === 0) {
     return (
       <AppLayout>
-        <Container className="py-6">
+        <Container className="py-4">
           <div className="flex items-center justify-center min-h-[60vh]">
             <BaseDrawer
               open={isCreateServiceOpen}
@@ -972,7 +972,7 @@ export function Services() {
         </BaseCard>
 
         {/* Services Table */}
-        <BaseCard>
+        <BaseCard padding="none">
           <CardContent className="p-0">
             <BaseTable
               data={filteredServices}
@@ -1029,7 +1029,7 @@ export function Services() {
                 .map((category) => (
                 <div 
                   key={category.category_id} 
-                  className={`border rounded-lg p-4 cursor-move transition-all duration-200 ${
+                  className={`border rounded-md p-4 cursor-move transition-all duration-200 ${
                     draggedCategoryId === category.category_id 
                       ? 'opacity-50 bg-muted/50' 
                       : 'hover:bg-muted/30'

@@ -88,7 +88,7 @@ export function TopNavigation() {
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg mr-3">
+          <div className="w-8 h-8 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg mr-3">
             G
           </div>
           <span className="text-lg sm:text-xl font-bold text-foreground">GlowDesk</span>
@@ -101,7 +101,7 @@ export function TopNavigation() {
               key={item.title}
               to={item.url}
               className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                "flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
                 isActive(item.url) 
                   ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground"
@@ -147,7 +147,7 @@ export function TopNavigation() {
                     to={item.url}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                      "flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
                       isActive(item.url) 
                         ? "bg-primary text-primary-foreground" 
                         : "text-muted-foreground"

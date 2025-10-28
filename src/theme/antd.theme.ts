@@ -50,11 +50,11 @@ export function getAntdTheme(mode: ThemeMode): ThemeConfig {
       fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       fontWeightStrong: 600,
       
-      // Border Radius
-      borderRadius: 12,
-      borderRadiusLG: 16,
-      borderRadiusSM: 8,
-      borderRadiusXS: 6,
+      // Border Radius - Set to 6px for consistent design
+      borderRadius: 6,
+      borderRadiusLG: 12,
+      borderRadiusSM: 4,
+      borderRadiusXS: 2,
       
       // Spacing
       marginXS: 8,
@@ -105,14 +105,18 @@ export function getAntdTheme(mode: ThemeMode): ThemeConfig {
       // Input
       Input: {
         controlHeight: 36,
-        activeBorderColor: hslToHex(colors.ring),
-        hoverBorderColor: hslToHex(colors.ring),
+        activeBorderColor: hslToHex(`39 100% 50%`), // Theme yellow (primary)
+        hoverBorderColor: hslToHex(`39 100% 50%`),  // Theme yellow (primary)
+        activeShadow: `0 0 0 2px ${hslToHex(`39 100% 50% / 0.2`)}`,
       },
       
       // Select
       Select: {
         controlHeight: 36,
         optionSelectedBg: hslToHex(colors.accent),
+        activeBorderColor: hslToHex(`39 100% 50%`), // Theme yellow (primary)
+        hoverBorderColor: hslToHex(`39 100% 50%`),  // Theme yellow (primary)
+        activeShadow: `0 0 0 2px ${hslToHex(`39 100% 50% / 0.2`)}`,
       },
       
       // DatePicker
@@ -132,6 +136,9 @@ export function getAntdTheme(mode: ThemeMode): ThemeConfig {
       // Drawer
       Drawer: {
         colorBgElevated: hslToHex(colors.card),
+        paddingLG: 16,
+        closeIconClass: 'drawer-close-right',
+        titleAlign: 'left',
       },
       
       // Table

@@ -131,7 +131,7 @@ export function ClientDetailDrawer({
 
         {/* Personal Information */}
         <BaseCard>
-          <div className="p-6">
+          <div className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <User className="h-5 w-5 text-muted-foreground" />
               <h3 className="text-lg font-semibold">Personal Information</h3>
@@ -226,7 +226,7 @@ export function ClientDetailDrawer({
         {/* Upcoming Appointments */}
         {upcomingAppointments.length > 0 && (
           <BaseCard>
-            <div className="p-6">
+            <div className="p-4">
               <div className="flex items-center gap-2 mb-4">
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <h3 className="text-lg font-semibold">
@@ -266,7 +266,7 @@ export function ClientDetailDrawer({
 
         {/* Past Appointments */}
         <BaseCard>
-          <div className="p-6">
+          <div className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <Calendar className="h-5 w-5 text-muted-foreground" />
               <h3 className="text-lg font-semibold">
@@ -316,7 +316,7 @@ export function ClientDetailDrawer({
 
         {/* Purchase History */}
         <BaseCard>
-          <div className="p-6">
+          <div className="p-4">
             <div className="flex items-center gap-2 mb-4">
               <Receipt className="h-5 w-5 text-muted-foreground" />
               <h3 className="text-lg font-semibold">

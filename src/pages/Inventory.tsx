@@ -273,7 +273,7 @@ const Inventory: React.FC = () => {
   if (inventoryItems.length === 0) {
     return (
       <AppLayout>
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold">Inventory</h1>
           </div>
@@ -316,7 +316,7 @@ const Inventory: React.FC = () => {
 
   return (
     <AppLayout>
-      <Container className="py-6">
+      <Container className="py-4">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -363,7 +363,7 @@ const Inventory: React.FC = () => {
         </div>
 
         {/* Search Section */}
-        <div className="bg-card rounded-lg border border-border shadow-sm p-6 mb-6">
+        <div className="bg-card rounded-md border border-border shadow-sm p-4 mb-6">
           <BaseInput
             placeholder="Search inventory or types..."
             value={searchTerm}
@@ -372,7 +372,7 @@ const Inventory: React.FC = () => {
         </div>
 
         {/* Table Section */}
-        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+        <div className="bg-card rounded-md border border-border shadow-sm overflow-hidden">
           <BaseTable
             data={filteredInventoryItems}
             columns={tableColumns}

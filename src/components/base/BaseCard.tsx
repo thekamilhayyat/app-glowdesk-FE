@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-  "rounded-lg border bg-card text-card-foreground transition-all duration-200",
+  "rounded-md border bg-card text-card-foreground transition-all duration-200",
   {
     variants: {
       variant: {
@@ -15,10 +15,10 @@ const cardVariants = cva(
       },
       padding: {
         none: "p-0",
-        sm: "p-4",
-        default: "p-6",
-        lg: "p-8",
-        xl: "p-12",
+        sm: "p-2",
+        default: "p-4",
+        lg: "p-6",
+        xl: "p-8",
       },
       hover: {
         none: "",

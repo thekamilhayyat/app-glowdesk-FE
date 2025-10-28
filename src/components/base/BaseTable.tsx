@@ -130,7 +130,7 @@ export function BaseTable<T extends Record<string, any>>({
   if (loading) {
     return (
       <div className={cn("w-full", className)}>
-        <div className="border rounded-lg">
+        <div className="border rounded-md">
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
             <p className="mt-2 text-muted-foreground">Loading...</p>
@@ -143,7 +143,7 @@ export function BaseTable<T extends Record<string, any>>({
   if (data.length === 0) {
     return (
       <div className={cn("w-full", className)}>
-        <div className="border rounded-lg">
+        <div className="border rounded-md">
           <div className="p-8 text-center">
             <p className="text-muted-foreground">{emptyMessage}</p>
           </div>
@@ -174,7 +174,7 @@ export function BaseTable<T extends Record<string, any>>({
 
       {/* Pagination */}
       {pagination && showPagination && (
-        <div className="flex items-center justify-between mt-4 p-4 border-t border-border">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Show</span>
             <BaseSelect

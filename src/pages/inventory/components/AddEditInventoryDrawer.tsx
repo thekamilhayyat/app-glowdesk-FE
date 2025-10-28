@@ -124,6 +124,26 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
       open={open}
       onOpenChange={onOpenChange}
       title={isEditing ? 'Edit Inventory' : 'Create New Inventory'}
+      footer={
+        <div className="flex gap-2 w-full">
+          <BaseButton
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="flex-1"
+          >
+            Cancel
+          </BaseButton>
+          <BaseButton
+            type="button"
+            variant="gradient"
+            onClick={handleSubmit}
+            className="flex-1"
+          >
+            {isEditing ? 'Update Inventory' : 'Create Inventory'}
+          </BaseButton>
+        </div>
+      }
     >
       <form ref={formRef} onSubmit={(e) => e.preventDefault()}>
         <div className="space-y-4">
@@ -276,25 +296,6 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
               rows={3}
             />
           </div>
-        </div>
-
-        <div className="flex gap-2 mt-6">
-          <BaseButton
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="flex-1"
-          >
-            Cancel
-          </BaseButton>
-          <BaseButton
-            type="button"
-            variant="gradient"
-            onClick={handleSubmit}
-            className="flex-1"
-          >
-            {isEditing ? 'Update Inventory' : 'Create Inventory'}
-          </BaseButton>
         </div>
       </form>
     </BaseDrawer>

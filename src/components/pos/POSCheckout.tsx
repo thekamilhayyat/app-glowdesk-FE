@@ -228,25 +228,23 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
       <div className="space-y-6">
         {/* Client Selection */}
         <BaseCard>
-          <div className="p-6">
-            <BaseLabel>Select Client *</BaseLabel>
-            <BaseSelect
-              value={selectedClientId}
-              onValueChange={setSelectedClientId}
-              placeholder="Choose a client"
-            >
-              {clients.map((client) => (
-                <BaseSelectItem key={client.id} value={client.id}>
-                  {client.name || `${client.firstName} ${client.lastName}`}
-                </BaseSelectItem>
-              ))}
-            </BaseSelect>
-          </div>
+          <BaseLabel>Select Client *</BaseLabel>
+          <BaseSelect
+            value={selectedClientId}
+            onValueChange={setSelectedClientId}
+            placeholder="Choose a client"
+          >
+            {clients.map((client) => (
+              <BaseSelectItem key={client.id} value={client.id}>
+                {client.name || `${client.firstName} ${client.lastName}`}
+              </BaseSelectItem>
+            ))}
+          </BaseSelect>
         </BaseCard>
 
         {/* Add Services */}
         <BaseCard>
-          <div className="p-6 space-y-4">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Add Services/Products</h3>
             </div>
@@ -272,7 +270,7 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
 
         {/* Items List */}
         <BaseCard>
-          <div className="p-6 space-y-4">
+          <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <ShoppingCart className="h-5 w-5" />
               Cart ({items.length} items)
@@ -287,7 +285,7 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="border rounded-lg p-4 space-y-3"
+                    className="border rounded-md p-4 space-y-3"
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
@@ -397,7 +395,7 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
       <div className="space-y-6">
         {/* Summary */}
         <BaseCard>
-          <div className="p-6 space-y-3">
+          <div className="space-y-3">
             <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
             
             <div className="space-y-2 text-sm">
@@ -433,7 +431,7 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
 
         {/* Tip */}
         <BaseCard>
-          <div className="p-6 space-y-4">
+          <div className="space-y-4">
             <BaseLabel>Add Tip</BaseLabel>
             
             <div className="grid grid-cols-4 gap-2">
@@ -463,7 +461,7 @@ export function POSCheckout({ clients, services, staff, onComplete }: POSCheckou
 
         {/* Payment Methods */}
         <BaseCard>
-          <div className="p-6 space-y-4">
+          <div className="space-y-4">
             <h3 className="text-lg font-semibold">Payment</h3>
             
             <div className="space-y-3">

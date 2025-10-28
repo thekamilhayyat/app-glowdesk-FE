@@ -312,7 +312,7 @@ export function Staff() {
   if (staff.length === 0) {
     return (
       <AppLayout>
-        <Container className="py-6">
+        <Container className="py-4">
           <div className="flex items-center justify-center min-h-[60vh]">
                         <BaseDrawer
               open={isDialogOpen}
@@ -541,11 +541,12 @@ export function Staff() {
               <CardHeader className="pb-4">
                 <h2 className="text-xl font-heading font-semibold">Staff List</h2>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="p-0">{/* Staff list items have their own padding */}
+                <div className="space-y-3">
                 {staff.map((member) => (
                   <div
                     key={member.employee_id}
-                    className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                    className={`p-4 rounded-md border cursor-pointer transition-all ${
                       selectedStaff?.employee_id === member.employee_id
                         ? 'border-primary bg-primary/5'
                         : 'border-border hover:border-primary/50'
@@ -565,6 +566,7 @@ export function Staff() {
                     </div>
                   </div>
                 ))}
+                </div>
               </CardContent>
             </BaseCard>
           </div>
@@ -578,7 +580,7 @@ export function Staff() {
                   <CardHeader>
                     <h3 className="text-lg font-heading font-semibold">Contact Info</h3>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="p-0 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <BaseLabel>Name</BaseLabel>
@@ -622,7 +624,7 @@ export function Staff() {
                   <CardHeader>
                     <h3 className="text-lg font-heading font-semibold">Working Hours</h3>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="p-0 space-y-4">
                     {weekDays.map((day) => (
                       <div key={day.key} className="grid grid-cols-3 gap-4 items-center">
                         <BaseLabel className="font-medium">{day.label}</BaseLabel>
@@ -736,7 +738,7 @@ export function Staff() {
                         </div>
                         
                         {selectedStaff.service_list.map((service, index) => (
-                          <div key={index} className="grid grid-cols-6 gap-3 items-center p-3 border rounded-lg">
+                          <div key={index} className="grid grid-cols-6 gap-3 items-center p-3 border rounded-md">
                             <BaseSelect
                               value={service.service_id}
                               onValueChange={(value) => updateService(index, 'service_id', value)}

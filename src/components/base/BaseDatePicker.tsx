@@ -47,7 +47,7 @@ export function BaseDatePicker({
           onChange={handleNativeChange}
           className={cn(
             'w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground',
-            'focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent',
+            'focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent hover:border-primary/50',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
           disabled={disabled}

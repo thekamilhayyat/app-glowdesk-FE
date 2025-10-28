@@ -10,6 +10,7 @@ export interface BaseDrawerProps {
   footer?: React.ReactNode
   trigger?: React.ReactNode
   className?: string
+  width?: number | string
 }
 
 export function BaseDrawer({
@@ -20,6 +21,7 @@ export function BaseDrawer({
   footer,
   trigger,
   className,
+  width = 400,
 }: BaseDrawerProps) {
   return (
     <>
@@ -30,6 +32,25 @@ export function BaseDrawer({
         title={title}
         className={className}
         footer={footer}
+        footerStyle={{
+          position: 'sticky',
+          bottom: 0,
+          zIndex: 10,
+          borderTop: '1px solid hsl(var(--border))',
+          backgroundColor: 'hsl(var(--background))',
+          padding: '16px 24px',
+          marginTop: 'auto'
+        }}
+        styles={{
+          body: {
+            padding: '16px',
+            paddingBottom: footer ? '0' : '16px'
+          }
+        }}
+        closable={true}
+        placement="right"
+        width={width}
+        maskClosable={true}
       >
         {children}
       </AntDrawer>

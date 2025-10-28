@@ -61,7 +61,7 @@ export function BaseMultiSelect({
           className={cn(
             'w-full flex items-center justify-between px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground',
             'focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent',
-            disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-ring',
+            disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary/50',
             selectedIds.length === 0 && 'text-muted-foreground'
           )}
           disabled={disabled}

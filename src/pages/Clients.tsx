@@ -60,6 +60,8 @@ export function Clients() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -168,7 +170,7 @@ export function Clients() {
 
   return (
     <AppLayout>
-      <Container className="py-6 space-y-6">
+      <Container className="py-4 space-y-6">
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -270,14 +272,7 @@ export function Clients() {
         </BaseCard>
 
         {/* Clients Table */}
-        <BaseCard>
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-heading font-semibold">
-                Client List ({filteredClients.length})
-              </h2>
-            </div>
-          </CardHeader>
+        <BaseCard padding="none">
           <CardContent className="p-0">
             <BaseTable
               data={filteredClients}
@@ -371,6 +366,14 @@ export function Clients() {
                 ? "No clients found matching your criteria" 
                 : "No clients added yet"
               }
+              pagination={{
+                currentPage,
+                itemsPerPage,
+                totalItems: filteredClients.length,
+                onPageChange: setCurrentPage,
+                onItemsPerPageChange: setItemsPerPage
+              }}
+              showPagination={true}
             />
           </CardContent>
         </BaseCard>

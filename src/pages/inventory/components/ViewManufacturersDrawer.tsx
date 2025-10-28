@@ -70,8 +70,7 @@ export const ViewManufacturersDrawer: React.FC<ViewManufacturersDrawerProps> = (
       open={open}
       onOpenChange={onOpenChange}
       title="View Manufacturers"
-    >
-      <div className="space-y-4">
+      footer={
         <BaseButton
           variant="gradient"
           onClick={onAddManufacturer}
@@ -79,7 +78,9 @@ export const ViewManufacturersDrawer: React.FC<ViewManufacturersDrawerProps> = (
         >
           Add Manufacturer
         </BaseButton>
-
+      }
+    >
+      <div className="space-y-4">
         <div className="space-y-2">
           {manufacturers.map((manufacturer) => (
             <BaseCard

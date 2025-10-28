@@ -193,7 +193,7 @@ export function CheckoutPayment() {
 
           {/* Remaining balance */}
           {remainingBalance > 0 && (
-            <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+            <div className="p-3 bg-primary/10 border border-primary/20 rounded-md">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Remaining Balance:</span>
                 <span className="font-semibold text-lg" data-testid="remaining-balance">
@@ -253,7 +253,7 @@ export function CheckoutPayment() {
 
       {/* Error Display */}
       {error && (
-        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
+        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive">
           {error}
         </div>
       )}

@@ -38,23 +38,8 @@ export const AddTypeDrawer: React.FC<AddTypeDrawerProps> = ({
       open={open}
       onOpenChange={onOpenChange}
       title="Add New Type"
-    >
-      <form ref={formRef} onSubmit={(e) => e.preventDefault()}>
-        <div className="space-y-4">
-          <div>
-            <BaseLabel htmlFor="type_name">Type Name *</BaseLabel>
-            <BaseInput
-              id="type_name"
-              {...typeForm.register('name')}
-              className={hasFieldError(typeForm.formState.errors, 'name') ? 'border-red-500' : ''}
-            />
-            {getFieldError(typeForm.formState.errors, 'name') && (
-              <p className="text-sm text-red-500 mt-1">{getFieldError(typeForm.formState.errors, 'name')}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex gap-2 mt-6">
+      footer={
+        <div className="flex gap-2 w-full">
           <BaseButton
             type="button"
             variant="outline"
@@ -71,6 +56,22 @@ export const AddTypeDrawer: React.FC<AddTypeDrawerProps> = ({
           >
             Create Type
           </BaseButton>
+        </div>
+      }
+    >
+      <form ref={formRef} onSubmit={(e) => e.preventDefault()}>
+        <div className="space-y-4">
+          <div>
+            <BaseLabel htmlFor="type_name">Type Name *</BaseLabel>
+            <BaseInput
+              id="type_name"
+              {...typeForm.register('name')}
+              className={hasFieldError(typeForm.formState.errors, 'name') ? 'border-red-500' : ''}
+            />
+            {getFieldError(typeForm.formState.errors, 'name') && (
+              <p className="text-sm text-red-500 mt-1">{getFieldError(typeForm.formState.errors, 'name')}</p>
+            )}
+          </div>
         </div>
       </form>
     </BaseDrawer>

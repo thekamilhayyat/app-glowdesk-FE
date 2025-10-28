@@ -44,7 +44,7 @@ const getStatusBadge = (status: string) => {
 
 export function Dashboard() {
   return (
-    <Container className="py-6 space-y-6">
+    <Container className="py-4 space-y-6">
       {/* Page Title */}
       <div>
         <h1 className="text-3xl font-heading font-semibold text-foreground">Dashboard</h1>

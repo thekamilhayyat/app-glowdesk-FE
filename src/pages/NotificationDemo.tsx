@@ -55,7 +55,7 @@ export function NotificationDemo() {
 
   return (
     <AppLayout>
-      <Container className="py-6">
+      <Container className="py-4">
         <div className="mb-6">
           <h1 className="text-3xl font-heading font-semibold text-foreground">Notification Demo</h1>
           <p className="text-muted-foreground">Test all notification types and features</p>

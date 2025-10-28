@@ -56,7 +56,7 @@ export function Appointments() {
 
   return (
     <AppLayout>
-      <Container className="py-6">
+      <Container className="py-4">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -72,9 +72,9 @@ export function Appointments() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-card border border-border rounded-lg p-4">
+          <div className="bg-card border border-border rounded-md p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-md bg-primary/20 flex items-center justify-center">
                 <IconCalendar className="h-5 w-5 text-primary" />
               </div>
               <div>
@@ -84,9 +84,9 @@ export function Appointments() {
             </div>
           </div>
           
-          <div className="bg-card border border-border rounded-lg p-4">
+          <div className="bg-card border border-border rounded-md p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-md bg-success/20 flex items-center justify-center">
                 <IconClock className="h-5 w-5 text-success" />
               </div>
               <div>
@@ -96,9 +96,9 @@ export function Appointments() {
             </div>
           </div>
           
-          <div className="bg-card border border-border rounded-lg p-4">
+          <div className="bg-card border border-border rounded-md p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-warning/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-md bg-warning/20 flex items-center justify-center">
                 <IconUser className="h-5 w-5 text-warning" />
               </div>
               <div>
@@ -108,9 +108,9 @@ export function Appointments() {
             </div>
           </div>
           
-          <div className="bg-card border border-border rounded-lg p-4">
+          <div className="bg-card border border-border rounded-md p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-md bg-purple-100 flex items-center justify-center">
                 <IconCash className="h-5 w-5 text-purple-600" />
               </div>
               <div>
@@ -122,14 +122,14 @@ export function Appointments() {
         </div>
 
         {/* Appointments List */}
-        <div className="bg-card border border-border rounded-lg">
-          <div className="p-6 border-b border-border">
+        <div className="bg-card border border-border rounded-md overflow-hidden">
+          <div className="p-4 border-b border-border">
             <h2 className="text-lg font-semibold text-foreground">Upcoming Appointments</h2>
           </div>
           
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-border">{/* No padding - items have their own */}
             {appointments.map((appointment) => (
-              <div key={appointment.id} className="p-6 hover:bg-accent/50 transition-colors">
+              <div key={appointment.id} className="p-4 hover:bg-accent/50 transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white font-semibold">
