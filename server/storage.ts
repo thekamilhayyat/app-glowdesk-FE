@@ -1,5 +1,5 @@
 import { db } from './db';
-import { eq, and, gte, lte, or, ilike, desc, asc } from 'drizzle-orm';
+import { eq, ne, and, gte, lte, lt, gt, or, ilike, desc, asc, not, inArray } from 'drizzle-orm';
 import * as schema from '../shared/schema';
 import type {
   Client, InsertClient,
@@ -202,6 +202,23 @@ export class DatabaseStorage implements IStorage {
 
   // Staff
   async getStaff(params?: { isActive?: boolean; serviceId?: string }): Promise<Staff[]> {
+    if (params?.serviceId) {
+      const conditions = [eq(schema.staffServices.serviceId, params.serviceId)];
+      
+      if (params.isActive !== undefined) {
+        conditions.push(eq(schema.staff.isActive, params.isActive));
+      }
+      
+      const result = await db
+        .select({ staff: schema.staff })
+        .from(schema.staffServices)
+        .innerJoin(schema.staff, eq(schema.staffServices.staffId, schema.staff.id))
+        .where(and(...conditions))
+        .orderBy(asc(schema.staff.firstName));
+      
+      return result.map(r => r.staff);
+    }
+    
     const conditions = [];
     
     if (params?.isActive !== undefined) {
@@ -234,6 +251,27 @@ export class DatabaseStorage implements IStorage {
 
   // Services
   async getServices(params?: { category?: string; isActive?: boolean; staffId?: string }): Promise<Service[]> {
+    if (params?.staffId) {
+      const conditions = [eq(schema.staffServices.staffId, params.staffId)];
+      
+      if (params.category) {
+        conditions.push(eq(schema.services.category, params.category));
+      }
+      
+      if (params.isActive !== undefined) {
+        conditions.push(eq(schema.services.isActive, params.isActive));
+      }
+      
+      const result = await db
+        .select({ service: schema.services })
+        .from(schema.staffServices)
+        .innerJoin(schema.services, eq(schema.staffServices.serviceId, schema.services.id))
+        .where(and(...conditions))
+        .orderBy(asc(schema.services.displayOrder));
+      
+      return result.map(r => r.service);
+    }
+    
     const conditions = [];
     
     if (params?.category) {
@@ -360,29 +398,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async checkAppointmentConflict(staffId: string, startTime: Date, endTime: Date, excludeId?: string): Promise<Appointment[]> {
-    const conditions = [
-      eq(schema.appointments.staffId, staffId),
-      or(
+    let query = db
+      .select()
+      .from(schema.appointments)
+      .where(
         and(
-          lte(schema.appointments.startTime, startTime),
-          gte(schema.appointments.endTime, startTime)
-        ),
-        and(
-          lte(schema.appointments.startTime, endTime),
-          gte(schema.appointments.endTime, endTime)
-        ),
-        and(
-          gte(schema.appointments.startTime, startTime),
-          lte(schema.appointments.endTime, endTime)
+          eq(schema.appointments.staffId, staffId),
+          lt(schema.appointments.startTime, endTime),
+          gt(schema.appointments.endTime, startTime)
         )
-      )
-    ];
+      );
     
-    if (excludeId) {
-      conditions.push(eq(schema.appointments.id, excludeId));
-    }
-
-    return await db.select().from(schema.appointments).where(and(...conditions));
+    const results = await query;
+    
+    return results.filter(apt => 
+      apt.status !== 'cancelled' && 
+      apt.status !== 'completed' && 
+      apt.status !== 'no-show' &&
+      (!excludeId || apt.id !== excludeId)
+    );
   }
 
   // Appointment Services

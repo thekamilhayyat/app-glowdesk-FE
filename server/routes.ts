@@ -2,6 +2,79 @@ import { Router } from 'express';
 import type { Response } from 'express';
 import { storage } from './storage';
 import { authMiddleware, generateToken, hashPassword, comparePassword, type AuthRequest } from './auth';
+import { validateBody } from './validation';
+import {
+  insertClientSchema,
+  insertStaffSchema,
+  insertServiceSchema,
+  insertStaffServiceSchema,
+  insertAppointmentSchema,
+  insertAppointmentServiceSchema,
+  insertSaleSchema,
+  insertSaleItemSchema,
+  insertProductSchema,
+  insertInventoryTransactionSchema,
+} from '../shared/schema';
+import { z } from 'zod';
+
+const createClientSchema = insertClientSchema;
+const updateClientSchema = insertClientSchema.partial();
+
+const createStaffSchema = insertStaffSchema.extend({
+  serviceIds: z.array(z.string()).optional(),
+}).passthrough();
+const updateStaffSchema = insertStaffSchema.partial().passthrough();
+
+const createServiceSchema = insertServiceSchema.extend({
+  staffIds: z.array(z.string()).optional(),
+}).passthrough();
+const updateServiceSchema = insertServiceSchema.partial().passthrough();
+
+const createAppointmentSchema = insertAppointmentSchema.omit({ createdBy: true }).extend({
+  startTime: z.coerce.date(),
+  endTime: z.coerce.date(),
+  serviceIds: z.array(z.string()).optional(),
+}).passthrough();
+const updateAppointmentSchema = z.object({
+  clientId: z.string().optional(),
+  staffId: z.string().optional(),
+  startTime: z.coerce.date().optional(),
+  endTime: z.coerce.date().optional(),
+  status: z.string().optional(),
+  totalPrice: z.string().optional(),
+  depositPaid: z.boolean().optional(),
+  notes: z.string().optional(),
+  serviceIds: z.array(z.string()).optional(),
+}).passthrough();
+
+const createSaleSchema = z.object({
+  clientId: z.string().optional(),
+  appointmentId: z.string().optional(),
+  totalAmount: z.string(),
+  subtotal: z.string(),
+  tax: z.string().optional(),
+  tip: z.string().optional(),
+  discount: z.string().optional(),
+  status: z.string().optional(),
+  notes: z.string().optional(),
+  items: z.array(z.object({
+    type: z.string(),
+    itemId: z.string().optional(),
+    name: z.string(),
+    quantity: z.number(),
+    price: z.string(),
+    discount: z.string().optional(),
+    tax: z.string().optional(),
+  })).optional(),
+  paymentMethods: z.array(z.object({
+    type: z.string(),
+    amount: z.string(),
+    reference: z.string().optional(),
+  })).optional(),
+}).passthrough();
+
+const createProductSchema = insertProductSchema;
+const updateProductSchema = insertProductSchema.partial();
 
 const router = Router();
 
@@ -113,7 +186,7 @@ router.get('/clients/:id', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/clients', authMiddleware, async (req, res) => {
+router.post('/clients', authMiddleware, validateBody(createClientSchema), async (req, res) => {
   try {
     const client = await storage.createClient(req.body);
     res.status(201).json({ client });
@@ -122,7 +195,7 @@ router.post('/clients', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/clients/:id', authMiddleware, async (req, res) => {
+router.put('/clients/:id', authMiddleware, validateBody(updateClientSchema), async (req, res) => {
   try {
     const client = await storage.updateClient(req.params.id, req.body);
     res.json({ client });
@@ -170,7 +243,7 @@ router.get('/staff/:id', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/staff', authMiddleware, async (req, res) => {
+router.post('/staff', authMiddleware, validateBody(createStaffSchema), async (req, res) => {
   try {
     const { serviceIds, ...staffData } = req.body;
     const staffMember = await storage.createStaff(staffData);
@@ -187,7 +260,7 @@ router.post('/staff', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/staff/:id', authMiddleware, async (req, res) => {
+router.put('/staff/:id', authMiddleware, validateBody(updateStaffSchema), async (req, res) => {
   try {
     const staffMember = await storage.updateStaff(req.params.id, req.body);
     res.json({ staff: staffMember });
@@ -234,7 +307,7 @@ router.get('/services/:id', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/services', authMiddleware, async (req, res) => {
+router.post('/services', authMiddleware, validateBody(createServiceSchema), async (req, res) => {
   try {
     const { staffIds, ...serviceData } = req.body;
     const service = await storage.createService(serviceData);
@@ -251,7 +324,7 @@ router.post('/services', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/services/:id', authMiddleware, async (req, res) => {
+router.put('/services/:id', authMiddleware, validateBody(updateServiceSchema), async (req, res) => {
   try {
     const service = await storage.updateService(req.params.id, req.body);
     res.json({ service });
@@ -328,7 +401,7 @@ router.get('/appointments/:id', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/appointments', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/appointments', authMiddleware, validateBody(createAppointmentSchema), async (req: AuthRequest, res: Response) => {
   try {
     const { serviceIds, ...appointmentData } = req.body;
     
@@ -376,9 +449,9 @@ router.post('/appointments', authMiddleware, async (req: AuthRequest, res: Respo
   }
 });
 
-router.put('/appointments/:id', authMiddleware, async (req, res) => {
+router.put('/appointments/:id', authMiddleware, validateBody(updateAppointmentSchema), async (req, res) => {
   try {
-    const { serviceIds, ...appointmentData } = req.body;
+    const { serviceIds, ...appointmentData} = req.body;
     
     if (appointmentData.staffId && appointmentData.startTime && appointmentData.endTime) {
       const conflicts = await storage.checkAppointmentConflict(
@@ -494,7 +567,7 @@ router.get('/sales/:id', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/sales', authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post('/sales', authMiddleware, validateBody(createSaleSchema), async (req: AuthRequest, res: Response) => {
   try {
     const { items, paymentMethods, ...saleData } = req.body;
     
@@ -562,7 +635,7 @@ router.get('/products/:id', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/products', authMiddleware, async (req, res) => {
+router.post('/products', authMiddleware, validateBody(createProductSchema), async (req, res) => {
   try {
     const product = await storage.createProduct(req.body);
     res.status(201).json({ product });
@@ -571,7 +644,7 @@ router.post('/products', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/products/:id', authMiddleware, async (req, res) => {
+router.put('/products/:id', authMiddleware, validateBody(updateProductSchema), async (req, res) => {
   try {
     const product = await storage.updateProduct(req.params.id, req.body);
     res.json({ product });
