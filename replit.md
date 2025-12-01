@@ -4,6 +4,51 @@ This is a salon management system called "GlowFlowApp" built with React, TypeScr
 
 # Recent Changes
 
+## December 1, 2025
+### Major Inventory Module Enhancement (Phases 1-4)
+Comprehensive inventory management system upgrade to achieve competitive parity with Mangomint and Fresha:
+
+**New Types & Data Structures** (src/types/inventory.ts):
+- Enhanced `InventoryItem` with stock tracking fields (currentStock, lowStockThreshold, reorderQuantity, reorderPoint)
+- Added barcode support, unitOfMeasure, isRetail, isBackBar, trackStock, taxable flags
+- New `Supplier` type with complete contact info, payment terms, lead time tracking
+- New `PurchaseOrder` and `PurchaseOrderItem` types with full order lifecycle
+- New `StockAdjustment` and `StockMovement` types for tracking all inventory changes
+- New `Stocktake` and `StocktakeItem` types for physical inventory counts
+- New `LowStockAlert` type for proactive inventory alerts
+- New `ReceivingRecord` for purchase order receiving
+
+**New Inventory Store** (src/stores/inventoryStore.ts):
+- Zustand store with complete inventory state management
+- Stock adjustment with movement tracking and reason codes
+- Purchase order lifecycle (create, update, receive, cancel)
+- Stocktake functionality (create, count, complete with optional adjustments)
+- Low stock alert generation and acknowledgment
+- Inventory analytics (stats, value, top-selling products)
+
+**New Components** (src/pages/inventory/components/):
+- `StockAdjustmentDrawer` - Add/remove stock with reason tracking
+- `SupplierDrawer` - Create/edit suppliers with full contact details
+- `SuppliersListDrawer` - View and manage supplier list
+- `PurchaseOrderDrawer` - Create/edit purchase orders with line items
+- `PurchaseOrdersListDrawer` - View and manage purchase orders
+- `ReceiveOrderDrawer` - Receive items from purchase orders
+- `StocktakeDrawer` - Physical inventory counting interface
+- `StocktakeListDrawer` - View stocktake history
+- `LowStockAlertsDrawer` - View and manage low stock alerts
+- `StockMovementDrawer` - View stock movement history
+- `InventoryReportsDrawer` - Inventory analytics and reports
+
+**Updated Inventory Page** (src/pages/Inventory.tsx):
+- Dashboard stats (total products, low stock, out of stock, inventory value)
+- Quick access toolbar for all inventory operations
+- Enhanced product table with stock level indicators
+- Integrated all new drawer components
+
+**Updated Validations** (src/lib/validations.ts):
+- Enhanced `inventoryFormInputSchema` with new fields (barcode, stock quantities, supplier)
+- Removed deprecated `serial_number` field
+
 ## October 2, 2025
 ### UI Improvements
 - **Redesigned AppointmentCard with Google Calendar style**: Completely redesigned appointment card to follow Google Calendar's compact, simple layout
@@ -38,13 +83,13 @@ Preferred communication style: Simple, everyday language.
 - **UI Framework**: Combination of shadcn/ui components and Ant Design for rich UI components
 - **Styling**: Tailwind CSS with custom design system including gradients, shadows, and animations
 - **Routing**: React Router for client-side navigation with protected routes
-- **State Management**: React Context for authentication state, React Hook Form for form state
+- **State Management**: Zustand for global state (inventory, calendar, checkout, sales), React Context for authentication
 - **Form Handling**: React Hook Form with Zod validation for type-safe form validation
 
 ## Component Structure
-- **Base Components**: Reusable UI primitives (BaseButton, BaseCard, BaseInput, etc.) with consistent styling
+- **Base Components**: Reusable UI primitives (BaseButton, BaseCard, BaseInput, BaseDrawer, etc.) with consistent styling
 - **Layout Components**: AppLayout with TopNavigation for responsive navigation across desktop and mobile
-- **Page Components**: Feature-specific pages (Dashboard, Clients, Staff, Services, Appointments, Inventory)
+- **Page Components**: Feature-specific pages (Dashboard, Clients, Staff, Services, Appointments, Inventory, POS)
 - **Form Components**: Standardized form fields with validation and error handling
 
 ## Authentication System
@@ -54,6 +99,7 @@ Preferred communication style: Simple, everyday language.
 - **Persistent Sessions**: localStorage integration for session persistence
 
 ## Data Management
+- **Zustand Stores**: inventoryStore, calendarStore, checkoutStore, salesStore for feature-specific state
 - **Mock Data**: JSON files simulate backend APIs for development (clients.json, staff.json, services.json, users.json)
 - **Query Management**: TanStack Query for data fetching and caching (prepared for future API integration)
 - **Form Validation**: Zod schemas for comprehensive form validation with custom error messages
@@ -63,11 +109,21 @@ Preferred communication style: Simple, everyday language.
 - **Design Tokens**: Custom CSS variables for colors, spacing, and typography
 - **Component Variants**: Consistent styling variants across all components (gradient, outline, ghost, etc.)
 - **Responsive Design**: Mobile-first approach with responsive navigation and layouts
+- **Drawer Pattern**: Consistent drawer-based UI for all edit/create operations (width-based, not size-based)
 
 ## Notification System
 - **Multiple Providers**: Dual notification system using both shadcn/ui toast and Ant Design notifications
 - **Custom Service**: Centralized notification service with different types (success, warning, error, info)
 - **Action Notifications**: Pre-built notifications for CRUD operations (created, updated, deleted)
+
+# Key Implementation Notes
+
+## Inventory Module Architecture
+- Uses Zustand store pattern consistent with other stores (calendarStore, checkoutStore, salesStore)
+- BaseDrawer component uses `width` prop (not `size`); all drawers use width={500} or width={600)
+- Enhanced InventoryItem uses camelCase (costPrice, currentStock) instead of snake_case
+- Stock movements are automatically tracked for all adjustments with reason codes
+- Low stock alerts are generated based on lowStockThreshold and reorderPoint
 
 # External Dependencies
 
@@ -82,6 +138,9 @@ Preferred communication style: Simple, everyday language.
 - **Ant Design**: Comprehensive component library for complex UI elements
 - **Radix UI**: Headless UI primitives for accessibility and customization
 - **Tailwind CSS**: Utility-first CSS framework for styling
+
+## State Management
+- **Zustand**: Lightweight state management for global app state
 
 ## Form and Validation
 - **React Hook Form**: Form state management and validation

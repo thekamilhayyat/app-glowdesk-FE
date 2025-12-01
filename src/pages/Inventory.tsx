@@ -1,85 +1,122 @@
 import React, { useState, useMemo } from 'react';
-import { BaseButton } from '../components/base/BaseButton';
-import { BaseInput } from '../components/base/BaseInput';
-import { BaseBadge } from '../components/base/BaseBadge';
-import { BaseTooltip } from '../components/base/BaseTooltip';
-import { BaseTable } from '../components/base/BaseTable';
-import { EmptyState } from '../components/EmptyState';
-import { AppLayout } from '../components/layout/AppLayout';
-import { Container } from '../components/ui/Container';
+import { BaseButton } from '@/components/base/BaseButton';
+import { BaseInput } from '@/components/base/BaseInput';
+import { BaseBadge } from '@/components/base/BaseBadge';
+import { BaseTooltip } from '@/components/base/BaseTooltip';
+import { BaseTable } from '@/components/base/BaseTable';
+import { EmptyState } from '@/components/EmptyState';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { Container } from '@/components/ui/Container';
 import { toast } from 'sonner';
+import { useInventoryStore } from '@/stores/inventoryStore';
+import { InventoryItem, Stocktake, PurchaseOrder } from '@/types/inventory';
 import {
   AddEditInventoryDrawer,
   ViewTypesDrawer,
   ViewManufacturersDrawer,
   AddTypeDrawer,
-  AddManufacturerDrawer
+  AddManufacturerDrawer,
+  StockAdjustmentDrawer,
+  SupplierDrawer,
+  SuppliersListDrawer,
+  PurchaseOrderDrawer,
+  PurchaseOrdersListDrawer,
+  ReceiveOrderDrawer,
+  StocktakeDrawer,
+  StocktakeListDrawer,
+  LowStockAlertsDrawer,
+  StockMovementDrawer,
+  InventoryReportsDrawer
 } from './inventory/components';
-import { InventoryType, Manufacturer, InventoryItem } from './inventory/types';
+import {
+  Plus,
+  Package,
+  AlertTriangle,
+  Truck,
+  ClipboardList,
+  BarChart3,
+  History,
+  Building2,
+  Tags,
+  Factory
+} from 'lucide-react';
 
 const Inventory: React.FC = () => {
-  // State for drawers
+  const { 
+    items, 
+    types,
+    manufacturers,
+    suppliers,
+    purchaseOrders,
+    stocktakes,
+    deleteItem,
+    addType,
+    addManufacturer,
+    reorderTypes,
+    reorderManufacturers,
+    getActiveAlerts,
+    getLowStockItems,
+    getOutOfStockItems,
+    getInventoryStats
+  } = useInventoryStore();
+
   const [isAddInventoryOpen, setIsAddInventoryOpen] = useState(false);
   const [isViewTypesOpen, setIsViewTypesOpen] = useState(false);
   const [isViewManufacturersOpen, setIsViewManufacturersOpen] = useState(false);
   const [isAddTypeOpen, setIsAddTypeOpen] = useState(false);
   const [isAddManufacturerOpen, setIsAddManufacturerOpen] = useState(false);
   const [isEditingInventory, setIsEditingInventory] = useState(false);
-  const [editingInventoryId, setEditingInventoryId] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
 
-  // State for data
-  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([
-    {
-      item_id: "INV-0001",
-      name: "Professional Hair Dryer",
-      type: "equipment",
-      manufacturer: "Dyson",
-      manufacturer_id: "1",
-      sku: "DRY-SUP-001",
-      cost_price: 299.0,
-      retail_price: 399.0,
-      serial_number: "DY-12345-ABCD",
-      notes: "High-quality professional hair dryer",
-      status: "active",
-      created_at: "2025-01-15T10:00:00Z",
-      updated_at: "2025-01-15T10:00:00Z"
-    }
-  ]);
-  const [types, setTypes] = useState<InventoryType[]>([
-    { type_id: 'type_1', name: 'Equipment', order: 1 },
-    { type_id: 'type_2', name: 'Supplies', order: 2 },
-    { type_id: 'type_3', name: 'Tools', order: 3 }
-  ]);
-  const [manufacturers, setManufacturers] = useState<Manufacturer[]>([
-    { manufacturer_id: 'man_1', name: 'Dyson', order: 1 },
-    { manufacturer_id: 'man_2', name: 'Philips', order: 2 },
-    { manufacturer_id: 'man_3', name: 'Wahl', order: 3 }
-  ]);
+  const [isStockAdjustmentOpen, setIsStockAdjustmentOpen] = useState(false);
+  const [stockAdjustmentItem, setStockAdjustmentItem] = useState<InventoryItem | null>(null);
+  const [adjustmentType, setAdjustmentType] = useState<'add' | 'remove'>('add');
 
-  // State for search and sorting
+  const [isSupplierDrawerOpen, setIsSupplierDrawerOpen] = useState(false);
+  const [isSuppliersListOpen, setIsSuppliersListOpen] = useState(false);
+  const [editingSupplier, setEditingSupplier] = useState(null);
+
+  const [isPurchaseOrderOpen, setIsPurchaseOrderOpen] = useState(false);
+  const [isPurchaseOrdersListOpen, setIsPurchaseOrdersListOpen] = useState(false);
+  const [editingPurchaseOrder, setEditingPurchaseOrder] = useState<PurchaseOrder | null>(null);
+  const [isReceiveOrderOpen, setIsReceiveOrderOpen] = useState(false);
+  const [receivingOrder, setReceivingOrder] = useState<PurchaseOrder | null>(null);
+
+  const [isStocktakeOpen, setIsStocktakeOpen] = useState(false);
+  const [isStocktakeListOpen, setIsStocktakeListOpen] = useState(false);
+  const [stocktakeMode, setStocktakeMode] = useState<'create' | 'count' | 'view'>('create');
+  const [selectedStocktake, setSelectedStocktake] = useState<Stocktake | null>(null);
+
+  const [isLowStockAlertsOpen, setIsLowStockAlertsOpen] = useState(false);
+  const [isStockMovementOpen, setIsStockMovementOpen] = useState(false);
+  const [isReportsOpen, setIsReportsOpen] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{
-    field: keyof InventoryItem;
+    field: string;
     direction: 'asc' | 'desc';
   } | null>(null);
 
-  // Filtered and sorted inventory items
-  const filteredInventoryItems = useMemo(() => {
-    let filtered = inventoryItems;
+  const stats = getInventoryStats();
+  const activeAlerts = getActiveAlerts();
+
+  const filteredItems = useMemo(() => {
+    let filtered = items;
     
     if (searchTerm) {
       filtered = filtered.filter(item =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.manufacturer.toLowerCase().includes(searchTerm.toLowerCase())
+        item.manufacturer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.barcode && item.barcode.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
     if (sortConfig) {
       filtered = [...filtered].sort((a, b) => {
-        const aValue = a[sortConfig.field];
-        const bValue = b[sortConfig.field];
+        const aValue = (a as any)[sortConfig.field];
+        const bValue = (b as any)[sortConfig.field];
         
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -88,10 +125,9 @@ const Inventory: React.FC = () => {
     }
 
     return filtered;
-  }, [inventoryItems, searchTerm, sortConfig]);
+  }, [items, searchTerm, sortConfig]);
 
-  // Handle sorting
-  const handleSort = (field: keyof InventoryItem) => {
+  const handleSort = (field: string) => {
     setSortConfig(current => {
       if (current?.field === field) {
         return {
@@ -103,70 +139,43 @@ const Inventory: React.FC = () => {
     });
   };
 
-  // Handle inventory operations
-  const handleInventoryCreated = (inventory: InventoryItem) => {
-    setInventoryItems(prev => [...prev, inventory]);
-  };
-
-  const handleInventoryUpdated = (inventory: InventoryItem) => {
-    setInventoryItems(prev => prev.map(item => 
-      item.item_id === inventory.item_id ? inventory : item
-    ));
-  };
-
   const handleEditInventory = (item: InventoryItem) => {
     setIsEditingInventory(true);
-    setEditingInventoryId(item.item_id);
+    setEditingItem(item);
     setIsAddInventoryOpen(true);
   };
 
   const handleDeleteInventory = (itemId: string) => {
-    setInventoryItems(prev => prev.filter(item => item.item_id !== itemId));
+    deleteItem(itemId);
     toast.success('Inventory item deleted successfully');
   };
 
-  // Handle type operations
+  const handleAdjustStock = (item: InventoryItem, type: 'add' | 'remove') => {
+    setStockAdjustmentItem(item);
+    setAdjustmentType(type);
+    setIsStockAdjustmentOpen(true);
+  };
+
   const handleTypeCreated = (name: string) => {
-    const newType: InventoryType = {
-      type_id: `type_${Date.now()}`,
-      name,
-      order: types.length + 1
-    };
-    setTypes(prev => [newType, ...prev]);
+    addType({ type_id: `type_${Date.now()}`, name, order: types.length + 1 });
   };
 
-  const handleTypeReorder = (updatedTypes: InventoryType[]) => {
-    setTypes(updatedTypes);
-  };
-
-  const handleCreateInventoryWithType = (type: InventoryType) => {
-    setIsViewTypesOpen(false);
-    setIsAddInventoryOpen(true);
-    // The drawer will handle pre-selecting the type
-  };
-
-  // Handle manufacturer operations
   const handleManufacturerCreated = (name: string) => {
-    const newManufacturer: Manufacturer = {
-      manufacturer_id: `man_${Date.now()}`,
-      name,
-      order: manufacturers.length + 1
-    };
-    setManufacturers(prev => [newManufacturer, ...prev]);
+    addManufacturer({ manufacturer_id: `man_${Date.now()}`, name, order: manufacturers.length + 1 });
   };
 
-  const handleManufacturerReorder = (updatedManufacturers: Manufacturer[]) => {
-    setManufacturers(updatedManufacturers);
-  };
-
-  const handleCreateInventoryWithManufacturer = (manufacturer: Manufacturer) => {
-    setIsViewManufacturersOpen(false);
-    setIsAddInventoryOpen(true);
-    // The drawer will handle pre-selecting the manufacturer
-  };
-
-  // Table columns
-  const tableColumns = [
+  const tableColumns: { key: keyof InventoryItem | 'actions'; header: string; sortable: boolean; render: (value: any, item: InventoryItem) => React.ReactNode }[] = [
+    {
+      key: 'name' as keyof InventoryItem,
+      header: 'Product',
+      sortable: true,
+      render: (value: any, item: InventoryItem) => (
+        <div>
+          <div className="font-medium">{item.name}</div>
+          <div className="text-xs text-muted-foreground">{item.sku}</div>
+        </div>
+      )
+    },
     {
       key: 'type' as keyof InventoryItem,
       header: 'Type',
@@ -180,34 +189,38 @@ const Inventory: React.FC = () => {
       render: (value: any, item: InventoryItem) => item.manufacturer
     },
     {
-      key: 'name' as keyof InventoryItem,
-      header: 'Name',
+      key: 'currentStock' as keyof InventoryItem,
+      header: 'Stock',
       sortable: true,
-      render: (value: any, item: InventoryItem) => item.name
+      render: (value: any, item: InventoryItem) => (
+        <div className="flex items-center gap-2">
+          <span className={
+            item.currentStock <= 0 ? 'text-red-600 font-medium' :
+            item.currentStock <= item.lowStockThreshold ? 'text-yellow-600 font-medium' :
+            'text-foreground'
+          }>
+            {item.currentStock}
+          </span>
+          {item.currentStock <= 0 && (
+            <BaseBadge variant="destructive" className="text-xs">Out</BaseBadge>
+          )}
+          {item.currentStock > 0 && item.currentStock <= item.lowStockThreshold && (
+            <BaseBadge variant="secondary" className="text-xs">Low</BaseBadge>
+          )}
+        </div>
+      )
     },
     {
-      key: 'sku' as keyof InventoryItem,
-      header: 'SKU',
+      key: 'costPrice' as keyof InventoryItem,
+      header: 'Cost',
       sortable: true,
-      render: (value: any, item: InventoryItem) => item.sku
+      render: (value: any, item: InventoryItem) => `$${item.costPrice.toFixed(2)}`
     },
     {
-      key: 'cost_price' as keyof InventoryItem,
-      header: 'Cost Price',
+      key: 'retailPrice' as keyof InventoryItem,
+      header: 'Retail',
       sortable: true,
-      render: (value: any, item: InventoryItem) => item.cost_price ? `$${item.cost_price.toFixed(2)}` : '-'
-    },
-    {
-      key: 'retail_price' as keyof InventoryItem,
-      header: 'Retail Price',
-      sortable: true,
-      render: (value: any, item: InventoryItem) => item.retail_price ? `$${item.retail_price.toFixed(2)}` : '-'
-    },
-    {
-      key: 'serial_number' as keyof InventoryItem,
-      header: 'Serial Number',
-      sortable: true,
-      render: (value: any, item: InventoryItem) => item.serial_number
+      render: (value: any, item: InventoryItem) => item.retailPrice ? `$${item.retailPrice.toFixed(2)}` : '-'
     },
     {
       key: 'status' as keyof InventoryItem,
@@ -220,12 +233,21 @@ const Inventory: React.FC = () => {
       )
     },
     {
-      key: 'actions' as keyof InventoryItem,
+      key: 'actions',
       header: 'Actions',
       sortable: false,
       render: (value: any, item: InventoryItem) => (
-        <div className="flex items-center gap-2">
-          <BaseTooltip content="Edit inventory">
+        <div className="flex items-center gap-1">
+          <BaseTooltip content="Add stock">
+            <BaseButton
+              variant="ghost"
+              size="sm"
+              onClick={() => handleAdjustStock(item, 'add')}
+            >
+              <Plus className="h-4 w-4" />
+            </BaseButton>
+          </BaseTooltip>
+          <BaseTooltip content="Edit">
             <BaseButton
               variant="ghost"
               size="sm"
@@ -236,11 +258,11 @@ const Inventory: React.FC = () => {
               </svg>
             </BaseButton>
           </BaseTooltip>
-          <BaseTooltip content="Delete inventory">
+          <BaseTooltip content="Delete">
             <BaseButton
               variant="ghost"
               size="sm"
-              onClick={() => handleDeleteInventory(item.item_id)}
+              onClick={() => handleDeleteInventory(item.id)}
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -252,25 +274,18 @@ const Inventory: React.FC = () => {
     }
   ];
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const pagination = {
     currentPage,
     itemsPerPage,
-    totalItems: filteredInventoryItems.length,
+    totalItems: filteredItems.length,
     onPageChange: setCurrentPage,
     onItemsPerPageChange: setItemsPerPage
   };
 
-  // Get the editing item
-  const editingItem = editingInventoryId 
-    ? inventoryItems.find(item => item.item_id === editingInventoryId) || null
-    : null;
-
-  // Empty state
-  if (inventoryItems.length === 0) {
+  if (items.length === 0) {
     return (
       <AppLayout>
         <div className="container mx-auto">
@@ -281,22 +296,28 @@ const Inventory: React.FC = () => {
             title="No inventory items yet"
             description="Get started by adding your first inventory item."
             actionLabel="Add New Inventory"
-            onAction={() => setIsAddInventoryOpen(true)}
+            onAction={() => {
+              setIsEditingInventory(false);
+              setEditingItem(null);
+              setIsAddInventoryOpen(true);
+            }}
           />
         </div>
 
-        {/* Drawers - Need to be rendered even in empty state */}
         <AddEditInventoryDrawer
           open={isAddInventoryOpen}
-          onOpenChange={setIsAddInventoryOpen}
+          onOpenChange={(open) => {
+            setIsAddInventoryOpen(open);
+            if (!open) {
+              setIsEditingInventory(false);
+              setEditingItem(null);
+            }
+          }}
           isEditing={isEditingInventory}
           editingItem={editingItem}
-          types={types}
-          manufacturers={manufacturers}
-          onInventoryCreated={handleInventoryCreated}
-          onInventoryUpdated={handleInventoryUpdated}
           onAddType={() => setIsAddTypeOpen(true)}
           onAddManufacturer={() => setIsAddManufacturerOpen(true)}
+          onAddSupplier={() => setIsSupplierDrawerOpen(true)}
         />
 
         <AddTypeDrawer
@@ -317,65 +338,157 @@ const Inventory: React.FC = () => {
   return (
     <AppLayout>
       <Container className="py-4">
-        {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-heading font-semibold text-foreground">Inventory</h1>
-            <p className="text-muted-foreground">Manage your inventory items and types</p>
+            <p className="text-muted-foreground">Manage your products, stock, and suppliers</p>
           </div>
           
-          <div className="flex gap-3">
-            <BaseButton 
-              variant="outline" 
-              onClick={() => setIsViewTypesOpen(true)}
-              className="gap-2"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              View Types
-            </BaseButton>
-            
-            <BaseButton 
-              variant="outline" 
-              onClick={() => setIsViewManufacturersOpen(true)}
-              className="gap-2"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              View Manufacturers
-            </BaseButton>
-            
+          <div className="flex gap-2">
             <BaseButton 
               variant="gradient" 
-              onClick={() => setIsAddInventoryOpen(true)}
+              onClick={() => {
+                setIsEditingInventory(false);
+                setEditingItem(null);
+                setIsAddInventoryOpen(true);
+              }}
               className="gap-2"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add New Inventory
+              <Plus className="h-4 w-4" />
+              Add Product
             </BaseButton>
           </div>
         </div>
 
-        {/* Search Section */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Products</p>
+                <p className="text-2xl font-bold">{stats.totalProducts}</p>
+              </div>
+              <Package className="h-8 w-8 text-muted-foreground" />
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Low Stock</p>
+                <p className="text-2xl font-bold text-yellow-600">{stats.lowStockCount}</p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-yellow-500" />
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Out of Stock</p>
+                <p className="text-2xl font-bold text-red-600">{stats.outOfStockCount}</p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-red-500" />
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Inventory Value</p>
+                <p className="text-2xl font-bold">${stats.totalValue.toFixed(0)}</p>
+              </div>
+              <BarChart3 className="h-8 w-8 text-muted-foreground" />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-6">
+          <BaseButton
+            variant="outline"
+            size="sm"
+            onClick={() => setIsLowStockAlertsOpen(true)}
+            className="gap-2"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            Alerts
+            {activeAlerts.length > 0 && (
+              <BaseBadge variant="destructive" className="ml-1">{activeAlerts.length}</BaseBadge>
+            )}
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
+            onClick={() => setIsSuppliersListOpen(true)}
+            className="gap-2"
+          >
+            <Building2 className="h-4 w-4" />
+            Suppliers
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
+            onClick={() => setIsPurchaseOrdersListOpen(true)}
+            className="gap-2"
+          >
+            <Truck className="h-4 w-4" />
+            Purchase Orders
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
+            onClick={() => setIsStocktakeListOpen(true)}
+            className="gap-2"
+          >
+            <ClipboardList className="h-4 w-4" />
+            Stocktakes
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
+            onClick={() => setIsStockMovementOpen(true)}
+            className="gap-2"
+          >
+            <History className="h-4 w-4" />
+            History
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
+            onClick={() => setIsReportsOpen(true)}
+            className="gap-2"
+          >
+            <BarChart3 className="h-4 w-4" />
+            Reports
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
+            onClick={() => setIsViewTypesOpen(true)}
+            className="gap-2"
+          >
+            <Tags className="h-4 w-4" />
+            Types
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
+            onClick={() => setIsViewManufacturersOpen(true)}
+            className="gap-2"
+          >
+            <Factory className="h-4 w-4" />
+            Manufacturers
+          </BaseButton>
+        </div>
+
         <div className="bg-card rounded-md border border-border shadow-sm p-4 mb-6">
           <BaseInput
-            placeholder="Search inventory or types..."
+            placeholder="Search products by name, SKU, or barcode..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        {/* Table Section */}
         <div className="bg-card rounded-md border border-border shadow-sm overflow-hidden">
           <BaseTable
-            data={filteredInventoryItems}
-            columns={tableColumns}
+            data={filteredItems}
+            columns={tableColumns as any}
             sortConfig={sortConfig}
             onSort={handleSort}
             pagination={pagination}
@@ -383,18 +496,20 @@ const Inventory: React.FC = () => {
           />
         </div>
 
-        {/* Drawers */}
         <AddEditInventoryDrawer
           open={isAddInventoryOpen}
-          onOpenChange={setIsAddInventoryOpen}
+          onOpenChange={(open) => {
+            setIsAddInventoryOpen(open);
+            if (!open) {
+              setIsEditingInventory(false);
+              setEditingItem(null);
+            }
+          }}
           isEditing={isEditingInventory}
           editingItem={editingItem}
-          types={types}
-          manufacturers={manufacturers}
-          onInventoryCreated={handleInventoryCreated}
-          onInventoryUpdated={handleInventoryUpdated}
           onAddType={() => setIsAddTypeOpen(true)}
           onAddManufacturer={() => setIsAddManufacturerOpen(true)}
+          onAddSupplier={() => setIsSupplierDrawerOpen(true)}
         />
 
         <ViewTypesDrawer
@@ -402,8 +517,11 @@ const Inventory: React.FC = () => {
           onOpenChange={setIsViewTypesOpen}
           types={types}
           onAddType={() => setIsAddTypeOpen(true)}
-          onTypeReorder={handleTypeReorder}
-          onCreateInventoryWithType={handleCreateInventoryWithType}
+          onTypeReorder={reorderTypes}
+          onCreateInventoryWithType={() => {
+            setIsViewTypesOpen(false);
+            setIsAddInventoryOpen(true);
+          }}
         />
 
         <ViewManufacturersDrawer
@@ -411,8 +529,11 @@ const Inventory: React.FC = () => {
           onOpenChange={setIsViewManufacturersOpen}
           manufacturers={manufacturers}
           onAddManufacturer={() => setIsAddManufacturerOpen(true)}
-          onManufacturerReorder={handleManufacturerReorder}
-          onCreateInventoryWithManufacturer={handleCreateInventoryWithManufacturer}
+          onManufacturerReorder={reorderManufacturers}
+          onCreateInventoryWithManufacturer={() => {
+            setIsViewManufacturersOpen(false);
+            setIsAddInventoryOpen(true);
+          }}
         />
 
         <AddTypeDrawer
@@ -426,9 +547,132 @@ const Inventory: React.FC = () => {
           onOpenChange={setIsAddManufacturerOpen}
           onManufacturerCreated={handleManufacturerCreated}
         />
+
+        <StockAdjustmentDrawer
+          open={isStockAdjustmentOpen}
+          onOpenChange={setIsStockAdjustmentOpen}
+          item={stockAdjustmentItem}
+          adjustmentType={adjustmentType}
+        />
+
+        <SupplierDrawer
+          open={isSupplierDrawerOpen}
+          onOpenChange={(open) => {
+            setIsSupplierDrawerOpen(open);
+            if (!open) setEditingSupplier(null);
+          }}
+          editingSupplier={editingSupplier}
+        />
+
+        <SuppliersListDrawer
+          open={isSuppliersListOpen}
+          onOpenChange={setIsSuppliersListOpen}
+          onAddSupplier={() => {
+            setIsSuppliersListOpen(false);
+            setEditingSupplier(null);
+            setIsSupplierDrawerOpen(true);
+          }}
+          onEditSupplier={(supplier) => {
+            setIsSuppliersListOpen(false);
+            setEditingSupplier(supplier as any);
+            setIsSupplierDrawerOpen(true);
+          }}
+        />
+
+        <PurchaseOrderDrawer
+          open={isPurchaseOrderOpen}
+          onOpenChange={(open) => {
+            setIsPurchaseOrderOpen(open);
+            if (!open) setEditingPurchaseOrder(null);
+          }}
+          editingOrder={editingPurchaseOrder}
+        />
+
+        <PurchaseOrdersListDrawer
+          open={isPurchaseOrdersListOpen}
+          onOpenChange={setIsPurchaseOrdersListOpen}
+          onAddOrder={() => {
+            setIsPurchaseOrdersListOpen(false);
+            setEditingPurchaseOrder(null);
+            setIsPurchaseOrderOpen(true);
+          }}
+          onEditOrder={(order) => {
+            setIsPurchaseOrdersListOpen(false);
+            setEditingPurchaseOrder(order);
+            setIsPurchaseOrderOpen(true);
+          }}
+          onReceiveOrder={(order) => {
+            setIsPurchaseOrdersListOpen(false);
+            setReceivingOrder(order);
+            setIsReceiveOrderOpen(true);
+          }}
+        />
+
+        <ReceiveOrderDrawer
+          open={isReceiveOrderOpen}
+          onOpenChange={(open) => {
+            setIsReceiveOrderOpen(open);
+            if (!open) setReceivingOrder(null);
+          }}
+          order={receivingOrder}
+        />
+
+        <StocktakeDrawer
+          open={isStocktakeOpen}
+          onOpenChange={setIsStocktakeOpen}
+          stocktake={selectedStocktake}
+          mode={stocktakeMode}
+          onCreate={() => setIsStocktakeListOpen(true)}
+        />
+
+        <StocktakeListDrawer
+          open={isStocktakeListOpen}
+          onOpenChange={setIsStocktakeListOpen}
+          onCreateStocktake={() => {
+            setIsStocktakeListOpen(false);
+            setSelectedStocktake(null);
+            setStocktakeMode('create');
+            setIsStocktakeOpen(true);
+          }}
+          onViewStocktake={(stocktake) => {
+            setIsStocktakeListOpen(false);
+            setSelectedStocktake(stocktake);
+            setStocktakeMode('view');
+            setIsStocktakeOpen(true);
+          }}
+          onContinueStocktake={(stocktake) => {
+            setIsStocktakeListOpen(false);
+            setSelectedStocktake(stocktake);
+            setStocktakeMode('count');
+            setIsStocktakeOpen(true);
+          }}
+        />
+
+        <LowStockAlertsDrawer
+          open={isLowStockAlertsOpen}
+          onOpenChange={setIsLowStockAlertsOpen}
+          onCreatePurchaseOrder={() => {
+            setIsLowStockAlertsOpen(false);
+            setIsPurchaseOrderOpen(true);
+          }}
+          onAdjustStock={(item) => {
+            setIsLowStockAlertsOpen(false);
+            handleAdjustStock(item, 'add');
+          }}
+        />
+
+        <StockMovementDrawer
+          open={isStockMovementOpen}
+          onOpenChange={setIsStockMovementOpen}
+        />
+
+        <InventoryReportsDrawer
+          open={isReportsOpen}
+          onOpenChange={setIsReportsOpen}
+        />
       </Container>
     </AppLayout>
   );
 };
 
-export default Inventory; 
+export default Inventory;
