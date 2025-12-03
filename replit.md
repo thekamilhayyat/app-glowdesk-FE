@@ -74,6 +74,38 @@ Implemented 8 staff management drawer components following the inventory module 
 **Component Index** (src/pages/staff/components/index.ts):
 - Exports all 8 drawer components for easy import
 
+### Staff.tsx Refactor - Enterprise Tab Integration
+
+Refactored Staff.tsx with 5-tab interface integrating all new enterprise drawer components:
+
+**Tab Structure**:
+1. **Team** - Legacy staff management with local JSON data
+2. **Commissions** - Commission plans and staff assignments (store-backed)
+3. **Time Tracking** - Clock in/out, active shifts, timesheet access (store-backed)
+4. **Payroll** - Pay summaries with breakdown (store-backed)
+5. **Performance** - Staff metrics and goals (store-backed)
+
+**Selection Synchronization**:
+- `selectedStoreStaffId` state with `useMemo`-derived `selectedStoreStaff`
+- `handleSelectStoreStaff()` for consistent selection handling
+- `handleSelectStaffInTeam()` syncs Team tab selection to store by matching display_name
+- `openDrawerForStaff()` helper with validation before opening drawers
+- `handleTabChange()` ensures staff selection when switching to enterprise tabs
+- `useEffect` auto-selects first staff if none selected or selected staff removed
+- All enterprise tab staff rows are clickable with visual selection indicator
+- Cross-tab selection continuity: Team tab selections now sync to enterprise tabs
+
+**Drawer Integration**:
+- All 8 drawer components wired with proper open/close state
+- Drawers receive `selectedStoreStaff` with type safety
+- Action buttons use `stopPropagation()` to prevent row selection conflicts
+- Toast notifications for validation errors
+
+**Design Notes**:
+- Dual state architecture: Team tab uses local JSON, enterprise tabs use staffStore
+- Selection state syncs when switching tabs via `handleTabChange`
+- Future enhancement: Migrate Team tab to staffStore for single source of truth
+
 ### Phase 1: Enterprise Features Foundation
 
 Implemented comprehensive type definitions and state management for enterprise salon features (commission management, time tracking, memberships, packages, permissions):
