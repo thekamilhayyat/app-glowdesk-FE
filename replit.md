@@ -5,6 +5,75 @@ This is a salon management system called "GlowFlowApp" built with React, TypeScr
 # Recent Changes
 
 ## December 3, 2025
+### Phase 2: Staff Enterprise Features - Drawer Components
+
+Implemented 8 staff management drawer components following the inventory module pattern (BaseDrawer with react-hook-form + zod validation):
+
+**New Staff Drawer Components** (src/pages/staff/components/):
+
+1. **CommissionPlanDrawer** - Create/edit commission plans with:
+   - Plan name, type (percentage/fixed/tiered)
+   - Rate configuration for single rates
+   - Tiered commission structure with add/remove tiers
+   - Applies to services/products toggles
+   - Default plan designation
+
+2. **CommissionPlansListDrawer** - View and manage all commission plans:
+   - Search functionality
+   - Shows plan type, rate, staff count
+   - Edit/delete actions with safety checks
+
+3. **TimeClockDrawer** - Real-time clock in/out with:
+   - Live clock display (updates every second)
+   - Clock in/out with timestamp logging
+   - Break management (paid/unpaid breaks)
+   - Break duration tracking
+   - Shift summary with total hours worked
+
+4. **TimesheetDrawer** - Weekly timesheet management:
+   - Week navigation (previous/next week)
+   - Daily breakdown with hours worked
+   - Break display per day
+   - Total regular hours, overtime hours, estimated pay
+   - Generate/approve timesheet actions
+
+5. **StaffPricingDrawer** - Staff-specific service pricing:
+   - Service list with search
+   - Custom price and duration per service
+   - Enable/disable per service
+   - Shows default vs custom pricing comparison
+
+6. **StaffPerformanceDrawer** - Performance analytics:
+   - Time period selector (7d/30d/90d/year)
+   - Revenue stats (total, service, product)
+   - Appointment metrics (completed, cancelled)
+   - Client metrics (new, returning)
+   - Utilization rate, satisfaction score
+   - Active goals with progress bars
+   - Rebooking rate visualization
+   - Estimated commission calculation
+
+7. **PayrollSummaryDrawer** - Payroll overview:
+   - Month navigation
+   - Gross pay display
+   - Hours breakdown (regular, overtime)
+   - Earnings breakdown (hourly, commissions, tips, bonuses)
+   - Deductions display
+   - Net pay calculation
+   - Export to JSON
+
+8. **StaffScheduleDrawer** - Advanced scheduling:
+   - Weekly schedule with day toggles
+   - Multiple shifts per day
+   - Time selection with 30-min intervals
+   - Schedule type (weekly/biweekly/rotating)
+   - Copy schedule to all days
+   - Total weekly hours calculation
+   - Validation (at least one working day, shift times)
+
+**Component Index** (src/pages/staff/components/index.ts):
+- Exports all 8 drawer components for easy import
+
 ### Phase 1: Enterprise Features Foundation
 
 Implemented comprehensive type definitions and state management for enterprise salon features (commission management, time tracking, memberships, packages, permissions):
