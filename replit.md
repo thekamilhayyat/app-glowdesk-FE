@@ -87,15 +87,17 @@ Implemented comprehensive type definitions and state management for enterprise s
    - Default values for all settings
 
 **New Settings Page** (src/pages/Settings.tsx):
-- 8-tab interface: Business, Hours, Commissions, Taxes, Payments, Booking, Notifications, Permissions
+- 10-tab interface: Business, Hours, Commissions, Taxes, Payments, Booking, Notifications, Permissions, Appearance, Integrations
 - Full business profile editing with address
 - Business hours management with open/close toggles
 - Commission rate configuration with calculation options
 - Tax settings with per-category support
 - Payment method toggles and tip configuration
-- Booking window, buffer time, and policy settings
+- Booking window, buffer time, waitlist configuration, and policy settings
 - Notification preferences for email/SMS
-- Permission template overview
+- Permission template overview with 5 role levels
+- Appearance settings: brand colors (primary/secondary/accent), theme, logo position, custom CSS
+- Integration settings: Google Calendar sync, Stripe payments, Mailchimp, Zapier webhooks
 
 **Updated App Routes** (src/App.tsx):
 - Added `/settings` route with Settings component
