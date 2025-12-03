@@ -4,6 +4,102 @@ This is a salon management system called "GlowFlowApp" built with React, TypeScr
 
 # Recent Changes
 
+## December 3, 2025
+### Phase 1: Enterprise Features Foundation
+
+Implemented comprehensive type definitions and state management for enterprise salon features (commission management, time tracking, memberships, packages, permissions):
+
+**New Type Definitions**:
+
+1. **Staff Types** (src/types/staff.ts):
+   - `StaffMember` with complete profile (pay type, commission rates, permissions, scheduling)
+   - `CommissionPlan` and `CommissionTier` for flexible commission structures (percentage, fixed, tiered)
+   - `TimeEntry`, `BreakEntry`, `Timesheet` for time clock tracking
+   - `PayrollSummary` for payroll calculations
+   - `SchedulePattern`, `WeekPattern`, `DaySchedule`, `Shift` for advanced scheduling
+   - `TimeOffRequest` for vacation/sick leave management
+   - `StaffPermissions` with granular permissions for all modules (calendar, clients, services, inventory, sales, staff, settings, reports)
+   - `PermissionTemplate` with 5 levels (owner, high, medium, low, basic)
+   - `PerformanceMetrics` and `StaffGoal` for analytics
+   - `StaffPricing` for staff-specific service prices
+   - `Role` and `Location` types
+
+2. **Service Types** (src/types/service.ts):
+   - `Service` with processing time, blocked time, deposits, resource requirements
+   - `ServiceAddOn` for additional services
+   - `ServicePackage` with sequential/parallel booking, various pricing types
+   - `Membership` with service-based, credit-based, or hybrid types
+   - `ClientMembership` and `ClientPackagePurchase` for client enrollments
+   - `Resource` and `ResourceBooking` for room/equipment management
+   - `ServiceCustomization` with price/duration adjustments
+   - `DynamicPricingRule` with conditions (day of week, time range, etc.)
+   - `ResolvedServicePrice` and `ResolvedServiceDuration` for calculated values
+
+3. **Settings Types** (src/types/settings.ts):
+   - `BusinessProfile` with contact info, social media
+   - `BusinessHours` with breaks support
+   - `CommissionSettings` with calculation options
+   - `TaxSettings` with custom rates
+   - `PaymentSettings` with methods, tips, deposits
+   - `BookingSettings` with policies
+   - `CancellationPolicy` and `NoShowPolicy`
+   - `NotificationSettings` for email, SMS, push
+
+**New Zustand Stores**:
+
+1. **staffStore** (src/stores/staffStore.ts):
+   - Staff CRUD with filtering
+   - Commission plan management with tiered calculation
+   - Time clock (clock in/out, breaks)
+   - Timesheet generation and approval
+   - Payroll summary generation
+   - Schedule pattern management
+   - Time off requests with approval workflow
+   - Staff-specific pricing
+   - Performance metrics tracking
+   - Staff goal management
+   - Permission template management
+   - Sample data for 3 staff members, 6 roles, 1 location, 2 commission plans
+
+2. **servicesStore** (src/stores/servicesStore.ts):
+   - Service CRUD with category filtering
+   - Add-on management with service applicability
+   - Package management with price calculation
+   - Client package purchase and redemption
+   - Membership management (enroll, pause, resume, cancel)
+   - Credit usage tracking
+   - Resource management with availability checking
+   - Resource booking
+   - Service customization with options
+   - Staff-specific pricing
+   - Dynamic pricing rules
+   - `resolveServicePrice()` and `resolveServiceDuration()` for final calculations
+   - Sample data for 4 services, 3 categories, 3 add-ons, 2 packages, 2 memberships, 3 resources
+
+3. **settingsStore** (src/stores/settingsStore.ts):
+   - Business profile management
+   - Business hours with open/close times
+   - Commission settings
+   - Tax settings
+   - Payment method settings
+   - Booking settings with policies
+   - Notification settings
+   - Default values for all settings
+
+**New Settings Page** (src/pages/Settings.tsx):
+- 8-tab interface: Business, Hours, Commissions, Taxes, Payments, Booking, Notifications, Permissions
+- Full business profile editing with address
+- Business hours management with open/close toggles
+- Commission rate configuration with calculation options
+- Tax settings with per-category support
+- Payment method toggles and tip configuration
+- Booking window, buffer time, and policy settings
+- Notification preferences for email/SMS
+- Permission template overview
+
+**Updated App Routes** (src/App.tsx):
+- Added `/settings` route with Settings component
+
 ## December 1, 2025
 ### Major Inventory Module Enhancement (Phases 1-4)
 Comprehensive inventory management system upgrade to achieve competitive parity with Mangomint and Fresha:
@@ -99,7 +195,7 @@ Preferred communication style: Simple, everyday language.
 - **Persistent Sessions**: localStorage integration for session persistence
 
 ## Data Management
-- **Zustand Stores**: inventoryStore, calendarStore, checkoutStore, salesStore for feature-specific state
+- **Zustand Stores**: inventoryStore, calendarStore, checkoutStore, salesStore, staffStore, servicesStore, settingsStore for feature-specific state
 - **Mock Data**: JSON files simulate backend APIs for development (clients.json, staff.json, services.json, users.json)
 - **Query Management**: TanStack Query for data fetching and caching (prepared for future API integration)
 - **Form Validation**: Zod schemas for comprehensive form validation with custom error messages

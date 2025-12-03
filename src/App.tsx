@@ -14,6 +14,7 @@ import { Services } from "@/pages/Services";
 import { Appointments } from "@/pages/Appointments";
 import Inventory from "@/pages/Inventory";
 import Sales from "@/pages/Sales";
+import { Settings } from "@/pages/Settings";
 import { NotificationDemo } from "@/pages/NotificationDemo";
 import NotFound from "./pages/NotFound";
 import { App as AntApp, ConfigProvider } from "antd";
@@ -64,6 +65,7 @@ const AppContent = () => {
                 <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
               <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
               <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/notification-demo" element={<ProtectedRoute><NotificationDemo /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
