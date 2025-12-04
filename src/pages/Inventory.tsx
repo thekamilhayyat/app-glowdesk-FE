@@ -31,7 +31,8 @@ import {
   QuickReorderDrawer,
   ExpirationAlertsDrawer,
   StaffConsumptionDrawer,
-  BarcodeScannerDrawer
+  BarcodeScannerDrawer,
+  ProductSalesCommissionDrawer
 } from './inventory/components';
 import {
   Plus,
@@ -48,7 +49,8 @@ import {
   ShoppingCart,
   Calendar,
   Users,
-  ScanLine
+  ScanLine,
+  Percent
 } from 'lucide-react';
 
 const Inventory: React.FC = () => {
@@ -105,6 +107,7 @@ const Inventory: React.FC = () => {
   const [isExpirationAlertsOpen, setIsExpirationAlertsOpen] = useState(false);
   const [isStaffConsumptionOpen, setIsStaffConsumptionOpen] = useState(false);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
+  const [isProductCommissionOpen, setIsProductCommissionOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{
@@ -490,6 +493,15 @@ const Inventory: React.FC = () => {
           <BaseButton
             variant="outline"
             size="sm"
+            onClick={() => setIsProductCommissionOpen(true)}
+            className="gap-2"
+          >
+            <Percent className="h-4 w-4" />
+            Commission
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
             onClick={() => setIsSuppliersListOpen(true)}
             className="gap-2"
           >
@@ -781,6 +793,11 @@ const Inventory: React.FC = () => {
             setAdjustmentType(type);
             setIsStockAdjustmentOpen(true);
           }}
+        />
+
+        <ProductSalesCommissionDrawer
+          open={isProductCommissionOpen}
+          onOpenChange={setIsProductCommissionOpen}
         />
       </Container>
     </AppLayout>

@@ -19,3 +19,4 @@ export { QuickReorderDrawer } from './QuickReorderDrawer';
 export { ExpirationAlertsDrawer } from './ExpirationAlertsDrawer';
 export { StaffConsumptionDrawer } from './StaffConsumptionDrawer';
 export { BarcodeScannerDrawer } from './BarcodeScannerDrawer';
+export { ProductSalesCommissionDrawer } from './ProductSalesCommissionDrawer';
