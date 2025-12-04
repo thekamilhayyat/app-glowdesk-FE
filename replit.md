@@ -46,6 +46,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Key Features & Implementations
 - **Inventory Module**: Comprehensive inventory management including stock tracking, suppliers, purchase orders, stock adjustments, stocktakes, and low stock alerts. Features new types (`InventoryItem`, `Supplier`, `PurchaseOrder`, `StockAdjustment`, `Stocktake`, `LowStockAlert`, `ReceivingRecord`) and a dedicated `inventoryStore`.
+  - **Phase 1 Enhancements (Completed)**:
+    - Product image support with URL field and preview display
+    - CSV import/export functionality via `ImportExportDrawer`
+    - One-click reorder from low stock items via `QuickReorderDrawer`
+    - Expiration date alerts system via `ExpirationAlertsDrawer`
+  - **Phase 2 In Progress**:
+    - Service-linked product consumption tracking with `ServiceProductConsumptionDrawer`
+    - New types: `ServiceProductConsumption`, `ProductConsumptionLog`
+    - Auto-deduct inventory when services are completed
 - **Staff Management**: Advanced features for staff, including commission plans (tiered, percentage, fixed), time clock, timesheets, payroll summaries, staff-specific pricing, performance analytics, and detailed scheduling. Implemented with dedicated `staffStore` and numerous drawer components.
 - **Service Management**: Enhanced service definitions with a 5-tab interface:
   - **Services Tab**: Core service management with categories, pricing, and duration settings
@@ -53,8 +62,9 @@ Preferred communication style: Simple, everyday language.
   - **Packages Tab**: Bundle services together with flexible pricing (sum, fixed, percentage discount) and track usage
   - **Memberships Tab**: Recurring membership plans with credit-based or service-based options, tracking active members and monthly revenue
   - **Resources Tab**: Manage rooms, equipment, and stations for booking and availability tracking
-  - Enterprise drawer components: `ServiceAddOnDrawer`, `ServicePackageDrawer`, `MembershipDrawer`, `ResourceDrawer`, `DynamicPricingDrawer`, and list drawers for each feature
-  - Managed by `servicesStore` Zustand store with comprehensive CRUD operations
+  - **Product Consumption**: Link products to services for automatic inventory deduction (`ServiceProductConsumptionDrawer`)
+  - Enterprise drawer components: `ServiceAddOnDrawer`, `ServicePackageDrawer`, `MembershipDrawer`, `ResourceDrawer`, `DynamicPricingDrawer`, `ServiceProductConsumptionDrawer`, and list drawers for each feature
+  - Managed by `servicesStore` Zustand store with comprehensive CRUD operations including product consumption tracking
 - **Settings Module**: Extensive business settings including profile, hours, commissions, taxes, payments, booking policies, notifications, permissions, appearance (branding), and integrations. Managed by `settingsStore` and presented in a multi-tab interface.
 - **Appointment Calendar**: Redesigned appointment card to mirror Google Calendar's compact style. Critical bug fix for duplicate appointment rendering in Day view, ensuring single rendering and preserving drag-and-drop.
 

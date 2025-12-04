@@ -306,3 +306,38 @@ export interface ResolvedServiceDuration {
   totalDuration: number;
   activeServiceTime: number;
 }
+
+export interface ServiceProductConsumption {
+  id: string;
+  serviceId: string;
+  productId: string;
+  productName: string;
+  productSku: string;
+  quantityPerService: number;
+  unitOfMeasure: string;
+  isRequired: boolean;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductConsumptionLog {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  appointmentId: string;
+  staffId: string;
+  staffName: string;
+  clientId?: string;
+  clientName?: string;
+  consumptions: {
+    productId: string;
+    productName: string;
+    quantityUsed: number;
+    unitCost: number;
+    totalCost: number;
+  }[];
+  totalCost: number;
+  consumedAt: string;
+  notes?: string;
+}

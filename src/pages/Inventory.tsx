@@ -26,7 +26,10 @@ import {
   StocktakeListDrawer,
   LowStockAlertsDrawer,
   StockMovementDrawer,
-  InventoryReportsDrawer
+  InventoryReportsDrawer,
+  ImportExportDrawer,
+  QuickReorderDrawer,
+  ExpirationAlertsDrawer
 } from './inventory/components';
 import {
   Plus,
@@ -38,7 +41,10 @@ import {
   History,
   Building2,
   Tags,
-  Factory
+  Factory,
+  Upload,
+  ShoppingCart,
+  Calendar
 } from 'lucide-react';
 
 const Inventory: React.FC = () => {
@@ -90,6 +96,9 @@ const Inventory: React.FC = () => {
   const [isLowStockAlertsOpen, setIsLowStockAlertsOpen] = useState(false);
   const [isStockMovementOpen, setIsStockMovementOpen] = useState(false);
   const [isReportsOpen, setIsReportsOpen] = useState(false);
+  const [isImportExportOpen, setIsImportExportOpen] = useState(false);
+  const [isQuickReorderOpen, setIsQuickReorderOpen] = useState(false);
+  const [isExpirationAlertsOpen, setIsExpirationAlertsOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{
@@ -170,9 +179,25 @@ const Inventory: React.FC = () => {
       header: 'Product',
       sortable: true,
       render: (value: any, item: InventoryItem) => (
-        <div>
-          <div className="font-medium">{item.name}</div>
-          <div className="text-xs text-muted-foreground">{item.sku}</div>
+        <div className="flex items-center gap-3">
+          {item.imageUrl ? (
+            <img 
+              src={item.imageUrl} 
+              alt={item.name}
+              className="w-10 h-10 rounded-lg object-cover border border-border"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+              <Package className="h-5 w-5 text-muted-foreground" />
+            </div>
+          )}
+          <div>
+            <div className="font-medium">{item.name}</div>
+            <div className="text-xs text-muted-foreground">{item.sku}</div>
+          </div>
         </div>
       )
     },
@@ -346,6 +371,14 @@ const Inventory: React.FC = () => {
           
           <div className="flex gap-2">
             <BaseButton 
+              variant="outline" 
+              onClick={() => setIsImportExportOpen(true)}
+              className="gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              Import/Export
+            </BaseButton>
+            <BaseButton 
               variant="gradient" 
               onClick={() => {
                 setIsEditingInventory(false);
@@ -407,10 +440,28 @@ const Inventory: React.FC = () => {
             className="gap-2"
           >
             <AlertTriangle className="h-4 w-4" />
-            Alerts
+            Stock Alerts
             {activeAlerts.length > 0 && (
               <BaseBadge variant="destructive" className="ml-1">{activeAlerts.length}</BaseBadge>
             )}
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
+            onClick={() => setIsExpirationAlertsOpen(true)}
+            className="gap-2"
+          >
+            <Calendar className="h-4 w-4" />
+            Expiration
+          </BaseButton>
+          <BaseButton
+            variant="default"
+            size="sm"
+            onClick={() => setIsQuickReorderOpen(true)}
+            className="gap-2"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Quick Reorder
           </BaseButton>
           <BaseButton
             variant="outline"
@@ -669,6 +720,24 @@ const Inventory: React.FC = () => {
         <InventoryReportsDrawer
           open={isReportsOpen}
           onOpenChange={setIsReportsOpen}
+        />
+
+        <ImportExportDrawer
+          open={isImportExportOpen}
+          onOpenChange={setIsImportExportOpen}
+        />
+
+        <QuickReorderDrawer
+          open={isQuickReorderOpen}
+          onOpenChange={setIsQuickReorderOpen}
+        />
+
+        <ExpirationAlertsDrawer
+          open={isExpirationAlertsOpen}
+          onOpenChange={setIsExpirationAlertsOpen}
+          onAdjustStock={(item) => {
+            handleAdjustStock(item, 'remove');
+          }}
         />
       </Container>
     </AppLayout>

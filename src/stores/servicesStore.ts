@@ -14,6 +14,8 @@ import {
   DynamicPricingRule,
   ResolvedServicePrice,
   ResolvedServiceDuration,
+  ServiceProductConsumption,
+  ProductConsumptionLog,
 } from '@/types/service';
 
 interface ServicesFilters {
@@ -36,6 +38,8 @@ interface ServicesState {
   customizations: ServiceCustomization[];
   staffPricing: StaffServicePricing[];
   pricingRules: DynamicPricingRule[];
+  productConsumptions: ServiceProductConsumption[];
+  consumptionLogs: ProductConsumptionLog[];
 
   isLoading: boolean;
   error: string | null;
@@ -118,6 +122,16 @@ interface ServicesState {
     selectedAddOnIds?: string[],
     selectedCustomizations?: { customizationId: string; optionId: string }[]
   ) => ResolvedServiceDuration;
+
+  addProductConsumption: (consumption: ServiceProductConsumption) => void;
+  updateProductConsumption: (id: string, updates: Partial<ServiceProductConsumption>) => void;
+  deleteProductConsumption: (id: string) => void;
+  getProductConsumptionsForService: (serviceId: string) => ServiceProductConsumption[];
+  
+  logProductConsumption: (log: ProductConsumptionLog) => void;
+  getConsumptionLogsForService: (serviceId: string) => ProductConsumptionLog[];
+  getConsumptionLogsForStaff: (staffId: string) => ProductConsumptionLog[];
+  getConsumptionLogsForAppointment: (appointmentId: string) => ProductConsumptionLog[];
 }
 
 const generateId = () => `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -425,6 +439,35 @@ export const useServicesStore = create<ServicesState>((set, get) => ({
       updatedAt: '2024-01-01T00:00:00Z',
     },
   ],
+  productConsumptions: [
+    {
+      id: 'pc_1',
+      serviceId: 'SRV002',
+      productId: 'INV001',
+      productName: 'Professional Hair Color',
+      productSku: 'PHC-001',
+      quantityPerService: 1,
+      unitOfMeasure: 'tube',
+      isRequired: true,
+      notes: 'Standard single-process color application',
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    },
+    {
+      id: 'pc_2',
+      serviceId: 'SRV002',
+      productId: 'INV002',
+      productName: 'Developer 20 Vol',
+      productSku: 'DEV-20',
+      quantityPerService: 0.5,
+      unitOfMeasure: 'bottle',
+      isRequired: true,
+      notes: 'Mixed with color for application',
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    },
+  ],
+  consumptionLogs: [],
   isLoading: false,
   error: null,
 
@@ -1038,5 +1081,41 @@ export const useServicesStore = create<ServicesState>((set, get) => ({
       totalDuration,
       activeServiceTime,
     };
+  },
+
+  addProductConsumption: (consumption) => {
+    set((state) => ({ productConsumptions: [...state.productConsumptions, consumption] }));
+  },
+
+  updateProductConsumption: (id, updates) => {
+    set((state) => ({
+      productConsumptions: state.productConsumptions.map((pc) =>
+        pc.id === id ? { ...pc, ...updates, updatedAt: new Date().toISOString() } : pc
+      ),
+    }));
+  },
+
+  deleteProductConsumption: (id) => {
+    set((state) => ({ productConsumptions: state.productConsumptions.filter((pc) => pc.id !== id) }));
+  },
+
+  getProductConsumptionsForService: (serviceId) => {
+    return get().productConsumptions.filter((pc) => pc.serviceId === serviceId);
+  },
+
+  logProductConsumption: (log) => {
+    set((state) => ({ consumptionLogs: [...state.consumptionLogs, log] }));
+  },
+
+  getConsumptionLogsForService: (serviceId) => {
+    return get().consumptionLogs.filter((log) => log.serviceId === serviceId);
+  },
+
+  getConsumptionLogsForStaff: (staffId) => {
+    return get().consumptionLogs.filter((log) => log.staffId === staffId);
+  },
+
+  getConsumptionLogsForAppointment: (appointmentId) => {
+    return get().consumptionLogs.filter((log) => log.appointmentId === appointmentId);
   },
 }));

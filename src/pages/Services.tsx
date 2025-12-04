@@ -30,6 +30,7 @@ import {
   PackagesListDrawer,
   MembershipsListDrawer,
   ResourcesListDrawer,
+  ServiceProductConsumptionDrawer,
 } from "@/pages/services/components";
 import { 
   categoryFormSchema, 
@@ -196,6 +197,8 @@ export function Services() {
   const [packagesListOpen, setPackagesListOpen] = useState(false);
   const [membershipsListOpen, setMembershipsListOpen] = useState(false);
   const [resourcesListOpen, setResourcesListOpen] = useState(false);
+  const [productConsumptionDrawerOpen, setProductConsumptionDrawerOpen] = useState(false);
+  const [selectedServiceForConsumption, setSelectedServiceForConsumption] = useState<any>(null);
   
   // Editing states for enterprise features
   const [editingAddOn, setEditingAddOn] = useState<any>(undefined);
@@ -333,6 +336,40 @@ export function Services() {
     createColumn<Service & { actions?: never }>("actions", "Actions", {
       render: (value, service) => (
         <div className="flex gap-2">
+          <BaseTooltip content="Product Consumption">
+            <BaseButton
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                const storeService = storeServices.find(s => s.id === service.service_id);
+                setSelectedServiceForConsumption(storeService || {
+                  id: service.service_id,
+                  name: service.name,
+                  categoryId: service.category_id,
+                  description: service.description,
+                  duration: service.duration_min,
+                  price: service.price,
+                  pricingType: 'fixed',
+                  taxable: true,
+                  isActive: service.active,
+                  bookableOnline: service.bookable_online,
+                  requiresDeposit: false,
+                  staffAssignments: service.staff_assignments ? {
+                    assignedStaffIds: service.staff_assignments.assigned_staff_ids,
+                    allowAnyStaff: service.staff_assignments.allow_any_staff
+                  } : { assignedStaffIds: [], allowAnyStaff: true },
+                  order: service.order,
+                  sku: service.sku,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: service.updated_at
+                });
+                setProductConsumptionDrawerOpen(true);
+              }}
+            >
+              <Package className="h-4 w-4" />
+            </BaseButton>
+          </BaseTooltip>
           <BaseTooltip content="Edit service">
             <BaseButton
               variant="ghost"
@@ -1643,7 +1680,7 @@ export function Services() {
         <AddOnsListDrawer
           open={addOnsListOpen}
           onOpenChange={setAddOnsListOpen}
-          onCreateNew={() => {
+          onCreate={() => {
             setEditingAddOn(undefined);
             setAddOnDrawerOpen(true);
           }}
@@ -1656,7 +1693,7 @@ export function Services() {
         <PackagesListDrawer
           open={packagesListOpen}
           onOpenChange={setPackagesListOpen}
-          onCreateNew={() => {
+          onCreate={() => {
             setEditingPackage(undefined);
             setPackageDrawerOpen(true);
           }}
@@ -1669,7 +1706,7 @@ export function Services() {
         <MembershipsListDrawer
           open={membershipsListOpen}
           onOpenChange={setMembershipsListOpen}
-          onCreateNew={() => {
+          onCreate={() => {
             setEditingMembership(undefined);
             setMembershipDrawerOpen(true);
           }}
@@ -1682,7 +1719,7 @@ export function Services() {
         <ResourcesListDrawer
           open={resourcesListOpen}
           onOpenChange={setResourcesListOpen}
-          onCreateNew={() => {
+          onCreate={() => {
             setEditingResource(undefined);
             setResourceDrawerOpen(true);
           }}
@@ -1690,6 +1727,12 @@ export function Services() {
             setEditingResource(resource);
             setResourceDrawerOpen(true);
           }}
+        />
+
+        <ServiceProductConsumptionDrawer
+          open={productConsumptionDrawerOpen}
+          onOpenChange={setProductConsumptionDrawerOpen}
+          service={selectedServiceForConsumption}
         />
       </Container>
     </AppLayout>

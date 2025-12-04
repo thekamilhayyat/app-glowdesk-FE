@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { BaseButton } from '@/components/base/BaseButton';
 import { BaseInput } from '@/components/base/BaseInput';
 import { BaseLabel } from '@/components/base/BaseLabel';
@@ -12,6 +12,7 @@ import { getFieldError, hasFieldError } from '@/hooks/useFormValidation';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useInventoryStore } from '@/stores/inventoryStore';
 import { InventoryItem, InventoryType, Manufacturer, Supplier } from '@/types/inventory';
+import { Image, X, Calendar } from 'lucide-react';
 
 interface AddEditInventoryDrawerProps {
   open: boolean;
@@ -36,9 +37,12 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
   const inventoryForm = useFormValidation(inventoryFormInputSchema);
   const { types, manufacturers, suppliers, addItem, updateItem } = useInventoryStore();
 
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   useEffect(() => {
     if (!open) {
       inventoryForm.reset();
+      setImagePreview(null);
     } else if (editingItem && isEditing) {
       inventoryForm.reset({
         name: editingItem.name,
@@ -47,6 +51,8 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
         manufacturer_id: editingItem.manufacturerId || '',
         sku: editingItem.sku,
         barcode: editingItem.barcode || '',
+        image_url: editingItem.imageUrl || '',
+        expiration_date: editingItem.expirationDate || '',
         cost_price: editingItem.costPrice.toString(),
         retail_price: editingItem.retailPrice?.toString() || '',
         current_stock: editingItem.currentStock.toString(),
@@ -61,6 +67,7 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
         taxable: editingItem.taxable,
         notes: editingItem.notes || ''
       });
+      setImagePreview(editingItem.imageUrl || null);
     } else {
       inventoryForm.reset({
         name: '',
@@ -69,6 +76,8 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
         manufacturer_id: '',
         sku: '',
         barcode: '',
+        image_url: '',
+        expiration_date: '',
         cost_price: '',
         retail_price: '',
         current_stock: '0',
@@ -83,8 +92,20 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
         taxable: true,
         notes: ''
       });
+      setImagePreview(null);
     }
   }, [open, editingItem, isEditing, inventoryForm]);
+
+  const handleImageUrlChange = (url: string) => {
+    inventoryForm.setValue('image_url', url);
+    if (url && url.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i)) {
+      setImagePreview(url);
+    } else if (url && url.match(/^https?:\/\/.+/)) {
+      setImagePreview(url);
+    } else {
+      setImagePreview(null);
+    }
+  };
 
   const handleSubmit = async () => {
     const isValid = await inventoryForm.trigger();
@@ -98,6 +119,8 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
       name: formData.name,
       sku: formData.sku,
       barcode: formData.barcode || undefined,
+      imageUrl: formData.image_url || undefined,
+      expirationDate: formData.expiration_date || undefined,
       type: formData.type,
       typeId: types.find(t => t.name === formData.type)?.type_id,
       manufacturer: formData.manufacturer,
@@ -131,6 +154,7 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
 
     onOpenChange(false);
     inventoryForm.reset();
+    setImagePreview(null);
   };
 
   return (
@@ -253,6 +277,66 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
                 placeholder="Scan or enter barcode"
               />
             </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <h4 className="font-medium mb-3 flex items-center gap-2">
+              <Image className="h-4 w-4" />
+              Product Image
+            </h4>
+            <div className="space-y-3">
+              <div>
+                <BaseLabel htmlFor="image_url">Image URL</BaseLabel>
+                <BaseInput
+                  id="image_url"
+                  {...inventoryForm.register('image_url')}
+                  placeholder="https://example.com/product-image.jpg"
+                  onChange={(e) => handleImageUrlChange(e.target.value)}
+                  className={hasFieldError(inventoryForm.formState.errors, 'image_url') ? 'border-red-500' : ''}
+                />
+                {getFieldError(inventoryForm.formState.errors, 'image_url') && (
+                  <p className="text-sm text-red-500 mt-1">{getFieldError(inventoryForm.formState.errors, 'image_url')}</p>
+                )}
+              </div>
+              {imagePreview && (
+                <div className="relative inline-block">
+                  <img 
+                    src={imagePreview} 
+                    alt="Product preview" 
+                    className="w-24 h-24 object-cover rounded-lg border border-border"
+                    onError={() => setImagePreview(null)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImagePreview(null);
+                      inventoryForm.setValue('image_url', '');
+                    }}
+                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 hover:bg-destructive/90"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+              {!imagePreview && (
+                <div className="w-24 h-24 border-2 border-dashed border-muted-foreground/25 rounded-lg flex items-center justify-center text-muted-foreground">
+                  <Image className="h-8 w-8" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <BaseLabel htmlFor="expiration_date" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Expiration Date
+            </BaseLabel>
+            <BaseInput
+              id="expiration_date"
+              type="date"
+              {...inventoryForm.register('expiration_date')}
+            />
+            <p className="text-xs text-muted-foreground mt-1">Leave empty for non-perishable items</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

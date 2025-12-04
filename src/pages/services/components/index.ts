@@ -7,3 +7,4 @@ export { AddOnsListDrawer } from './AddOnsListDrawer';
 export { PackagesListDrawer } from './PackagesListDrawer';
 export { MembershipsListDrawer } from './MembershipsListDrawer';
 export { ResourcesListDrawer } from './ResourcesListDrawer';
+export { ServiceProductConsumptionDrawer } from './ServiceProductConsumptionDrawer';
