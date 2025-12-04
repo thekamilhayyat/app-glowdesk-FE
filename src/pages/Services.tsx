@@ -11,13 +11,26 @@ import { BaseBadge } from "@/components/base/BaseBadge";
 import { BaseDrawer } from "@/components/base/BaseDrawer";
 import { BaseSelect, BaseSelectItem } from "@/components/base/BaseSelect";
 import { EmptyState } from "@/components/EmptyState";
-import { Plus, Edit2, Trash2, Clock, DollarSign, Search, Eye, ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
+import { Plus, Edit2, Trash2, Clock, DollarSign, Search, Eye, ChevronLeft, ChevronRight, GripVertical, Package, Crown, Box, TrendingUp, Sparkles } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BaseTooltip } from "@/components/base/BaseTooltip";
 import { BaseFormField, BaseFormSelectField, BaseFormSelectItem } from "@/components/base/BaseFormField";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { BaseTable, createSortableColumn, createColumn } from "@/components/base/BaseTable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useServicesStore } from "@/stores/servicesStore";
+import {
+  ServiceAddOnDrawer,
+  ServicePackageDrawer,
+  MembershipDrawer,
+  ResourceDrawer,
+  DynamicPricingDrawer,
+  AddOnsListDrawer,
+  PackagesListDrawer,
+  MembershipsListDrawer,
+  ResourcesListDrawer,
+} from "@/pages/services/components";
 import { 
   categoryFormSchema, 
   serviceFormInputSchema, 
@@ -169,6 +182,38 @@ export function Services() {
   const categoryForm = useFormValidation(categoryFormSchema);
   const serviceForm = useFormValidation(serviceFormInputSchema);
   const firstTimeForm = useFormValidation(firstTimeServiceFormSchema);
+
+  // Tab state
+  const [activeTab, setActiveTab] = useState("services");
+  
+  // Enterprise feature drawer states
+  const [addOnDrawerOpen, setAddOnDrawerOpen] = useState(false);
+  const [packageDrawerOpen, setPackageDrawerOpen] = useState(false);
+  const [membershipDrawerOpen, setMembershipDrawerOpen] = useState(false);
+  const [resourceDrawerOpen, setResourceDrawerOpen] = useState(false);
+  const [pricingRuleDrawerOpen, setPricingRuleDrawerOpen] = useState(false);
+  const [addOnsListOpen, setAddOnsListOpen] = useState(false);
+  const [packagesListOpen, setPackagesListOpen] = useState(false);
+  const [membershipsListOpen, setMembershipsListOpen] = useState(false);
+  const [resourcesListOpen, setResourcesListOpen] = useState(false);
+  
+  // Editing states for enterprise features
+  const [editingAddOn, setEditingAddOn] = useState<any>(undefined);
+  const [editingPackage, setEditingPackage] = useState<any>(undefined);
+  const [editingMembership, setEditingMembership] = useState<any>(undefined);
+  const [editingResource, setEditingResource] = useState<any>(undefined);
+  const [editingPricingRule, setEditingPricingRule] = useState<any>(undefined);
+
+  // Store data for enterprise features
+  const { 
+    addOns, 
+    packages, 
+    memberships, 
+    resources, 
+    pricingRules,
+    services: storeServices,
+    clientMemberships 
+  } = useServicesStore();
 
   // Set default values for service form
   React.useEffect(() => {
@@ -656,6 +701,401 @@ export function Services() {
     setDraggedCategoryId(null);
   };
 
+  // Enterprise tab render functions
+  const renderAddOnsTab = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-heading font-semibold">Service Add-Ons</h2>
+          <p className="text-muted-foreground">Create additional services that can be added to appointments</p>
+        </div>
+        <div className="flex gap-2">
+          <BaseButton variant="outline" onClick={() => setAddOnsListOpen(true)}>
+            <Eye className="h-4 w-4 mr-2" />
+            View All
+          </BaseButton>
+          <BaseButton variant="gradient" onClick={() => {
+            setEditingAddOn(undefined);
+            setAddOnDrawerOpen(true);
+          }}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Add-On
+          </BaseButton>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <BaseCard className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
+          <Sparkles className="h-8 w-8 text-purple-500 mb-2" />
+          <p className="text-2xl font-bold">{addOns.length}</p>
+          <p className="text-sm text-muted-foreground">Total Add-Ons</p>
+        </BaseCard>
+        <BaseCard className="p-4">
+          <DollarSign className="h-8 w-8 text-green-500 mb-2" />
+          <p className="text-2xl font-bold">
+            ${addOns.reduce((sum, a) => sum + a.price, 0).toFixed(0)}
+          </p>
+          <p className="text-sm text-muted-foreground">Total Value</p>
+        </BaseCard>
+        <BaseCard className="p-4">
+          <Clock className="h-8 w-8 text-blue-500 mb-2" />
+          <p className="text-2xl font-bold">
+            {addOns.filter(a => a.isActive).length}
+          </p>
+          <p className="text-sm text-muted-foreground">Active Add-Ons</p>
+        </BaseCard>
+      </div>
+
+      <BaseCard>
+        <CardHeader>
+          <h3 className="text-lg font-heading font-semibold">Recent Add-Ons</h3>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {addOns.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">
+                No add-ons created yet. Create your first add-on to get started.
+              </p>
+            ) : (
+              addOns.slice(0, 5).map((addOn) => (
+                <div key={addOn.id} className="flex items-center justify-between p-3 border rounded-lg hover:border-primary/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{addOn.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        ${addOn.price} • {addOn.duration} min
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!addOn.isActive && <BaseBadge variant="outline">Inactive</BaseBadge>}
+                    <BaseButton 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setEditingAddOn(addOn);
+                        setAddOnDrawerOpen(true);
+                      }}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </BaseButton>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </BaseCard>
+    </div>
+  );
+
+  const renderPackagesTab = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-heading font-semibold">Service Packages</h2>
+          <p className="text-muted-foreground">Bundle services together with special pricing</p>
+        </div>
+        <div className="flex gap-2">
+          <BaseButton variant="outline" onClick={() => setPackagesListOpen(true)}>
+            <Eye className="h-4 w-4 mr-2" />
+            View All
+          </BaseButton>
+          <BaseButton variant="gradient" onClick={() => {
+            setEditingPackage(undefined);
+            setPackageDrawerOpen(true);
+          }}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Package
+          </BaseButton>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <BaseCard className="p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10">
+          <Package className="h-8 w-8 text-blue-500 mb-2" />
+          <p className="text-2xl font-bold">{packages.length}</p>
+          <p className="text-sm text-muted-foreground">Total Packages</p>
+        </BaseCard>
+        <BaseCard className="p-4">
+          <DollarSign className="h-8 w-8 text-green-500 mb-2" />
+          <p className="text-2xl font-bold">
+            {packages.reduce((sum, p) => sum + p.usageCount, 0)}
+          </p>
+          <p className="text-sm text-muted-foreground">Total Sold</p>
+        </BaseCard>
+        <BaseCard className="p-4">
+          <TrendingUp className="h-8 w-8 text-orange-500 mb-2" />
+          <p className="text-2xl font-bold">
+            {packages.filter(p => p.isActive).length}
+          </p>
+          <p className="text-sm text-muted-foreground">Active Packages</p>
+        </BaseCard>
+      </div>
+
+      <BaseCard>
+        <CardHeader>
+          <h3 className="text-lg font-heading font-semibold">All Packages</h3>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {packages.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">
+                No packages created yet. Bundle services to offer great value.
+              </p>
+            ) : (
+              packages.map((pkg) => (
+                <div key={pkg.id} className="flex items-center justify-between p-4 border rounded-lg hover:border-primary/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                      <Package className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{pkg.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {pkg.serviceIds.length} services • {pkg.totalDuration} min
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="font-bold text-green-600">
+                        ${pkg.calculatedPrice || pkg.fixedPrice || 0}
+                      </p>
+                      {pkg.pricingType === 'percentage_discount' && (
+                        <p className="text-xs text-muted-foreground">{pkg.discountPercentage}% off</p>
+                      )}
+                    </div>
+                    <BaseButton 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setEditingPackage(pkg);
+                        setPackageDrawerOpen(true);
+                      }}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </BaseButton>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </BaseCard>
+    </div>
+  );
+
+  const renderMembershipsTab = () => {
+    const activeMemberCount = clientMemberships.filter(cm => cm.status === 'active').length;
+    const monthlyRevenue = memberships.reduce((sum, m) => {
+      const memberCount = clientMemberships.filter(
+        cm => cm.membershipId === m.id && cm.status === 'active'
+      ).length;
+      return sum + (m.price * memberCount);
+    }, 0);
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-heading font-semibold">Memberships</h2>
+            <p className="text-muted-foreground">Create recurring membership plans with credits and discounts</p>
+          </div>
+          <div className="flex gap-2">
+            <BaseButton variant="outline" onClick={() => setMembershipsListOpen(true)}>
+              <Eye className="h-4 w-4 mr-2" />
+              View All
+            </BaseButton>
+            <BaseButton variant="gradient" onClick={() => {
+              setEditingMembership(undefined);
+              setMembershipDrawerOpen(true);
+            }}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Membership
+            </BaseButton>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <BaseCard className="p-4 bg-gradient-to-br from-yellow-500/10 to-orange-500/10">
+            <Crown className="h-8 w-8 text-yellow-500 mb-2" />
+            <p className="text-2xl font-bold">{memberships.length}</p>
+            <p className="text-sm text-muted-foreground">Membership Plans</p>
+          </BaseCard>
+          <BaseCard className="p-4">
+            <p className="text-2xl font-bold">{activeMemberCount}</p>
+            <p className="text-sm text-muted-foreground">Active Members</p>
+          </BaseCard>
+          <BaseCard className="p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10">
+            <DollarSign className="h-8 w-8 text-green-500 mb-2" />
+            <p className="text-2xl font-bold">${monthlyRevenue.toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground">Monthly Revenue</p>
+          </BaseCard>
+          <BaseCard className="p-4">
+            <p className="text-2xl font-bold">
+              {memberships.filter(m => m.isActive).length}
+            </p>
+            <p className="text-sm text-muted-foreground">Active Plans</p>
+          </BaseCard>
+        </div>
+
+        <BaseCard>
+          <CardHeader>
+            <h3 className="text-lg font-heading font-semibold">Membership Plans</h3>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {memberships.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  No memberships created yet. Start building recurring revenue.
+                </p>
+              ) : (
+                memberships.map((membership) => {
+                  const memberCount = clientMemberships.filter(
+                    cm => cm.membershipId === membership.id && cm.status === 'active'
+                  ).length;
+                  return (
+                    <div key={membership.id} className="flex items-center justify-between p-4 border rounded-lg hover:border-primary/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-yellow-500/20 to-orange-500/10 flex items-center justify-center">
+                          <Crown className="h-6 w-6 text-yellow-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{membership.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {membership.type.replace('_', ' ')} • {membership.billingInterval}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="font-bold text-green-600">${membership.price}/mo</p>
+                          <p className="text-xs text-muted-foreground">{memberCount} member(s)</p>
+                        </div>
+                        <BaseButton 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setEditingMembership(membership);
+                            setMembershipDrawerOpen(true);
+                          }}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </BaseButton>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </CardContent>
+        </BaseCard>
+      </div>
+    );
+  };
+
+  const renderResourcesTab = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-heading font-semibold">Resources</h2>
+          <p className="text-muted-foreground">Manage rooms, equipment, and stations for booking</p>
+        </div>
+        <div className="flex gap-2">
+          <BaseButton variant="outline" onClick={() => setResourcesListOpen(true)}>
+            <Eye className="h-4 w-4 mr-2" />
+            View All
+          </BaseButton>
+          <BaseButton variant="gradient" onClick={() => {
+            setEditingResource(undefined);
+            setResourceDrawerOpen(true);
+          }}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Resource
+          </BaseButton>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <BaseCard className="p-4 bg-gradient-to-br from-indigo-500/10 to-purple-500/10">
+          <Box className="h-8 w-8 text-indigo-500 mb-2" />
+          <p className="text-2xl font-bold">{resources.length}</p>
+          <p className="text-sm text-muted-foreground">Total Resources</p>
+        </BaseCard>
+        <BaseCard className="p-4">
+          <p className="text-2xl font-bold">
+            {resources.filter(r => r.type === 'room').length}
+          </p>
+          <p className="text-sm text-muted-foreground">Rooms</p>
+        </BaseCard>
+        <BaseCard className="p-4">
+          <p className="text-2xl font-bold">
+            {resources.filter(r => r.isActive).length}
+          </p>
+          <p className="text-sm text-muted-foreground">Active Resources</p>
+        </BaseCard>
+      </div>
+
+      <BaseCard>
+        <CardHeader>
+          <h3 className="text-lg font-heading font-semibold">All Resources</h3>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {resources.length === 0 ? (
+              <p className="col-span-full text-center text-muted-foreground py-8">
+                No resources created yet. Add rooms and equipment to manage availability.
+              </p>
+            ) : (
+              resources.map((resource) => (
+                <div 
+                  key={resource.id} 
+                  className="p-4 border rounded-lg hover:border-primary/50 transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div 
+                      className="w-10 h-10 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: resource.color ? `${resource.color}20` : '#6366f120' }}
+                    >
+                      <Box 
+                        className="h-5 w-5" 
+                        style={{ color: resource.color || '#6366f1' }}
+                      />
+                    </div>
+                    <BaseButton 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setEditingResource(resource);
+                        setResourceDrawerOpen(true);
+                      }}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </BaseButton>
+                  </div>
+                  <h4 className="font-medium mb-1">{resource.name}</h4>
+                  <div className="flex items-center gap-2">
+                    <BaseBadge variant="outline" size="sm">{resource.type}</BaseBadge>
+                    <span className="text-xs text-muted-foreground">
+                      Capacity: {resource.capacity}
+                    </span>
+                  </div>
+                  {!resource.isActive && (
+                    <BaseBadge variant="outline" size="sm" className="mt-2">Inactive</BaseBadge>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </BaseCard>
+    </div>
+  );
+
   // Initial empty state
   if (data.data.services.length === 0) {
     return (
@@ -807,18 +1247,46 @@ export function Services() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-heading font-semibold text-foreground">Services</h1>
-            <p className="text-muted-foreground">Manage your services and categories</p>
+            <p className="text-muted-foreground">Manage your services, add-ons, packages, and memberships</p>
           </div>
-          
-          <div className="flex gap-3">
-            <BaseButton 
-              variant="outline" 
-              onClick={() => setIsViewCategoriesOpen(true)}
-              className="gap-2"
-            >
-              <Eye className="h-4 w-4" />
-              View Categories
-            </BaseButton>
+        </div>
+
+        {/* Tabs for different sections */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="mb-4">
+            <TabsTrigger value="services" className="gap-2">
+              <Clock className="h-4 w-4" />
+              Services
+            </TabsTrigger>
+            <TabsTrigger value="addons" className="gap-2">
+              <Sparkles className="h-4 w-4" />
+              Add-Ons
+            </TabsTrigger>
+            <TabsTrigger value="packages" className="gap-2">
+              <Package className="h-4 w-4" />
+              Packages
+            </TabsTrigger>
+            <TabsTrigger value="memberships" className="gap-2">
+              <Crown className="h-4 w-4" />
+              Memberships
+            </TabsTrigger>
+            <TabsTrigger value="resources" className="gap-2">
+              <Box className="h-4 w-4" />
+              Resources
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Services Tab */}
+          <TabsContent value="services" className="space-y-6">
+            <div className="flex gap-3 justify-end">
+              <BaseButton 
+                variant="outline" 
+                onClick={() => setIsViewCategoriesOpen(true)}
+                className="gap-2"
+              >
+                <Eye className="h-4 w-4" />
+                View Categories
+              </BaseButton>
             
             <BaseDrawer
               open={isCreateServiceOpen}
@@ -953,47 +1421,68 @@ export function Services() {
                 </FormProvider>
               </form>
             </BaseDrawer>
-          </div>
-        </div>
-
-        {/* Search Bar */}
-        <BaseCard className="mb-6">
-          <CardContent>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <BaseInput
-                placeholder="Search services or categories..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
             </div>
-          </CardContent>
-        </BaseCard>
 
-        {/* Services Table */}
-        <BaseCard padding="none">
-          <CardContent className="p-0">
-            <BaseTable
-              data={filteredServices}
-              columns={tableColumns}
-              sortConfig={{
-                field: sortField,
-                direction: sortDirection
-              }}
-              onSort={handleSort}
-              pagination={{
-                currentPage,
-                itemsPerPage,
-                totalItems: filteredServices.length,
-                onPageChange: setCurrentPage,
-                onItemsPerPageChange: setItemsPerPage
-              }}
-              showPagination={true}
-              emptyMessage="No services found"
-            />
-          </CardContent>
-        </BaseCard>
+            {/* Search Bar */}
+            <BaseCard className="mb-6">
+              <CardContent>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <BaseInput
+                    placeholder="Search services or categories..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </CardContent>
+            </BaseCard>
+
+            {/* Services Table */}
+            <BaseCard padding="none">
+              <CardContent className="p-0">
+                <BaseTable
+                  data={filteredServices}
+                  columns={tableColumns}
+                  sortConfig={{
+                    field: sortField,
+                    direction: sortDirection
+                  }}
+                  onSort={handleSort}
+                  pagination={{
+                    currentPage,
+                    itemsPerPage,
+                    totalItems: filteredServices.length,
+                    onPageChange: setCurrentPage,
+                    onItemsPerPageChange: setItemsPerPage
+                  }}
+                  showPagination={true}
+                  emptyMessage="No services found"
+                />
+              </CardContent>
+            </BaseCard>
+          </TabsContent>
+
+          {/* Add-Ons Tab */}
+          <TabsContent value="addons">
+            {renderAddOnsTab()}
+          </TabsContent>
+
+          {/* Packages Tab */}
+          <TabsContent value="packages">
+            {renderPackagesTab()}
+          </TabsContent>
+
+          {/* Memberships Tab */}
+          <TabsContent value="memberships">
+            {renderMembershipsTab()}
+          </TabsContent>
+
+          {/* Resources Tab */}
+          <TabsContent value="resources">
+            {renderResourcesTab()}
+          </TabsContent>
+        </Tabs>
 
         {/* View Categories Drawer */}
         <BaseDrawer
@@ -1118,6 +1607,90 @@ export function Services() {
             </FormProvider>
           </form>
         </BaseDrawer>
+
+        {/* Enterprise Feature Drawers */}
+        <ServiceAddOnDrawer
+          open={addOnDrawerOpen}
+          onOpenChange={setAddOnDrawerOpen}
+          addOn={editingAddOn}
+        />
+
+        <ServicePackageDrawer
+          open={packageDrawerOpen}
+          onOpenChange={setPackageDrawerOpen}
+          pkg={editingPackage}
+        />
+
+        <MembershipDrawer
+          open={membershipDrawerOpen}
+          onOpenChange={setMembershipDrawerOpen}
+          membership={editingMembership}
+        />
+
+        <ResourceDrawer
+          open={resourceDrawerOpen}
+          onOpenChange={setResourceDrawerOpen}
+          resource={editingResource}
+        />
+
+        <DynamicPricingDrawer
+          open={pricingRuleDrawerOpen}
+          onOpenChange={setPricingRuleDrawerOpen}
+          rule={editingPricingRule}
+        />
+
+        {/* List Drawers */}
+        <AddOnsListDrawer
+          open={addOnsListOpen}
+          onOpenChange={setAddOnsListOpen}
+          onCreateNew={() => {
+            setEditingAddOn(undefined);
+            setAddOnDrawerOpen(true);
+          }}
+          onEdit={(addOn) => {
+            setEditingAddOn(addOn);
+            setAddOnDrawerOpen(true);
+          }}
+        />
+
+        <PackagesListDrawer
+          open={packagesListOpen}
+          onOpenChange={setPackagesListOpen}
+          onCreateNew={() => {
+            setEditingPackage(undefined);
+            setPackageDrawerOpen(true);
+          }}
+          onEdit={(pkg) => {
+            setEditingPackage(pkg);
+            setPackageDrawerOpen(true);
+          }}
+        />
+
+        <MembershipsListDrawer
+          open={membershipsListOpen}
+          onOpenChange={setMembershipsListOpen}
+          onCreateNew={() => {
+            setEditingMembership(undefined);
+            setMembershipDrawerOpen(true);
+          }}
+          onEdit={(membership) => {
+            setEditingMembership(membership);
+            setMembershipDrawerOpen(true);
+          }}
+        />
+
+        <ResourcesListDrawer
+          open={resourcesListOpen}
+          onOpenChange={setResourcesListOpen}
+          onCreateNew={() => {
+            setEditingResource(undefined);
+            setResourceDrawerOpen(true);
+          }}
+          onEdit={(resource) => {
+            setEditingResource(resource);
+            setResourceDrawerOpen(true);
+          }}
+        />
       </Container>
     </AppLayout>
   );
