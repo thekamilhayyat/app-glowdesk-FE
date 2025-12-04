@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web"]
+modules = ["nodejs-20", "web", "python-3.11"]
 
 [nix]
 channel = "stable-25_05"
@@ -51,3 +51,4 @@ externalPort = 3000
 
 [agent]
 expertMode = true
+integrations = ["github:1.0.0"]
