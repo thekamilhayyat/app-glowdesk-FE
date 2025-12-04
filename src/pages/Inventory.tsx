@@ -30,7 +30,8 @@ import {
   ImportExportDrawer,
   QuickReorderDrawer,
   ExpirationAlertsDrawer,
-  StaffConsumptionDrawer
+  StaffConsumptionDrawer,
+  BarcodeScannerDrawer
 } from './inventory/components';
 import {
   Plus,
@@ -46,7 +47,8 @@ import {
   Upload,
   ShoppingCart,
   Calendar,
-  Users
+  Users,
+  ScanLine
 } from 'lucide-react';
 
 const Inventory: React.FC = () => {
@@ -102,6 +104,7 @@ const Inventory: React.FC = () => {
   const [isQuickReorderOpen, setIsQuickReorderOpen] = useState(false);
   const [isExpirationAlertsOpen, setIsExpirationAlertsOpen] = useState(false);
   const [isStaffConsumptionOpen, setIsStaffConsumptionOpen] = useState(false);
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{
@@ -478,6 +481,15 @@ const Inventory: React.FC = () => {
           <BaseButton
             variant="outline"
             size="sm"
+            onClick={() => setIsBarcodeScannerOpen(true)}
+            className="gap-2"
+          >
+            <ScanLine className="h-4 w-4" />
+            Scan Barcode
+          </BaseButton>
+          <BaseButton
+            variant="outline"
+            size="sm"
             onClick={() => setIsSuppliersListOpen(true)}
             className="gap-2"
           >
@@ -755,6 +767,20 @@ const Inventory: React.FC = () => {
         <StaffConsumptionDrawer
           open={isStaffConsumptionOpen}
           onOpenChange={setIsStaffConsumptionOpen}
+        />
+
+        <BarcodeScannerDrawer
+          open={isBarcodeScannerOpen}
+          onOpenChange={setIsBarcodeScannerOpen}
+          onProductFound={(item) => {
+            setEditingItem(item);
+            setIsEditingInventory(true);
+          }}
+          onAdjustStock={(item, type) => {
+            setStockAdjustmentItem(item);
+            setAdjustmentType(type);
+            setIsStockAdjustmentOpen(true);
+          }}
         />
       </Container>
     </AppLayout>

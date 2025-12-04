@@ -18,3 +18,4 @@ export { ImportExportDrawer } from './ImportExportDrawer';
 export { QuickReorderDrawer } from './QuickReorderDrawer';
 export { ExpirationAlertsDrawer } from './ExpirationAlertsDrawer';
 export { StaffConsumptionDrawer } from './StaffConsumptionDrawer';
+export { BarcodeScannerDrawer } from './BarcodeScannerDrawer';
