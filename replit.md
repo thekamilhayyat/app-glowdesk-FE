@@ -1,274 +1,6 @@
 # Overview
 
-This is a salon management system called "GlowFlowApp" built with React, TypeScript, and Vite. The application provides a comprehensive solution for managing salon operations including client management, staff scheduling, service offerings, appointments, and inventory tracking. It features a modern, responsive interface with authentication, dashboard analytics, and complete CRUD operations for all business entities.
-
-# Recent Changes
-
-## December 3, 2025
-### Phase 2: Staff Enterprise Features - Drawer Components
-
-Implemented 8 staff management drawer components following the inventory module pattern (BaseDrawer with react-hook-form + zod validation):
-
-**New Staff Drawer Components** (src/pages/staff/components/):
-
-1. **CommissionPlanDrawer** - Create/edit commission plans with:
-   - Plan name, type (percentage/fixed/tiered)
-   - Rate configuration for single rates
-   - Tiered commission structure with add/remove tiers
-   - Applies to services/products toggles
-   - Default plan designation
-
-2. **CommissionPlansListDrawer** - View and manage all commission plans:
-   - Search functionality
-   - Shows plan type, rate, staff count
-   - Edit/delete actions with safety checks
-
-3. **TimeClockDrawer** - Real-time clock in/out with:
-   - Live clock display (updates every second)
-   - Clock in/out with timestamp logging
-   - Break management (paid/unpaid breaks)
-   - Break duration tracking
-   - Shift summary with total hours worked
-
-4. **TimesheetDrawer** - Weekly timesheet management:
-   - Week navigation (previous/next week)
-   - Daily breakdown with hours worked
-   - Break display per day
-   - Total regular hours, overtime hours, estimated pay
-   - Generate/approve timesheet actions
-
-5. **StaffPricingDrawer** - Staff-specific service pricing:
-   - Service list with search
-   - Custom price and duration per service
-   - Enable/disable per service
-   - Shows default vs custom pricing comparison
-
-6. **StaffPerformanceDrawer** - Performance analytics:
-   - Time period selector (7d/30d/90d/year)
-   - Revenue stats (total, service, product)
-   - Appointment metrics (completed, cancelled)
-   - Client metrics (new, returning)
-   - Utilization rate, satisfaction score
-   - Active goals with progress bars
-   - Rebooking rate visualization
-   - Estimated commission calculation
-
-7. **PayrollSummaryDrawer** - Payroll overview:
-   - Month navigation
-   - Gross pay display
-   - Hours breakdown (regular, overtime)
-   - Earnings breakdown (hourly, commissions, tips, bonuses)
-   - Deductions display
-   - Net pay calculation
-   - Export to JSON
-
-8. **StaffScheduleDrawer** - Advanced scheduling:
-   - Weekly schedule with day toggles
-   - Multiple shifts per day
-   - Time selection with 30-min intervals
-   - Schedule type (weekly/biweekly/rotating)
-   - Copy schedule to all days
-   - Total weekly hours calculation
-   - Validation (at least one working day, shift times)
-
-**Component Index** (src/pages/staff/components/index.ts):
-- Exports all 8 drawer components for easy import
-
-### Staff.tsx Refactor - Enterprise Tab Integration
-
-Refactored Staff.tsx with 5-tab interface integrating all new enterprise drawer components:
-
-**Tab Structure**:
-1. **Team** - Legacy staff management with local JSON data
-2. **Commissions** - Commission plans and staff assignments (store-backed)
-3. **Time Tracking** - Clock in/out, active shifts, timesheet access (store-backed)
-4. **Payroll** - Pay summaries with breakdown (store-backed)
-5. **Performance** - Staff metrics and goals (store-backed)
-
-**Selection Synchronization**:
-- `selectedStoreStaffId` state with `useMemo`-derived `selectedStoreStaff`
-- `handleSelectStoreStaff()` for consistent selection handling
-- `handleSelectStaffInTeam()` syncs Team tab selection to store by matching display_name
-- `openDrawerForStaff()` helper with validation before opening drawers
-- `handleTabChange()` ensures staff selection when switching to enterprise tabs
-- `useEffect` auto-selects first staff if none selected or selected staff removed
-- All enterprise tab staff rows are clickable with visual selection indicator
-- Cross-tab selection continuity: Team tab selections now sync to enterprise tabs
-
-**Drawer Integration**:
-- All 8 drawer components wired with proper open/close state
-- Drawers receive `selectedStoreStaff` with type safety
-- Action buttons use `stopPropagation()` to prevent row selection conflicts
-- Toast notifications for validation errors
-
-**Design Notes**:
-- Dual state architecture: Team tab uses local JSON, enterprise tabs use staffStore
-- Selection state syncs when switching tabs via `handleTabChange`
-- Future enhancement: Migrate Team tab to staffStore for single source of truth
-
-### Phase 1: Enterprise Features Foundation
-
-Implemented comprehensive type definitions and state management for enterprise salon features (commission management, time tracking, memberships, packages, permissions):
-
-**New Type Definitions**:
-
-1. **Staff Types** (src/types/staff.ts):
-   - `StaffMember` with complete profile (pay type, commission rates, permissions, scheduling)
-   - `CommissionPlan` and `CommissionTier` for flexible commission structures (percentage, fixed, tiered)
-   - `TimeEntry`, `BreakEntry`, `Timesheet` for time clock tracking
-   - `PayrollSummary` for payroll calculations
-   - `SchedulePattern`, `WeekPattern`, `DaySchedule`, `Shift` for advanced scheduling
-   - `TimeOffRequest` for vacation/sick leave management
-   - `StaffPermissions` with granular permissions for all modules (calendar, clients, services, inventory, sales, staff, settings, reports)
-   - `PermissionTemplate` with 5 levels (owner, high, medium, low, basic)
-   - `PerformanceMetrics` and `StaffGoal` for analytics
-   - `StaffPricing` for staff-specific service prices
-   - `Role` and `Location` types
-
-2. **Service Types** (src/types/service.ts):
-   - `Service` with processing time, blocked time, deposits, resource requirements
-   - `ServiceAddOn` for additional services
-   - `ServicePackage` with sequential/parallel booking, various pricing types
-   - `Membership` with service-based, credit-based, or hybrid types
-   - `ClientMembership` and `ClientPackagePurchase` for client enrollments
-   - `Resource` and `ResourceBooking` for room/equipment management
-   - `ServiceCustomization` with price/duration adjustments
-   - `DynamicPricingRule` with conditions (day of week, time range, etc.)
-   - `ResolvedServicePrice` and `ResolvedServiceDuration` for calculated values
-
-3. **Settings Types** (src/types/settings.ts):
-   - `BusinessProfile` with contact info, social media
-   - `BusinessHours` with breaks support
-   - `CommissionSettings` with calculation options
-   - `TaxSettings` with custom rates
-   - `PaymentSettings` with methods, tips, deposits
-   - `BookingSettings` with policies
-   - `CancellationPolicy` and `NoShowPolicy`
-   - `NotificationSettings` for email, SMS, push
-
-**New Zustand Stores**:
-
-1. **staffStore** (src/stores/staffStore.ts):
-   - Staff CRUD with filtering
-   - Commission plan management with tiered calculation
-   - Time clock (clock in/out, breaks)
-   - Timesheet generation and approval
-   - Payroll summary generation
-   - Schedule pattern management
-   - Time off requests with approval workflow
-   - Staff-specific pricing
-   - Performance metrics tracking
-   - Staff goal management
-   - Permission template management
-   - Sample data for 3 staff members, 6 roles, 1 location, 2 commission plans
-
-2. **servicesStore** (src/stores/servicesStore.ts):
-   - Service CRUD with category filtering
-   - Add-on management with service applicability
-   - Package management with price calculation
-   - Client package purchase and redemption
-   - Membership management (enroll, pause, resume, cancel)
-   - Credit usage tracking
-   - Resource management with availability checking
-   - Resource booking
-   - Service customization with options
-   - Staff-specific pricing
-   - Dynamic pricing rules
-   - `resolveServicePrice()` and `resolveServiceDuration()` for final calculations
-   - Sample data for 4 services, 3 categories, 3 add-ons, 2 packages, 2 memberships, 3 resources
-
-3. **settingsStore** (src/stores/settingsStore.ts):
-   - Business profile management
-   - Business hours with open/close times
-   - Commission settings
-   - Tax settings
-   - Payment method settings
-   - Booking settings with policies
-   - Notification settings
-   - Default values for all settings
-
-**New Settings Page** (src/pages/Settings.tsx):
-- 10-tab interface: Business, Hours, Commissions, Taxes, Payments, Booking, Notifications, Permissions, Appearance, Integrations
-- Full business profile editing with address
-- Business hours management with open/close toggles
-- Commission rate configuration with calculation options
-- Tax settings with per-category support
-- Payment method toggles and tip configuration
-- Booking window, buffer time, waitlist configuration, and policy settings
-- Notification preferences for email/SMS
-- Permission template overview with 5 role levels
-- Appearance settings: brand colors (primary/secondary/accent), theme, logo position, custom CSS
-- Integration settings: Google Calendar sync, Stripe payments, Mailchimp, Zapier webhooks
-
-**Updated App Routes** (src/App.tsx):
-- Added `/settings` route with Settings component
-
-## December 1, 2025
-### Major Inventory Module Enhancement (Phases 1-4)
-Comprehensive inventory management system upgrade to achieve competitive parity with Mangomint and Fresha:
-
-**New Types & Data Structures** (src/types/inventory.ts):
-- Enhanced `InventoryItem` with stock tracking fields (currentStock, lowStockThreshold, reorderQuantity, reorderPoint)
-- Added barcode support, unitOfMeasure, isRetail, isBackBar, trackStock, taxable flags
-- New `Supplier` type with complete contact info, payment terms, lead time tracking
-- New `PurchaseOrder` and `PurchaseOrderItem` types with full order lifecycle
-- New `StockAdjustment` and `StockMovement` types for tracking all inventory changes
-- New `Stocktake` and `StocktakeItem` types for physical inventory counts
-- New `LowStockAlert` type for proactive inventory alerts
-- New `ReceivingRecord` for purchase order receiving
-
-**New Inventory Store** (src/stores/inventoryStore.ts):
-- Zustand store with complete inventory state management
-- Stock adjustment with movement tracking and reason codes
-- Purchase order lifecycle (create, update, receive, cancel)
-- Stocktake functionality (create, count, complete with optional adjustments)
-- Low stock alert generation and acknowledgment
-- Inventory analytics (stats, value, top-selling products)
-
-**New Components** (src/pages/inventory/components/):
-- `StockAdjustmentDrawer` - Add/remove stock with reason tracking
-- `SupplierDrawer` - Create/edit suppliers with full contact details
-- `SuppliersListDrawer` - View and manage supplier list
-- `PurchaseOrderDrawer` - Create/edit purchase orders with line items
-- `PurchaseOrdersListDrawer` - View and manage purchase orders
-- `ReceiveOrderDrawer` - Receive items from purchase orders
-- `StocktakeDrawer` - Physical inventory counting interface
-- `StocktakeListDrawer` - View stocktake history
-- `LowStockAlertsDrawer` - View and manage low stock alerts
-- `StockMovementDrawer` - View stock movement history
-- `InventoryReportsDrawer` - Inventory analytics and reports
-
-**Updated Inventory Page** (src/pages/Inventory.tsx):
-- Dashboard stats (total products, low stock, out of stock, inventory value)
-- Quick access toolbar for all inventory operations
-- Enhanced product table with stock level indicators
-- Integrated all new drawer components
-
-**Updated Validations** (src/lib/validations.ts):
-- Enhanced `inventoryFormInputSchema` with new fields (barcode, stock quantities, supplier)
-- Removed deprecated `serial_number` field
-
-## October 2, 2025
-### UI Improvements
-- **Redesigned AppointmentCard with Google Calendar style**: Completely redesigned appointment card to follow Google Calendar's compact, simple layout
-  - **Line 1**: Client name as title with line-clamp-2 (wraps to 2 lines if long), NEW indicator inline, status icons (VIP, messages, recurring) on right
-  - **Line 2**: Time range in simple format (e.g., "10:00 am - 10:45 am")
-  - **Line 3**: Status label (Confirmed, In Progress, etc.)
-  - **Line 4**: Service name with subtle styling (reduced opacity)
-  - **Bottom Section**: Compact action buttons (Edit and Checkout) with subtle border-top separator
-  - **Styling**: White text on status-colored background, small text sizes (text-xs, text-sm), compact padding
-  - **Functionality**: Preserved drag-and-drop, edit dialog, checkout flow, and all conditional rendering
-  - **Code Quality**: Removed unused imports (Badge, Clock, User, DollarSign) and variables (duration)
-
-## October 1, 2025
-### Bug Fixes
-- **Fixed duplicate appointment rendering in Day view**: Resolved critical bug where appointments were being rendered 18 times
-  - **Root Cause**: TimeGrid component was rendering its children inside each of the 18 time slot divs (9 AM to 6 PM with 30-minute intervals), causing all appointments to render once per time slot
-  - **Solution**: Restructured DayView architecture to isolate TimeGrid to the left column for time labels only, with staff columns and appointments rendered independently
-  - **Additional Safeguards**: Added store-level deduplication in `initializeData` and `addAppointment` to prevent duplicate appointments by ID
-  - This fix ensures each appointment renders exactly once while preserving drag-and-drop functionality and time slot interactions
-- **Fixed incorrect type imports**: Updated imports across calendar components to use individual type files instead of non-existent '@/types/calendar' exports
-- **Added missing client names in mock data**: Updated mock client data to include required `name` field along with firstName and lastName
+GlowFlowApp is a comprehensive salon management system built with React, TypeScript, and Vite. It aims to streamline salon operations by providing robust features for client management, staff scheduling, service offerings, appointments, inventory tracking, and point-of-sale functionalities. The application features a modern, responsive interface, including authentication, dashboard analytics, and complete CRUD operations for all essential business entities. The project's ambition is to offer a competitive, feature-rich solution for salon owners, rivaling existing market leaders like Mangomint and Fresha.
 
 # User Preferences
 
@@ -277,84 +9,82 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-- **Framework**: React 18 with TypeScript for type safety and modern development
-- **Build Tool**: Vite for fast development and optimized production builds
-- **UI Framework**: Combination of shadcn/ui components and Ant Design for rich UI components
-- **Styling**: Tailwind CSS with custom design system including gradients, shadows, and animations
-- **Routing**: React Router for client-side navigation with protected routes
-- **State Management**: Zustand for global state (inventory, calendar, checkout, sales), React Context for authentication
-- **Form Handling**: React Hook Form with Zod validation for type-safe form validation
+- **Framework**: React 18 with TypeScript.
+- **Build Tool**: Vite.
+- **UI Frameworks**: Combination of shadcn/ui and Ant Design.
+- **Styling**: Tailwind CSS with a custom design system.
+- **Routing**: React Router with protected routes.
+- **State Management**: Zustand for global state (inventory, calendar, checkout, sales, staff, services, settings), React Context for authentication.
+- **Form Handling**: React Hook Form with Zod validation.
 
 ## Component Structure
-- **Base Components**: Reusable UI primitives (BaseButton, BaseCard, BaseInput, BaseDrawer, etc.) with consistent styling
-- **Layout Components**: AppLayout with TopNavigation for responsive navigation across desktop and mobile
-- **Page Components**: Feature-specific pages (Dashboard, Clients, Staff, Services, Appointments, Inventory, POS)
-- **Form Components**: Standardized form fields with validation and error handling
+- **Reusable Components**: Base components (e.g., BaseButton, BaseCard, BaseInput, BaseDrawer) ensure consistent styling and functionality.
+- **Layout**: `AppLayout` with `TopNavigation` for consistent, responsive navigation.
+- **Pages**: Dedicated pages for core features like Dashboard, Clients, Staff, Services, Appointments, Inventory, and POS.
+- **Form Components**: Standardized form fields with built-in validation and error handling.
 
 ## Authentication System
-- **Context-based**: AuthContext provides authentication state throughout the app
-- **Protected Routes**: ProtectedRoute component wraps authenticated pages
-- **Mock Authentication**: Uses local JSON data for demonstration with JWT-like tokens
-- **Persistent Sessions**: localStorage integration for session persistence
+- **Mechanism**: Context-based using `AuthContext`.
+- **Security**: `ProtectedRoute` component for restricted access.
+- **Implementation**: Mock authentication using local JSON data with JWT-like tokens for demonstration, persistent sessions via `localStorage`.
 
 ## Data Management
-- **Zustand Stores**: inventoryStore, calendarStore, checkoutStore, salesStore, staffStore, servicesStore, settingsStore for feature-specific state
-- **Mock Data**: JSON files simulate backend APIs for development (clients.json, staff.json, services.json, users.json)
-- **Query Management**: TanStack Query for data fetching and caching (prepared for future API integration)
-- **Form Validation**: Zod schemas for comprehensive form validation with custom error messages
+- **State Stores**: Zustand stores (`inventoryStore`, `calendarStore`, `checkoutStore`, `salesStore`, `staffStore`, `servicesStore`, `settingsStore`) manage feature-specific state.
+- **Mock Data**: JSON files are used to simulate backend APIs for development.
+- **Query Management**: TanStack Query is integrated for future API data fetching and caching.
+- **Validation**: Zod schemas provide comprehensive, type-safe form validation.
 
 ## UI/UX Design System
-- **Theme Support**: Dark/light mode toggle with theme persistence
-- **Design Tokens**: Custom CSS variables for colors, spacing, and typography
-- **Component Variants**: Consistent styling variants across all components (gradient, outline, ghost, etc.)
-- **Responsive Design**: Mobile-first approach with responsive navigation and layouts
-- **Drawer Pattern**: Consistent drawer-based UI for all edit/create operations (width-based, not size-based)
+- **Theme**: Supports dark/light mode with persistence.
+- **Design Tokens**: Custom CSS variables define colors, spacing, and typography.
+- **Responsiveness**: Mobile-first approach.
+- **Drawer Pattern**: Consistent drawer-based UI (width-based) for all create/edit operations.
 
 ## Notification System
-- **Multiple Providers**: Dual notification system using both shadcn/ui toast and Ant Design notifications
-- **Custom Service**: Centralized notification service with different types (success, warning, error, info)
-- **Action Notifications**: Pre-built notifications for CRUD operations (created, updated, deleted)
+- **Dual System**: Utilizes both shadcn/ui toast and Ant Design notifications.
+- **Centralized Service**: Custom notification service for various types (success, warning, error, info) and pre-built CRUD operation notifications.
 
-# Key Implementation Notes
-
-## Inventory Module Architecture
-- Uses Zustand store pattern consistent with other stores (calendarStore, checkoutStore, salesStore)
-- BaseDrawer component uses `width` prop (not `size`); all drawers use width={500} or width={600)
-- Enhanced InventoryItem uses camelCase (costPrice, currentStock) instead of snake_case
-- Stock movements are automatically tracked for all adjustments with reason codes
-- Low stock alerts are generated based on lowStockThreshold and reorderPoint
+## Key Features & Implementations
+- **Inventory Module**: Comprehensive inventory management including stock tracking, suppliers, purchase orders, stock adjustments, stocktakes, and low stock alerts. Features new types (`InventoryItem`, `Supplier`, `PurchaseOrder`, `StockAdjustment`, `Stocktake`, `LowStockAlert`, `ReceivingRecord`) and a dedicated `inventoryStore`.
+- **Staff Management**: Advanced features for staff, including commission plans (tiered, percentage, fixed), time clock, timesheets, payroll summaries, staff-specific pricing, performance analytics, and detailed scheduling. Implemented with dedicated `staffStore` and numerous drawer components.
+- **Service Management**: Enhanced service definitions with a 5-tab interface:
+  - **Services Tab**: Core service management with categories, pricing, and duration settings
+  - **Add-Ons Tab**: Create and manage service add-ons that can be added to appointments (e.g., deep conditioning, scalp massage)
+  - **Packages Tab**: Bundle services together with flexible pricing (sum, fixed, percentage discount) and track usage
+  - **Memberships Tab**: Recurring membership plans with credit-based or service-based options, tracking active members and monthly revenue
+  - **Resources Tab**: Manage rooms, equipment, and stations for booking and availability tracking
+  - Enterprise drawer components: `ServiceAddOnDrawer`, `ServicePackageDrawer`, `MembershipDrawer`, `ResourceDrawer`, `DynamicPricingDrawer`, and list drawers for each feature
+  - Managed by `servicesStore` Zustand store with comprehensive CRUD operations
+- **Settings Module**: Extensive business settings including profile, hours, commissions, taxes, payments, booking policies, notifications, permissions, appearance (branding), and integrations. Managed by `settingsStore` and presented in a multi-tab interface.
+- **Appointment Calendar**: Redesigned appointment card to mirror Google Calendar's compact style. Critical bug fix for duplicate appointment rendering in Day view, ensuring single rendering and preserving drag-and-drop.
 
 # External Dependencies
 
 ## Core Framework Dependencies
-- **React**: Core framework with hooks and context
-- **TypeScript**: Type safety and development experience
-- **Vite**: Build tool and development server
-- **React Router**: Client-side routing and navigation
+- **React**
+- **TypeScript**
+- **Vite**
+- **React Router**
 
 ## UI Component Libraries
-- **shadcn/ui**: Modern React components built on Radix UI primitives
-- **Ant Design**: Comprehensive component library for complex UI elements
-- **Radix UI**: Headless UI primitives for accessibility and customization
-- **Tailwind CSS**: Utility-first CSS framework for styling
+- **shadcn/ui**
+- **Ant Design**
+- **Radix UI**
+- **Tailwind CSS**
 
 ## State Management
-- **Zustand**: Lightweight state management for global app state
+- **Zustand**
 
 ## Form and Validation
-- **React Hook Form**: Form state management and validation
-- **Zod**: TypeScript-first schema validation
-- **@hookform/resolvers**: Integration between React Hook Form and Zod
+- **React Hook Form**
+- **Zod**
+- **@hookform/resolvers**
 
 ## Utility Libraries
-- **TanStack Query**: Data fetching and caching (prepared for API integration)
-- **Lucide React**: Icon library for consistent iconography
-- **Tabler Icons**: Additional icon set for extended icon needs
-- **date-fns**: Date manipulation and formatting
-- **clsx + tailwind-merge**: Conditional class name handling
-- **react-phone-number-input**: International phone number input component
-
-## Development Tools
-- **ESLint**: Code linting with TypeScript and React rules
-- **PostCSS + Autoprefixer**: CSS processing and vendor prefixing
-- **Lovable Tagger**: Development-specific component tagging (development mode only)
+- **TanStack Query**
+- **Lucide React**
+- **Tabler Icons**
+- **date-fns**
+- **clsx**
+- **tailwind-merge**
+- **react-phone-number-input**
