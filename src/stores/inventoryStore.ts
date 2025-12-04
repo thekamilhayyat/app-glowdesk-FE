@@ -16,6 +16,8 @@ import {
   InventoryFilters,
   StockAdjustmentReason,
   ReceivingRecord,
+  StockTransfer,
+  LocationStock,
 } from '@/types/inventory';
 
 interface InventoryState {
@@ -29,6 +31,7 @@ interface InventoryState {
   receivingRecords: ReceivingRecord[];
   stocktakes: Stocktake[];
   lowStockAlerts: LowStockAlert[];
+  stockTransfers: StockTransfer[];
   
   isLoading: boolean;
   error: string | null;
@@ -104,6 +107,24 @@ interface InventoryState {
   getInventoryStats: () => InventoryStats;
   getInventoryValue: () => { costValue: number; retailValue: number };
   getTopSellingProducts: (limit?: number) => { itemId: string; itemName: string; quantitySold: number; revenue: number }[];
+
+  createStockTransfer: (
+    itemId: string,
+    fromLocationId: string,
+    fromLocationName: string,
+    toLocationId: string,
+    toLocationName: string,
+    quantity: number,
+    userId: string,
+    userName: string,
+    notes?: string
+  ) => StockTransfer | null;
+  completeStockTransfer: (transferId: string, userId: string, userName: string) => boolean;
+  cancelStockTransfer: (transferId: string) => boolean;
+  getStockTransfers: (filters?: { itemId?: string; locationId?: string; status?: StockTransfer['status'] }) => StockTransfer[];
+  getStockByLocation: (itemId: string) => LocationStock[];
+  updateLocationStock: (itemId: string, locationId: string, locationName: string, quantity: number) => void;
+  ensureLocationStock: (itemId: string, locationId: string, locationName: string, seedFromCurrent?: boolean) => number;
 }
 
 const generateId = () => `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -298,6 +319,7 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   receivingRecords: [],
   stocktakes: [],
   lowStockAlerts: [],
+  stockTransfers: [],
   isLoading: false,
   error: null,
 
@@ -380,6 +402,16 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
 
     if (filters.isBackBar !== undefined) {
       items = items.filter((item) => item.isBackBar === filters.isBackBar);
+    }
+
+    if (filters.locationId) {
+      items = items.filter((item) => {
+        const hasLocationStock = item.locationStock && item.locationStock.length > 0;
+        if (hasLocationStock) {
+          return item.locationStock.some(ls => ls.locationId === filters.locationId && ls.quantity > 0);
+        }
+        return item.currentStock > 0;
+      });
     }
 
     return items;
@@ -854,5 +886,207 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
       })
       .sort((a, b) => b.quantitySold - a.quantitySold)
       .slice(0, limit);
+  },
+
+  createStockTransfer: (itemId, fromLocationId, fromLocationName, toLocationId, toLocationName, quantity, userId, userName, notes) => {
+    const item = get().getItemById(itemId);
+    if (!item) return null;
+    
+    const sourceQty = get().ensureLocationStock(itemId, fromLocationId, fromLocationName, true);
+    get().ensureLocationStock(itemId, toLocationId, toLocationName, false);
+    
+    if (!item.allowNegativeStock && sourceQty < quantity) {
+      return null;
+    }
+    
+    const transfer: StockTransfer = {
+      id: generateId(),
+      itemId,
+      itemName: item.name,
+      sku: item.sku,
+      fromLocationId,
+      fromLocationName,
+      toLocationId,
+      toLocationName,
+      quantity,
+      status: 'pending',
+      notes,
+      requestedBy: userId,
+      requestedByName: userName,
+      requestedAt: new Date().toISOString(),
+    };
+    
+    set((state) => ({
+      stockTransfers: [transfer, ...state.stockTransfers],
+    }));
+    
+    return transfer;
+  },
+
+  completeStockTransfer: (transferId, userId, userName) => {
+    const transfer = get().stockTransfers.find(t => t.id === transferId);
+    if (!transfer || transfer.status !== 'pending') return false;
+    
+    const item = get().getItemById(transfer.itemId);
+    if (!item) return false;
+    
+    get().ensureLocationStock(transfer.itemId, transfer.fromLocationId, transfer.fromLocationName, true);
+    get().ensureLocationStock(transfer.itemId, transfer.toLocationId, transfer.toLocationName, false);
+    
+    const sourceStock = get().getStockByLocation(transfer.itemId).find(
+      ls => ls.locationId === transfer.fromLocationId
+    );
+    const sourceQty = sourceStock?.quantity || 0;
+    
+    if (!item.allowNegativeStock && sourceQty < transfer.quantity) {
+      return false;
+    }
+    
+    get().updateLocationStock(
+      transfer.itemId,
+      transfer.fromLocationId,
+      transfer.fromLocationName,
+      sourceQty - transfer.quantity
+    );
+    
+    const destStock = get().getStockByLocation(transfer.itemId).find(
+      ls => ls.locationId === transfer.toLocationId
+    );
+    const destQty = destStock?.quantity || 0;
+    
+    get().updateLocationStock(
+      transfer.itemId,
+      transfer.toLocationId,
+      transfer.toLocationName,
+      destQty + transfer.quantity
+    );
+    
+    get().adjustStock(
+      transfer.itemId,
+      0,
+      'transfer_out',
+      `Stock transfer: ${transfer.quantity} units from ${transfer.fromLocationName} to ${transfer.toLocationName}`,
+      userId,
+      userName,
+      transferId,
+      'transfer'
+    );
+    
+    set((state) => ({
+      stockTransfers: state.stockTransfers.map(t => 
+        t.id === transferId
+          ? {
+              ...t,
+              status: 'completed' as const,
+              completedBy: userId,
+              completedByName: userName,
+              completedAt: new Date().toISOString(),
+            }
+          : t
+      ),
+    }));
+    
+    return true;
+  },
+
+  cancelStockTransfer: (transferId) => {
+    const transfer = get().stockTransfers.find(t => t.id === transferId);
+    if (!transfer || transfer.status !== 'pending') return false;
+    
+    set((state) => ({
+      stockTransfers: state.stockTransfers.map(t =>
+        t.id === transferId
+          ? { ...t, status: 'cancelled' as const }
+          : t
+      ),
+    }));
+    
+    return true;
+  },
+
+  getStockTransfers: (filters) => {
+    let transfers = [...get().stockTransfers];
+    
+    if (filters?.itemId) {
+      transfers = transfers.filter(t => t.itemId === filters.itemId);
+    }
+    if (filters?.locationId) {
+      transfers = transfers.filter(t => 
+        t.fromLocationId === filters.locationId || t.toLocationId === filters.locationId
+      );
+    }
+    if (filters?.status) {
+      transfers = transfers.filter(t => t.status === filters.status);
+    }
+    
+    return transfers.sort((a, b) => 
+      new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
+    );
+  },
+
+  getStockByLocation: (itemId) => {
+    const item = get().getItemById(itemId);
+    if (!item) return [];
+    return item.locationStock || [];
+  },
+
+  updateLocationStock: (itemId, locationId, locationName, quantity) => {
+    set((state) => ({
+      items: state.items.map(item => {
+        if (item.id !== itemId) return item;
+        
+        const locationStock = item.locationStock || [];
+        const existingIndex = locationStock.findIndex(ls => ls.locationId === locationId);
+        
+        let updatedLocationStock: typeof locationStock;
+        
+        if (existingIndex >= 0) {
+          updatedLocationStock = [...locationStock];
+          updatedLocationStock[existingIndex] = {
+            ...updatedLocationStock[existingIndex],
+            quantity,
+            lastUpdated: new Date().toISOString(),
+          };
+        } else {
+          updatedLocationStock = [
+            ...locationStock,
+            {
+              locationId,
+              locationName,
+              quantity,
+              lowStockThreshold: item.lowStockThreshold,
+              lastUpdated: new Date().toISOString(),
+            },
+          ];
+        }
+        
+        const newCurrentStock = updatedLocationStock.reduce((sum, ls) => sum + ls.quantity, 0);
+        
+        return { 
+          ...item, 
+          locationStock: updatedLocationStock,
+          currentStock: newCurrentStock,
+          updatedAt: new Date().toISOString(),
+        };
+      }),
+    }));
+    get().generateLowStockAlerts();
+  },
+
+  ensureLocationStock: (itemId, locationId, locationName, seedFromCurrent = false) => {
+    const item = get().getItemById(itemId);
+    if (!item) return 0;
+    
+    const locationStock = item.locationStock || [];
+    const existing = locationStock.find(ls => ls.locationId === locationId);
+    
+    if (existing) {
+      return existing.quantity;
+    }
+    
+    const seedQty = seedFromCurrent && locationStock.length === 0 ? item.currentStock : 0;
+    get().updateLocationStock(itemId, locationId, locationName, seedQty);
+    
+    return seedQty;
   },
 }));

@@ -70,6 +70,7 @@ export interface InventoryItem {
   imageUrl?: string;
   notes?: string;
   status: 'active' | 'inactive' | 'discontinued';
+  locationStock?: LocationStock[];
   createdAt: string;
   updatedAt: string;
 }
@@ -266,6 +267,7 @@ export interface InventoryFilters {
   stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock';
   isRetail?: boolean;
   isBackBar?: boolean;
+  locationId?: string;
 }
 
 export interface InventoryStats {
@@ -276,4 +278,32 @@ export interface InventoryStats {
   outOfStockCount: number;
   activeProducts: number;
   inactiveProducts: number;
+}
+
+export interface LocationStock {
+  locationId: string;
+  locationName: string;
+  quantity: number;
+  lowStockThreshold: number;
+  lastUpdated: string;
+}
+
+export interface StockTransfer {
+  id: string;
+  itemId: string;
+  itemName: string;
+  sku: string;
+  fromLocationId: string;
+  fromLocationName: string;
+  toLocationId: string;
+  toLocationName: string;
+  quantity: number;
+  status: 'pending' | 'completed' | 'cancelled';
+  notes?: string;
+  requestedBy: string;
+  requestedByName: string;
+  requestedAt: string;
+  completedBy?: string;
+  completedByName?: string;
+  completedAt?: string;
 }

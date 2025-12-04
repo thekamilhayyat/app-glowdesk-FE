@@ -51,10 +51,19 @@ Preferred communication style: Simple, everyday language.
     - CSV import/export functionality via `ImportExportDrawer`
     - One-click reorder from low stock items via `QuickReorderDrawer`
     - Expiration date alerts system via `ExpirationAlertsDrawer`
-  - **Phase 2 In Progress**:
+  - **Phase 2 (Completed)**:
     - Service-linked product consumption tracking with `ServiceProductConsumptionDrawer`
+    - Staff consumption tracking with `StaffConsumptionDrawer`
+    - Barcode scanning with camera support via `BarcodeScannerDrawer`
+    - Product sales commission tracking via `ProductSalesCommissionDrawer`
     - New types: `ServiceProductConsumption`, `ProductConsumptionLog`
-    - Auto-deduct inventory when services are completed
+  - **Phase 3.1 (Completed)**: Multi-location inventory with stock transfers
+    - New types: `LocationStock`, `StockTransfer` with pending/completed/cancelled statuses
+    - `StockTransferDrawer` with create/pending/history tabs
+    - `ensureLocationStock` helper for automatic location stock initialization
+    - `updateLocationStock` keeps currentStock in sync with locationStock totals
+    - locationId filter in `getFilteredItems` for location-based inventory views
+    - UI shows per-location stock and handles items without location data gracefully
 - **Staff Management**: Advanced features for staff, including commission plans (tiered, percentage, fixed), time clock, timesheets, payroll summaries, staff-specific pricing, performance analytics, and detailed scheduling. Implemented with dedicated `staffStore` and numerous drawer components.
 - **Service Management**: Enhanced service definitions with a 5-tab interface:
   - **Services Tab**: Core service management with categories, pricing, and duration settings
