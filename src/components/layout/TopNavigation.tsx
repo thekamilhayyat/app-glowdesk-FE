@@ -16,7 +16,9 @@ import { cn } from "@/lib/utils"
 import { BaseButton } from "@/components/base/BaseButton";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Separator } from "@/components/ui/separator";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useAuth } from "@/contexts/AuthContext";
+import { useQueryClient } from "@tanstack/react-query";
 import { Dropdown } from "antd";
 import {
   Sheet,
@@ -45,7 +47,12 @@ export function TopNavigation() {
   const location = useLocation()
   const currentPath = location.pathname
   const { user, logout } = useAuth()
+  const queryClient = useQueryClient()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  
+  const handleLogout = async () => {
+    await logout(queryClient)
+  }
 
   const isActive = (path: string) => currentPath === path
 
@@ -77,7 +84,7 @@ export function TopNavigation() {
             <span>Log out</span>
           </div>
         ),
-        onClick: logout,
+        onClick: handleLogout,
         className: "cursor-pointer"
       }
     ]
@@ -120,6 +127,11 @@ export function TopNavigation() {
         {/* Right side - Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
+          
+          <Separator orientation="vertical" className="h-6 hidden sm:block" />
+          
+          {/* Notifications */}
+          <NotificationDropdown />
           
           <Separator orientation="vertical" className="h-6 hidden sm:block" />
           

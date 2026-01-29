@@ -6,9 +6,16 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    host: "localhost",
     port: 5000,
     allowedHosts: [".replit.dev", ".repl.co"],
+    // Headers for iframe embedding
+    headers: {
+      'X-Frame-Options': 'SAMEORIGIN', // Allow iframe embedding from same origin
+      // In production, use: 'X-Frame-Options': 'ALLOW-FROM https://yourdomain.com'
+      // Or remove X-Frame-Options entirely and use Content-Security-Policy
+      'Content-Security-Policy': "frame-ancestors 'self' *;", // Allow embedding from any origin (for testing)
+    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(
     Boolean,

@@ -3,9 +3,12 @@ import App from './App.tsx'
 import './styles/index.scss'
 import 'antd/dist/reset.css'
 import { ThemeProvider } from './components/ui/theme-provider'
+import { StripeProvider } from './providers/StripeProvider'
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-    <App />
+    <StripeProvider>
+      <App />
+    </StripeProvider>
   </ThemeProvider>
 );

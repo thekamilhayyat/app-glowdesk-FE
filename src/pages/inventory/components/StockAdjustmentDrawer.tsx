@@ -7,7 +7,7 @@ import { BaseSelect, BaseSelectItem } from '@/components/base/BaseSelect';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { useInventoryStore } from '@/stores/inventoryStore';
+import { useAdjustStock } from '@/hooks/api/useInventory';
 import { InventoryItem, StockAdjustmentReason } from '@/types/inventory';
 import { Plus, Minus, Package, AlertTriangle } from 'lucide-react';
 
@@ -40,7 +40,7 @@ export const StockAdjustmentDrawer: React.FC<StockAdjustmentDrawerProps> = ({
   item,
   adjustmentType,
 }) => {
-  const { adjustStock } = useInventoryStore();
+  const adjustStockMutation = useAdjustStock();
 
   const {
     register,
@@ -73,30 +73,27 @@ export const StockAdjustmentDrawer: React.FC<StockAdjustmentDrawerProps> = ({
     (r) => r.type === adjustmentType || r.type === 'both'
   );
 
-  const onSubmit = (data: { quantity: string; reason: string; notes?: string }) => {
+  const onSubmit = async (data: { quantity: string; reason: string; notes?: string }) => {
     if (!item) return;
 
     const qty = parseInt(data.quantity) || 0;
-    const adjustmentQuantity = adjustmentType === 'add' ? qty : -qty;
-    
-    const result = adjustStock(
-      item.id,
-      adjustmentQuantity,
-      data.reason as StockAdjustmentReason,
-      data.notes,
-      'current_user',
-      'Current User'
-    );
+    if (qty <= 0) {
+      toast.error('Quantity must be greater than 0');
+      return;
+    }
 
-    if (result) {
-      toast.success(
-        adjustmentType === 'add' 
-          ? `Added ${qty} units to ${item.name}` 
-          : `Removed ${qty} units from ${item.name}`
-      );
+    const adjustmentQuantity = adjustmentType === 'add' ? qty : -qty;
+
+    try {
+      await adjustStockMutation.mutateAsync({
+        id: item.id,
+        quantity: adjustmentQuantity,
+        reason: data.reason as StockAdjustmentReason,
+        notes: data.notes,
+      });
       onOpenChange(false);
-    } else {
-      toast.error('Failed to adjust stock. Negative stock not allowed.');
+    } catch (error) {
+      // Error handling is done in the hook
     }
   };
 
@@ -122,6 +119,7 @@ export const StockAdjustmentDrawer: React.FC<StockAdjustmentDrawerProps> = ({
             variant={adjustmentType === 'add' ? 'gradient' : 'destructive'}
             onClick={handleSubmit(onSubmit)}
             className="flex-1"
+            disabled={adjustStockMutation.isPending}
           >
             {adjustmentType === 'add' ? (
               <>

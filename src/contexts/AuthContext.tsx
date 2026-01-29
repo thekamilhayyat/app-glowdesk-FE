@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import usersData from '@/data/users.json';
+import { QueryClient } from '@tanstack/react-query';
+import { login as apiLogin, logout as apiLogout, getCurrentUser, LoginResponse } from '@/api/auth.api';
+import { getAuthToken, setAuthToken, removeAuthToken, extractData, hasError } from '@/api/client';
 
 interface User {
   id: string;
@@ -8,14 +10,17 @@ interface User {
   lastName: string;
   role: string;
   token: string;
+  isActive?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, firstName: string, lastName: string) => Promise<boolean>;
-  logout: () => void;
+  logout: (queryClient?: QueryClient) => Promise<void>;
   isAuthenticated: boolean;
+  isLoading: boolean;
+  salonId: string | null; // Multi-salon support
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,66 +40,82 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [salonId, setSalonId] = useState<string | null>(null);
+  
+  // Get query client for cache clearing on logout
+  // Note: We can't use useQueryClient here directly, so we'll clear cache in logout function
+  // by accessing the queryClient from the provider context
 
   useEffect(() => {
     // Check if user is already logged in (from localStorage)
-    const storedToken = localStorage.getItem('authToken');
-    const storedUser = localStorage.getItem('authUser');
-    
-    if (storedToken && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        // Verify token exists in our dummy data
-        const validUser = usersData.users.find(u => u.token === storedToken);
-        if (validUser) {
-          setUser(parsedUser);
-          setIsAuthenticated(true);
-        } else {
-          // Invalid token, clear storage
-          localStorage.removeItem('authToken');
+    const initializeAuth = async () => {
+      const storedToken = getAuthToken();
+      const storedUser = localStorage.getItem('authUser');
+      
+      if (storedToken && storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          
+          // Verify token with API
+          const response = await getCurrentUser(storedToken);
+          
+          if (!hasError(response) && response.data) {
+            setUser({
+              ...parsedUser,
+              ...response.data.user,
+            });
+            setIsAuthenticated(true);
+            // Set salon ID from user context (would come from API in real app)
+            setSalonId('salon-1'); // Default salon for MVP
+          } else {
+            // Invalid token, clear storage
+            removeAuthToken();
+            localStorage.removeItem('authUser');
+          }
+        } catch (error) {
+          // Token invalid or expired, clear storage silently
+          removeAuthToken();
           localStorage.removeItem('authUser');
         }
-      } catch (error) {
-        console.error('Error parsing stored user data:', error);
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('authUser');
       }
-    }
+      
+      setIsLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await apiLogin({ email, password });
       
-      // Find user in dummy data
-      const foundUser = usersData.users.find(
-        u => u.email === email && u.password === password
-      );
-
-      if (foundUser) {
-        const userWithoutPassword = {
-          id: foundUser.id,
-          email: foundUser.email,
-          firstName: foundUser.firstName,
-          lastName: foundUser.lastName,
-          role: foundUser.role,
-          token: foundUser.token
-        };
-
-        setUser(userWithoutPassword);
-        setIsAuthenticated(true);
-        
-        // Store in localStorage
-        localStorage.setItem('authToken', foundUser.token);
-        localStorage.setItem('authUser', JSON.stringify(userWithoutPassword));
-        
-        return true;
+      if (hasError(response)) {
+        return false;
       }
+
+      const data = extractData(response);
+      const userData: User = {
+        id: data.user.id,
+        email: data.user.email,
+        firstName: data.user.firstName,
+        lastName: data.user.lastName,
+        role: data.user.role,
+        token: data.token,
+        isActive: data.user.isActive,
+      };
+
+      setUser(userData);
+      setIsAuthenticated(true);
+      setAuthToken(data.token);
+      setSalonId('salon-1'); // Default salon for MVP
       
-      return false;
+      // Store user in localStorage
+      localStorage.setItem('authUser', JSON.stringify(userData));
+      
+      return true;
     } catch (error) {
-      console.error('Login error:', error);
+      // Error already handled by API layer
       return false;
     }
   };
@@ -106,53 +127,67 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     lastName: string
   ): Promise<boolean> => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // For MVP, signup uses login endpoint after creating account
+      // In real app, there would be a separate signup endpoint
+      // For now, we'll simulate by checking if user exists
+      const response = await apiLogin({ email, password });
       
-      // Check if user already exists
-      const existingUser = usersData.users.find(u => u.email === email);
-      if (existingUser) {
-        return false; // User already exists
+      if (hasError(response)) {
+        // User doesn't exist, create account (mock)
+        // In real app, call POST /auth/signup
+        const mockToken = `new_user_token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+
+        const userData: User = {
+          id: `user-${Date.now()}`,
+          email,
+          firstName,
+          lastName,
+          role: 'user',
+          token: mockToken,
+          isActive: true,
+        };
+
+        setUser(userData);
+        setIsAuthenticated(true);
+        setAuthToken(mockToken);
+        setSalonId('salon-1');
+        
+        localStorage.setItem('authUser', JSON.stringify(userData));
+        
+        return true;
       }
 
-      // Create new user (in real app, this would be sent to backend)
-      const newUser = {
-        id: (usersData.users.length + 1).toString(),
-        email,
-        firstName,
-        lastName,
-        role: 'user',
-        token: `new_user_token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      };
-
-      const userWithoutPassword = {
-        id: newUser.id,
-        email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        role: newUser.role,
-        token: newUser.token
-      };
-
-      setUser(userWithoutPassword);
-      setIsAuthenticated(true);
-      
-      // Store in localStorage
-      localStorage.setItem('authToken', newUser.token);
-      localStorage.setItem('authUser', JSON.stringify(userWithoutPassword));
-      
-      return true;
+      // User already exists
+      return false;
     } catch (error) {
-      console.error('Signup error:', error);
+      // Error already handled by API layer
       return false;
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('authUser');
+  const logout = async (queryClient?: QueryClient) => {
+    try {
+      const token = getAuthToken();
+      if (token) {
+        await apiLogout();
+      }
+    } catch (error) {
+      // Continue with logout even if API call fails
+    } finally {
+      // Clear React Query cache
+      if (queryClient) {
+        queryClient.clear();
+      }
+      
+      // Clear auth state
+      setUser(null);
+      setIsAuthenticated(false);
+      setSalonId(null);
+      removeAuthToken();
+      localStorage.removeItem('authUser');
+    }
   };
 
   const value = {
@@ -160,7 +195,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     signup,
     logout,
-    isAuthenticated
+    isAuthenticated,
+    isLoading,
+    salonId,
   };
 
   return (

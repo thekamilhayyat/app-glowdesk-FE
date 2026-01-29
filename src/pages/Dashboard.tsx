@@ -1,37 +1,14 @@
+import { useMemo } from "react";
 import { Container } from "@/components/ui/Container";
 import { BaseCard, CardHeader, CardContent } from "@/components/base/BaseCard";
 import { BaseBadge } from "@/components/base/BaseBadge";
 import { BaseButton } from "@/components/base/BaseButton";
 import { BaseTable, createColumn } from "@/components/base/BaseTable";
-
-// Mock data
-const kpiData = [
-  { title: "Today's Appointments", value: "12", change: "+8%", trend: "up" },
-  { title: "Today's Sales", value: "$2,547", change: "+12%", trend: "up" },
-  { title: "MTD Sales", value: "$45,892", change: "+15%", trend: "up" },
-  { title: "No-show Rate", value: "4.2%", change: "-1%", trend: "down" },
-];
-
-const todaysSchedule = [
-  { time: "09:00", client: "Sarah Johnson", service: "Hair Cut", staff: "Emma", status: "confirmed" },
-  { time: "09:30", client: "Mike Davis", service: "Beard Trim", staff: "Jake", status: "checked-in" },
-  { time: "10:00", client: "Lisa Chen", service: "Color & Style", staff: "Emma", status: "in-progress" },
-  { time: "11:00", client: "John Smith", service: "Hair Cut", staff: "Alex", status: "confirmed" },
-  { time: "11:30", client: "Maria Garcia", service: "Highlights", staff: "Emma", status: "confirmed" },
-];
-
-const recentSales = [
-  { time: "14:30", client: "Sarah Johnson", total: "$85", method: "Card" },
-  { time: "13:45", client: "Mike Davis", total: "$35", method: "Cash" },
-  { time: "13:15", client: "Lisa Chen", total: "$145", method: "Card" },
-  { time: "12:30", client: "Tom Wilson", total: "$65", method: "Card" },
-];
-
-const lowStockItems = [
-  "Shampoo 250ml",
-  "Hair Gel 150ml", 
-  "Styling Cream",
-];
+import { useSalesReport, useAppointmentsReport } from "@/hooks/api/useReports";
+import { useAppointments } from "@/hooks/api/useAppointments";
+import { useSales } from "@/hooks/api/useSales";
+import { useLowStockAlerts } from "@/hooks/api/useInventory";
+import { format, startOfDay, endOfDay, startOfMonth } from "date-fns";
 
 const getStatusBadge = (status: string) => {
   const variants = {
@@ -43,6 +20,127 @@ const getStatusBadge = (status: string) => {
 };
 
 export function Dashboard() {
+  const today = useMemo(() => {
+    const now = new Date();
+    return {
+      start: startOfDay(now).toISOString(),
+      end: endOfDay(now).toISOString(),
+    };
+  }, []);
+
+  const monthStart = useMemo(() => startOfMonth(new Date()).toISOString(), []);
+
+  // Reports for KPIs
+  const { data: todaySalesReport, isLoading: isLoadingTodaySales } = useSalesReport({
+    startDate: today.start,
+    endDate: today.end,
+  });
+
+  const { data: mtdSalesReport, isLoading: isLoadingMTDSales } = useSalesReport({
+    startDate: monthStart,
+    endDate: today.end,
+  });
+
+  const { data: todayAppointmentsReport, isLoading: isLoadingTodayAppointments } = useAppointmentsReport({
+    startDate: today.start,
+    endDate: today.end,
+  });
+
+  // Today's schedule and recent sales
+  const { data: todayAppointmentsData, isLoading: isLoadingAppointments } = useAppointments({
+    startDate: today.start,
+    endDate: today.end,
+    limit: 10,
+  });
+
+  const { data: recentSalesData, isLoading: isLoadingSales } = useSales({
+    startDate: today.start,
+    endDate: today.end,
+    limit: 5,
+  });
+
+  // Low stock alerts
+  const { data: lowStockData } = useLowStockAlerts();
+
+  // Compute KPI values
+  const kpiData = useMemo(() => {
+    const todayAppointmentsCount = todayAppointmentsReport?.summary?.totalAppointments || 0;
+    const todaySalesAmount = todaySalesReport?.summary?.totalRevenue || 0;
+    const mtdSalesAmount = mtdSalesReport?.summary?.totalRevenue || 0;
+    const noShowRate = todayAppointmentsReport?.summary?.noShowRate || 0;
+
+    return [
+      {
+        title: "Today's Appointments",
+        value: todayAppointmentsCount.toString(),
+        change: "+8%", // TODO: Calculate from previous period when backend provides
+        trend: "up" as const,
+        isLoading: isLoadingTodayAppointments,
+      },
+      {
+        title: "Today's Sales",
+        value: `$${todaySalesAmount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+        change: "+12%", // TODO: Calculate from previous period
+        trend: "up" as const,
+        isLoading: isLoadingTodaySales,
+      },
+      {
+        title: "MTD Sales",
+        value: `$${mtdSalesAmount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+        change: "+15%", // TODO: Calculate from previous period
+        trend: "up" as const,
+        isLoading: isLoadingMTDSales,
+      },
+      {
+        title: "No-show Rate",
+        value: `${noShowRate.toFixed(1)}%`,
+        change: "-1%", // TODO: Calculate from previous period
+        trend: "down" as const,
+        isLoading: isLoadingTodayAppointments,
+      },
+    ];
+  }, [
+    todayAppointmentsReport,
+    todaySalesReport,
+    mtdSalesReport,
+    isLoadingTodayAppointments,
+    isLoadingTodaySales,
+    isLoadingMTDSales,
+  ]);
+
+  // Format today's schedule
+  // Note: Backend should return appointments with populated client/service/staff names
+  // If not available, fallback to IDs or 'Unknown'
+  const todaysSchedule = useMemo(() => {
+    if (!todayAppointmentsData?.data) return [];
+    return todayAppointmentsData.data
+      .slice(0, 5)
+      .map((apt: any) => ({
+        time: format(new Date(apt.startTime), 'HH:mm'),
+        client: apt.clientName || apt.client?.name || `Client ${apt.clientId?.slice(0, 8)}` || 'Unknown',
+        service: apt.serviceNames?.join(', ') || apt.services?.map((s: any) => s.name).join(', ') || 'Unknown',
+        staff: apt.staffName || apt.staff?.name || `Staff ${apt.staffId?.slice(0, 8)}` || 'Unknown',
+        status: apt.status,
+      }));
+  }, [todayAppointmentsData]);
+
+  // Format recent sales
+  const recentSales = useMemo(() => {
+    if (!recentSalesData?.data) return [];
+    return recentSalesData.data.map((sale) => ({
+      time: format(new Date(sale.completedAt), 'HH:mm'),
+      client: sale.clientName,
+      total: `$${sale.total.toFixed(2)}`,
+      method: sale.paymentMethods?.[0]?.type?.replace('-', ' ') || 'Unknown',
+    }));
+  }, [recentSalesData]);
+
+  // Low stock items
+  const lowStockItems = useMemo(() => {
+    if (!lowStockData?.alerts) return [];
+    return lowStockData.alerts.slice(0, 3).map((alert) => alert.itemName);
+  }, [lowStockData]);
+
   return (
     <Container className="py-4 space-y-6">
       {/* Page Title */}
@@ -54,17 +152,23 @@ export function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpiData.map((kpi, index) => (
           <BaseCard key={index} variant="elevated" hover="lift">
-            <CardContent >
+            <CardContent>
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">{kpi.title}</p>
                 <div className="flex items-center justify-between">
-                  <p className="text-2xl font-heading font-semibold">{kpi.value}</p>
-                  <BaseBadge 
-                    variant={kpi.trend === "up" ? "success" : "destructive"}
-                    size="sm"
-                  >
-                    {kpi.change}
-                  </BaseBadge>
+                  {kpi.isLoading ? (
+                    <p className="text-2xl font-heading font-semibold">...</p>
+                  ) : (
+                    <>
+                      <p className="text-2xl font-heading font-semibold">{kpi.value}</p>
+                      <BaseBadge
+                        variant={kpi.trend === "up" ? "success" : "destructive"}
+                        size="sm"
+                      >
+                        {kpi.change}
+                      </BaseBadge>
+                    </>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -87,22 +191,32 @@ export function Dashboard() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <BaseTable
-                data={todaysSchedule}
-                columns={[
-                  createColumn('time', 'Time'),
-                  createColumn('client', 'Client'),
-                  createColumn('service', 'Service'),
-                  createColumn('staff', 'Staff'),
-                  createColumn('status', 'Status', {
-                    render: (value) => (
-                      <BaseBadge variant={getStatusBadge(value)} size="sm">
-                        {value}
-                      </BaseBadge>
-                    )
-                  })
-                ]}
-              />
+              {isLoadingAppointments ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading schedule...
+                </div>
+              ) : todaysSchedule.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No appointments scheduled for today
+                </div>
+              ) : (
+                <BaseTable
+                  data={todaysSchedule}
+                  columns={[
+                    createColumn('time', 'Time'),
+                    createColumn('client', 'Client'),
+                    createColumn('service', 'Service'),
+                    createColumn('staff', 'Staff'),
+                    createColumn('status', 'Status', {
+                      render: (value) => (
+                        <BaseBadge variant={getStatusBadge(value)} size="sm">
+                          {value}
+                        </BaseBadge>
+                      )
+                    })
+                  ]}
+                />
+              )}
             </CardContent>
           </BaseCard>
 
@@ -112,15 +226,25 @@ export function Dashboard() {
               <h2 className="text-xl font-heading font-semibold">Recent Sales</h2>
             </CardHeader>
             <CardContent className="p-0">
-              <BaseTable
-                data={recentSales}
-                columns={[
-                  createColumn('time', 'Time'),
-                  createColumn('client', 'Client'),
-                  createColumn('total', 'Total'),
-                  createColumn('method', 'Method')
-                ]}
-              />
+              {isLoadingSales ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading sales...
+                </div>
+              ) : recentSales.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No sales today
+                </div>
+              ) : (
+                <BaseTable
+                  data={recentSales}
+                  columns={[
+                    createColumn('time', 'Time'),
+                    createColumn('client', 'Client'),
+                    createColumn('total', 'Total'),
+                    createColumn('method', 'Method')
+                  ]}
+                />
+              )}
             </CardContent>
           </BaseCard>
         </div>

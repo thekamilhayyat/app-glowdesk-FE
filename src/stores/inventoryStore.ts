@@ -20,66 +20,56 @@ import {
   LocationStock,
 } from '@/types/inventory';
 
+/**
+ * Inventory Store
+ * 
+ * NOTE: Inventory items (products) are now managed via React Query hooks and backend API.
+ * This store only manages:
+ * - Types, Manufacturers, Suppliers (reference data)
+ * - Purchase Orders, Stocktakes, Stock Transfers (workflow data)
+ * 
+ * Use hooks from @/hooks/api/useInventory for product CRUD operations.
+ */
 interface InventoryState {
-  items: InventoryItem[];
+  // Reference data (still managed in store for now - may migrate to API later)
   types: InventoryType[];
   manufacturers: Manufacturer[];
   suppliers: Supplier[];
-  stockAdjustments: StockAdjustment[];
-  stockMovements: StockMovement[];
+  
+  // Workflow data (still managed in store - not part of products API)
   purchaseOrders: PurchaseOrder[];
   receivingRecords: ReceivingRecord[];
   stocktakes: Stocktake[];
-  lowStockAlerts: LowStockAlert[];
   stockTransfers: StockTransfer[];
   
   isLoading: boolean;
   error: string | null;
 
   initializeData: (data: {
-    items?: InventoryItem[];
     types?: InventoryType[];
     manufacturers?: Manufacturer[];
     suppliers?: Supplier[];
   }) => void;
 
-  addItem: (item: InventoryItem) => void;
-  updateItem: (id: string, updates: Partial<InventoryItem>) => void;
-  deleteItem: (id: string) => void;
-  getItemById: (id: string) => InventoryItem | undefined;
-  getItemBySku: (sku: string) => InventoryItem | undefined;
-  getItemByBarcode: (barcode: string) => InventoryItem | undefined;
-  getFilteredItems: (filters: InventoryFilters) => InventoryItem[];
-
+  // Type management
   addType: (type: InventoryType) => void;
   updateType: (id: string, updates: Partial<InventoryType>) => void;
   deleteType: (id: string) => void;
   reorderTypes: (types: InventoryType[]) => void;
 
+  // Manufacturer management
   addManufacturer: (manufacturer: Manufacturer) => void;
   updateManufacturer: (id: string, updates: Partial<Manufacturer>) => void;
   deleteManufacturer: (id: string) => void;
   reorderManufacturers: (manufacturers: Manufacturer[]) => void;
 
+  // Supplier management
   addSupplier: (supplier: Supplier) => void;
   updateSupplier: (id: string, updates: Partial<Supplier>) => void;
   deleteSupplier: (id: string) => void;
   getSupplierById: (id: string) => Supplier | undefined;
 
-  adjustStock: (
-    itemId: string,
-    quantity: number,
-    reason: StockAdjustmentReason,
-    notes?: string,
-    userId?: string,
-    userName?: string,
-    referenceId?: string,
-    referenceType?: 'purchase_order' | 'sale' | 'stocktake' | 'transfer'
-  ) => StockAdjustment | null;
-
-  getStockMovements: (itemId?: string) => StockMovement[];
-  getStockAdjustments: (itemId?: string) => StockAdjustment[];
-
+  // Purchase Order management
   createPurchaseOrder: (order: Omit<PurchaseOrder, 'id' | 'orderNumber' | 'createdAt' | 'updatedAt'>) => PurchaseOrder;
   updatePurchaseOrder: (id: string, updates: Partial<PurchaseOrder>) => void;
   deletePurchaseOrder: (id: string) => void;
@@ -92,22 +82,14 @@ interface InventoryState {
     notes?: string
   ) => ReceivingRecord | null;
 
+  // Stocktake management
   createStocktake: (name: string, description?: string, userId?: string, userName?: string) => Stocktake;
   updateStocktakeItem: (stocktakeId: string, itemId: string, countedQuantity: number, notes?: string, userId?: string) => void;
   completeStocktake: (stocktakeId: string, userId?: string, userName?: string, applyAdjustments?: boolean) => void;
   cancelStocktake: (stocktakeId: string) => void;
   getStocktakeById: (id: string) => Stocktake | undefined;
 
-  getLowStockItems: () => InventoryItem[];
-  getOutOfStockItems: () => InventoryItem[];
-  generateLowStockAlerts: () => void;
-  acknowledgeLowStockAlert: (alertId: string, userId: string) => void;
-  getActiveAlerts: () => LowStockAlert[];
-
-  getInventoryStats: () => InventoryStats;
-  getInventoryValue: () => { costValue: number; retailValue: number };
-  getTopSellingProducts: (limit?: number) => { itemId: string; itemName: string; quantitySold: number; revenue: number }[];
-
+  // Stock Transfer management
   createStockTransfer: (
     itemId: string,
     fromLocationId: string,
@@ -131,138 +113,6 @@ const generateId = () => `${Date.now()}_${Math.random().toString(36).substr(2, 9
 const generateOrderNumber = () => `PO-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
 
 export const useInventoryStore = create<InventoryState>((set, get) => ({
-  items: [
-    {
-      id: 'inv_1',
-      name: 'Professional Hair Dryer',
-      sku: 'DRY-PRO-001',
-      barcode: '123456789012',
-      type: 'Equipment',
-      typeId: 'type_1',
-      manufacturer: 'Dyson',
-      manufacturerId: 'man_1',
-      supplierId: 'sup_1',
-      costPrice: 299.00,
-      retailPrice: 449.99,
-      currentStock: 5,
-      lowStockThreshold: 3,
-      reorderQuantity: 5,
-      reorderPoint: 3,
-      unitOfMeasure: 'unit',
-      isRetail: true,
-      isBackBar: false,
-      trackStock: true,
-      allowNegativeStock: false,
-      taxable: true,
-      status: 'active',
-      createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-01-15T10:00:00Z'
-    },
-    {
-      id: 'inv_2',
-      name: 'Olaplex No. 3 Hair Perfector',
-      sku: 'OLA-003-250',
-      barcode: '896364002350',
-      type: 'Retail Products',
-      typeId: 'type_4',
-      manufacturer: 'Olaplex',
-      manufacturerId: 'man_5',
-      supplierId: 'sup_2',
-      costPrice: 16.00,
-      retailPrice: 30.00,
-      currentStock: 24,
-      lowStockThreshold: 10,
-      reorderQuantity: 24,
-      reorderPoint: 10,
-      unitOfMeasure: 'unit',
-      isRetail: true,
-      isBackBar: false,
-      trackStock: true,
-      allowNegativeStock: false,
-      taxable: true,
-      status: 'active',
-      createdAt: '2024-01-10T10:00:00Z',
-      updatedAt: '2024-01-10T10:00:00Z'
-    },
-    {
-      id: 'inv_3',
-      name: 'Redken All Soft Shampoo 1L',
-      sku: 'RED-SHP-1000',
-      barcode: '884486178107',
-      type: 'Back Bar',
-      typeId: 'type_5',
-      manufacturer: 'Redken',
-      manufacturerId: 'man_4',
-      supplierId: 'sup_2',
-      costPrice: 28.00,
-      retailPrice: null,
-      currentStock: 2,
-      lowStockThreshold: 5,
-      reorderQuantity: 6,
-      reorderPoint: 4,
-      unitOfMeasure: 'bottle',
-      isRetail: false,
-      isBackBar: true,
-      trackStock: true,
-      allowNegativeStock: false,
-      taxable: false,
-      notes: 'Professional use only - back bar',
-      status: 'active',
-      createdAt: '2024-01-05T10:00:00Z',
-      updatedAt: '2024-01-05T10:00:00Z'
-    },
-    {
-      id: 'inv_4',
-      name: 'Professional Clipper Set',
-      sku: 'WAH-CLP-PRO',
-      barcode: '043917100135',
-      type: 'Tools',
-      typeId: 'type_3',
-      manufacturer: 'Wahl',
-      manufacturerId: 'man_3',
-      supplierId: 'sup_1',
-      costPrice: 89.00,
-      retailPrice: 149.99,
-      currentStock: 0,
-      lowStockThreshold: 2,
-      reorderQuantity: 3,
-      reorderPoint: 2,
-      unitOfMeasure: 'unit',
-      isRetail: true,
-      isBackBar: false,
-      trackStock: true,
-      allowNegativeStock: false,
-      taxable: true,
-      status: 'active',
-      createdAt: '2024-01-08T10:00:00Z',
-      updatedAt: '2024-01-08T10:00:00Z'
-    },
-    {
-      id: 'inv_5',
-      name: 'Hair Color Bowls (Set of 6)',
-      sku: 'SUP-BOWL-6PK',
-      type: 'Supplies',
-      typeId: 'type_2',
-      manufacturer: 'Philips',
-      manufacturerId: 'man_2',
-      supplierId: 'sup_1',
-      costPrice: 12.00,
-      retailPrice: 24.99,
-      currentStock: 15,
-      lowStockThreshold: 5,
-      reorderQuantity: 10,
-      reorderPoint: 5,
-      unitOfMeasure: 'pack',
-      isRetail: true,
-      isBackBar: false,
-      trackStock: true,
-      allowNegativeStock: false,
-      taxable: true,
-      status: 'active',
-      createdAt: '2024-01-12T10:00:00Z',
-      updatedAt: '2024-01-12T10:00:00Z'
-    }
-  ],
   types: [
     { type_id: 'type_1', name: 'Equipment', order: 1 },
     { type_id: 'type_2', name: 'Supplies', order: 2 },
@@ -313,12 +163,9 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
       updatedAt: '2024-01-01T00:00:00Z'
     }
   ],
-  stockAdjustments: [],
-  stockMovements: [],
   purchaseOrders: [],
   receivingRecords: [],
   stocktakes: [],
-  lowStockAlerts: [],
   stockTransfers: [],
   isLoading: false,
   error: null,
@@ -453,71 +300,8 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
 
   getSupplierById: (id) => get().suppliers.find((s) => s.id === id),
 
-  adjustStock: (itemId, quantity, reason, notes, userId = 'system', userName = 'System', referenceId, referenceType) => {
-    const item = get().getItemById(itemId);
-    if (!item) return null;
-
-    const previousQuantity = item.currentStock;
-    const newQuantity = previousQuantity + quantity;
-
-    if (!item.allowNegativeStock && newQuantity < 0) {
-      return null;
-    }
-
-    const adjustment: StockAdjustment = {
-      id: `adj_${generateId()}`,
-      itemId,
-      itemName: item.name,
-      previousQuantity,
-      adjustmentQuantity: quantity,
-      newQuantity,
-      reason,
-      notes,
-      referenceId,
-      referenceType,
-      adjustedBy: userId,
-      adjustedByName: userName,
-      createdAt: new Date().toISOString(),
-    };
-
-    const movement: StockMovement = {
-      id: `mov_${generateId()}`,
-      itemId,
-      itemName: item.name,
-      movementType: quantity > 0 ? 'in' : 'out',
-      quantity: Math.abs(quantity),
-      previousStock: previousQuantity,
-      newStock: newQuantity,
-      reason,
-      referenceId,
-      referenceType,
-      notes,
-      performedBy: userId,
-      performedByName: userName,
-      createdAt: new Date().toISOString(),
-    };
-
-    set((state) => ({
-      items: state.items.map((i) =>
-        i.id === itemId ? { ...i, currentStock: newQuantity, updatedAt: new Date().toISOString() } : i
-      ),
-      stockAdjustments: [adjustment, ...state.stockAdjustments],
-      stockMovements: [movement, ...state.stockMovements],
-    }));
-
-    get().generateLowStockAlerts();
-    return adjustment;
-  },
-
-  getStockMovements: (itemId) => {
-    const movements = get().stockMovements;
-    return itemId ? movements.filter((m) => m.itemId === itemId) : movements;
-  },
-
-  getStockAdjustments: (itemId) => {
-    const adjustments = get().stockAdjustments;
-    return itemId ? adjustments.filter((a) => a.itemId === itemId) : adjustments;
-  },
+  // NOTE: adjustStock, getStockMovements, getStockAdjustments removed
+  // Use useAdjustStock hook from @/hooks/api/useInventory instead
 
   createPurchaseOrder: (orderData) => {
     const order: PurchaseOrder = {
@@ -759,134 +543,11 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
 
   getStocktakeById: (id) => get().stocktakes.find((st) => st.id === id),
 
-  getLowStockItems: () => {
-    return get().items.filter(
-      (item) => item.trackStock && item.status === 'active' && item.currentStock <= item.lowStockThreshold && item.currentStock > 0
-    );
-  },
-
-  getOutOfStockItems: () => {
-    return get().items.filter((item) => item.trackStock && item.status === 'active' && item.currentStock <= 0);
-  },
-
-  generateLowStockAlerts: () => {
-    const items = get().items;
-    const existingAlerts = get().lowStockAlerts;
-
-    const newAlerts: LowStockAlert[] = [];
-
-    items.forEach((item) => {
-      if (!item.trackStock || item.status !== 'active') return;
-
-      const existingAlert = existingAlerts.find((a) => a.itemId === item.id && !a.acknowledgedAt);
-      
-      if (item.currentStock <= 0) {
-        if (!existingAlert) {
-          const supplier = item.supplierId ? get().getSupplierById(item.supplierId) : undefined;
-          newAlerts.push({
-            id: `alert_${generateId()}`,
-            itemId: item.id,
-            itemName: item.name,
-            sku: item.sku,
-            currentStock: item.currentStock,
-            lowStockThreshold: item.lowStockThreshold,
-            reorderQuantity: item.reorderQuantity,
-            supplierId: item.supplierId,
-            supplierName: supplier?.name,
-            severity: 'critical',
-            createdAt: new Date().toISOString(),
-          });
-        }
-      } else if (item.currentStock <= item.lowStockThreshold) {
-        if (!existingAlert) {
-          const supplier = item.supplierId ? get().getSupplierById(item.supplierId) : undefined;
-          newAlerts.push({
-            id: `alert_${generateId()}`,
-            itemId: item.id,
-            itemName: item.name,
-            sku: item.sku,
-            currentStock: item.currentStock,
-            lowStockThreshold: item.lowStockThreshold,
-            reorderQuantity: item.reorderQuantity,
-            supplierId: item.supplierId,
-            supplierName: supplier?.name,
-            severity: 'warning',
-            createdAt: new Date().toISOString(),
-          });
-        }
-      }
-    });
-
-    if (newAlerts.length > 0) {
-      set((state) => ({
-        lowStockAlerts: [...newAlerts, ...state.lowStockAlerts],
-      }));
-    }
-  },
-
-  acknowledgeLowStockAlert: (alertId, userId) => {
-    set((state) => ({
-      lowStockAlerts: state.lowStockAlerts.map((alert) =>
-        alert.id === alertId
-          ? { ...alert, acknowledgedAt: new Date().toISOString(), acknowledgedBy: userId }
-          : alert
-      ),
-    }));
-  },
-
-  getActiveAlerts: () => {
-    return get().lowStockAlerts.filter((alert) => !alert.acknowledgedAt);
-  },
-
-  getInventoryStats: () => {
-    const items = get().items;
-    const activeItems = items.filter((item) => item.status === 'active');
-
-    return {
-      totalProducts: items.length,
-      totalValue: activeItems.reduce((sum, item) => sum + item.costPrice * item.currentStock, 0),
-      totalRetailValue: activeItems.reduce((sum, item) => sum + (item.retailPrice || 0) * item.currentStock, 0),
-      lowStockCount: get().getLowStockItems().length,
-      outOfStockCount: get().getOutOfStockItems().length,
-      activeProducts: activeItems.length,
-      inactiveProducts: items.filter((item) => item.status === 'inactive').length,
-    };
-  },
-
-  getInventoryValue: () => {
-    const items = get().items.filter((item) => item.status === 'active');
-    return {
-      costValue: items.reduce((sum, item) => sum + item.costPrice * item.currentStock, 0),
-      retailValue: items.reduce((sum, item) => sum + (item.retailPrice || 0) * item.currentStock, 0),
-    };
-  },
-
-  getTopSellingProducts: (limit = 10) => {
-    const movements = get().stockMovements.filter((m) => m.reason === 'sold');
-    const salesByItem: Record<string, { quantity: number; revenue: number }> = {};
-
-    movements.forEach((m) => {
-      if (!salesByItem[m.itemId]) {
-        salesByItem[m.itemId] = { quantity: 0, revenue: 0 };
-      }
-      const item = get().getItemById(m.itemId);
-      salesByItem[m.itemId].quantity += m.quantity;
-      salesByItem[m.itemId].revenue += m.quantity * (item?.retailPrice || item?.costPrice || 0);
-    });
-
-    return Object.entries(salesByItem)
-      .map(([itemId, data]) => {
-        const item = get().getItemById(itemId);
-        return {
-          itemId,
-          itemName: item?.name || 'Unknown',
-          quantitySold: data.quantity,
-          revenue: data.revenue,
-        };
-      })
-      .sort((a, b) => b.quantitySold - a.quantitySold)
-      .slice(0, limit);
-  },
+  // NOTE: Item-related helper methods removed
+  // Use React Query hooks from @/hooks/api/useInventory instead:
+  // - useProducts() for item data
+  // - useLowStockAlerts() for alerts
+  // - Compute stats from query data in components
 
   createStockTransfer: (itemId, fromLocationId, fromLocationName, toLocationId, toLocationName, quantity, userId, userName, notes) => {
     const item = get().getItemById(itemId);

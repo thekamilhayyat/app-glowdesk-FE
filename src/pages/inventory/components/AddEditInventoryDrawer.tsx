@@ -12,6 +12,7 @@ import { getFieldError, hasFieldError } from '@/hooks/useFormValidation';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useInventoryStore } from '@/stores/inventoryStore';
 import { InventoryItem, InventoryType, Manufacturer, Supplier } from '@/types/inventory';
+import { useCreateProduct, useUpdateProduct } from '@/hooks/api/useInventory';
 import { Image, X, Calendar } from 'lucide-react';
 
 interface AddEditInventoryDrawerProps {
@@ -35,7 +36,9 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
 }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const inventoryForm = useFormValidation(inventoryFormInputSchema);
-  const { types, manufacturers, suppliers, addItem, updateItem } = useInventoryStore();
+  const { types, manufacturers, suppliers } = useInventoryStore();
+  const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -112,49 +115,44 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
     if (!isValid) return;
 
     const formData = inventoryForm.getValues();
-    const supplier = suppliers.find(s => s.id === formData.supplier_id);
-    
-    const inventoryData: InventoryItem = {
-      id: isEditing && editingItem ? editingItem.id : `inv_${Date.now()}`,
-      name: formData.name,
-      sku: formData.sku,
-      barcode: formData.barcode || undefined,
-      imageUrl: formData.image_url || undefined,
-      expirationDate: formData.expiration_date || undefined,
-      type: formData.type,
-      typeId: types.find(t => t.name === formData.type)?.type_id,
-      manufacturer: formData.manufacturer,
-      manufacturerId: formData.manufacturer_id,
-      supplierId: formData.supplier_id || undefined,
-      costPrice: parseFloat(formData.cost_price) || 0,
-      retailPrice: formData.retail_price ? parseFloat(formData.retail_price) : null,
-      currentStock: parseInt(formData.current_stock) || 0,
-      lowStockThreshold: parseInt(formData.low_stock_threshold) || 5,
-      reorderQuantity: parseInt(formData.reorder_quantity) || 10,
-      reorderPoint: parseInt(formData.reorder_point) || 5,
-      unitOfMeasure: formData.unit_of_measure || 'unit',
-      isRetail: formData.is_retail ?? true,
-      isBackBar: formData.is_back_bar ?? false,
-      trackStock: formData.track_stock ?? true,
-      allowNegativeStock: false,
-      taxable: formData.taxable ?? true,
-      notes: formData.notes,
-      status: 'active',
-      createdAt: isEditing && editingItem ? editingItem.createdAt : new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    const typeId = types.find(t => t.name === formData.type)?.type_id;
 
-    if (isEditing && editingItem) {
-      updateItem(editingItem.id, inventoryData);
-      toast.success('Inventory item updated successfully');
-    } else {
-      addItem(inventoryData);
-      toast.success('Inventory item created successfully');
+    try {
+      if (isEditing && editingItem) {
+        await updateProductMutation.mutateAsync({
+          id: editingItem.id,
+          request: {
+            name: formData.name,
+            description: formData.notes,
+            price: formData.retail_price ? parseFloat(formData.retail_price) : undefined,
+            cost: parseFloat(formData.cost_price) || undefined,
+            quantityInStock: parseInt(formData.current_stock) || undefined,
+            lowStockThreshold: parseInt(formData.low_stock_threshold) || undefined,
+            isActive: true, // Assuming active status
+          },
+        });
+      } else {
+        await createProductMutation.mutateAsync({
+          name: formData.name,
+          description: formData.notes,
+          sku: formData.sku,
+          barcode: formData.barcode || undefined,
+          manufacturerId: formData.manufacturer_id || undefined,
+          typeId: typeId,
+          price: parseFloat(formData.retail_price) || 0,
+          cost: parseFloat(formData.cost_price) || undefined,
+          quantityInStock: parseInt(formData.current_stock) || 0,
+          lowStockThreshold: parseInt(formData.low_stock_threshold) || 10,
+          isActive: true,
+        });
+      }
+
+      onOpenChange(false);
+      inventoryForm.reset();
+      setImagePreview(null);
+    } catch (error) {
+      // Error handling is done in the hook
     }
-
-    onOpenChange(false);
-    inventoryForm.reset();
-    setImagePreview(null);
   };
 
   return (
@@ -178,8 +176,13 @@ export const AddEditInventoryDrawer: React.FC<AddEditInventoryDrawerProps> = ({
             variant="gradient"
             onClick={handleSubmit}
             className="flex-1"
+            disabled={createProductMutation.isPending || updateProductMutation.isPending}
           >
-            {isEditing ? 'Update Inventory' : 'Create Inventory'}
+            {createProductMutation.isPending || updateProductMutation.isPending
+              ? 'Saving...'
+              : isEditing
+              ? 'Update Inventory'
+              : 'Create Inventory'}
           </BaseButton>
         </div>
       }
