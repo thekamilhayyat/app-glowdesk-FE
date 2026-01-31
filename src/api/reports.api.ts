@@ -3,9 +3,8 @@
  * Real backend API implementation
  */
 
-import { ApiResponse, getAuthToken, createApiError } from './client';
-
-const API_BASE_URL = '/api/reports';
+import { ApiResponse, createApiError } from './client';
+import { apiFetch } from './http';
 
 /**
  * Date range filter for reports
@@ -43,32 +42,6 @@ export interface InventoryReportResponse {
   totalProducts: number;
 }
 
-/**
- * Make authenticated HTTP request
- */
-const makeRequest = async <T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> => {
-  const token = getAuthToken();
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : '',
-      ...options.headers,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`);
-  }
-
-  return response.json();
-};
 
 /**
  * GET /api/reports/sales?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
@@ -83,10 +56,10 @@ export const getSalesReport = async (
     if (filters?.endDate) params.append('endDate', filters.endDate);
 
     const queryString = params.toString();
-    const endpoint = `/sales${queryString ? `?${queryString}` : ''}`;
-    const response = await makeRequest<SalesReportResponse>(endpoint);
+    const endpoint = `/api/reports/sales${queryString ? `?${queryString}` : ''}`;
+    const data = await apiFetch<SalesReportResponse>(endpoint);
 
-    return { data: response };
+    return { data };
   } catch (error) {
     return createApiError(
       'FETCH_ERROR',
@@ -108,10 +81,10 @@ export const getAppointmentsReport = async (
     if (filters?.endDate) params.append('endDate', filters.endDate);
 
     const queryString = params.toString();
-    const endpoint = `/appointments${queryString ? `?${queryString}` : ''}`;
-    const response = await makeRequest<AppointmentsReportResponse>(endpoint);
+    const endpoint = `/api/reports/appointments${queryString ? `?${queryString}` : ''}`;
+    const data = await apiFetch<AppointmentsReportResponse>(endpoint);
 
-    return { data: response };
+    return { data };
   } catch (error) {
     return createApiError(
       'FETCH_ERROR',
@@ -126,8 +99,8 @@ export const getAppointmentsReport = async (
  */
 export const getInventoryReport = async (): Promise<ApiResponse<InventoryReportResponse>> => {
   try {
-    const response = await makeRequest<InventoryReportResponse>('/inventory');
-    return { data: response };
+    const data = await apiFetch<InventoryReportResponse>('/api/reports/inventory');
+    return { data };
   } catch (error) {
     return createApiError(
       'FETCH_ERROR',

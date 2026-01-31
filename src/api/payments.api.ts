@@ -3,9 +3,8 @@
  * Stripe payment integration
  */
 
-import { ApiResponse, getAuthToken, createApiError } from './client';
-
-const API_BASE_URL = '/api/payments';
+import { ApiResponse, createApiError } from './client';
+import { apiFetch } from './http';
 
 /**
  * Currency types supported
@@ -60,32 +59,6 @@ export interface PaymentResponse {
   createdAt: string;
 }
 
-/**
- * Make authenticated HTTP request
- */
-const makeRequest = async <T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> => {
-  const token = getAuthToken();
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : '',
-      ...options.headers,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`);
-  }
-
-  return response.json();
-};
 
 /**
  * POST /api/payments/create-intent
@@ -95,12 +68,12 @@ export const createPaymentIntent = async (
   request: CreatePaymentIntentRequest
 ): Promise<ApiResponse<PaymentIntentResponse>> => {
   try {
-    const response = await makeRequest<PaymentIntentResponse>('/create-intent', {
+    const data = await apiFetch<PaymentIntentResponse>('/api/payments/create-intent', {
       method: 'POST',
       body: JSON.stringify(request),
     });
 
-    return { data: response };
+    return { data };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to create payment intent';
     
@@ -134,12 +107,12 @@ export const confirmPayment = async (
   request: ConfirmPaymentRequest
 ): Promise<ApiResponse<PaymentResponse>> => {
   try {
-    const response = await makeRequest<PaymentResponse>('/confirm', {
+    const data = await apiFetch<PaymentResponse>('/api/payments/confirm', {
       method: 'POST',
       body: JSON.stringify(request),
     });
 
-    return { data: response };
+    return { data };
   } catch (error) {
     return createApiError(
       'FETCH_ERROR',

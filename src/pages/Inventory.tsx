@@ -141,9 +141,6 @@ const Inventory: React.FC = () => {
     direction: 'asc' | 'desc';
   } | null>(null);
 
-  const stats = getInventoryStats();
-  const activeAlerts = getActiveAlerts();
-
   const filteredItems = useMemo(() => {
     let filtered = items;
     

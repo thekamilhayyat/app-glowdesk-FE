@@ -272,24 +272,30 @@ export function AppointmentDialog({
           description: 'The appointment has been successfully updated',
         });
         onOpenChange(false);
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to update appointment',
+          variant: 'destructive',
+        });
       }
     } else {
       const newAppointment: Appointment = {
-        id: `apt-${Date.now()}`,
-        clientId: formData.clientId,
-        staffId: formData.staffId,
-        serviceIds: formData.serviceIds,
-        startTime,
-        endTime,
-        status: formData.status,
-        notes: formData.notes,
-        hasUnreadMessages: false,
-        isRecurring: false,
-        depositPaid: false,
-        totalPrice,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+          id: `apt-${Date.now()}`,
+          clientId: formData.clientId,
+          staffId: formData.staffId,
+          serviceIds: formData.serviceIds,
+          startTime,
+          endTime,
+          status: formData.status,
+          notes: formData.notes,
+          hasUnreadMessages: false,
+          isRecurring: false,
+          depositPaid: false,
+          totalPrice,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
 
       const result = addAppointment(newAppointment);
 
@@ -306,7 +312,8 @@ export function AppointmentDialog({
           variant: 'destructive',
         });
       }
-    } catch (error) {
+    }
+  } catch (error) {
       toast({
         title: 'Error',
         description: 'An unexpected error occurred',

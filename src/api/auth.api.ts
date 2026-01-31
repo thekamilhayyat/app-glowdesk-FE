@@ -1,10 +1,10 @@
 /**
  * Authentication API endpoints
- * Mock implementation matching API_DOCUMENTATION.md
+ * Real backend API implementation
  */
 
-import { apiRequest, createApiError, createApiSuccess, ApiResponse } from './client';
-import usersData from '@/data/users.json';
+import { ApiResponse, createApiError } from './client';
+import { apiFetch } from './http';
 
 export interface LoginRequest {
   email: string;
@@ -22,6 +22,17 @@ export interface LoginResponse {
   };
   token: string;
   expiresAt: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface RegisterResponse {
+  message: string;
 }
 
 export interface User {
@@ -43,96 +54,141 @@ export interface RefreshTokenResponse {
 }
 
 /**
- * POST /auth/login
+ * POST /api/auth/login
  * Authenticate user and receive JWT token
  */
 export const login = async (credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
-  return apiRequest(async () => {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  try {
+    const data = await apiFetch<LoginResponse>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
 
-    // Find user in mock data
-    const foundUser = usersData.users.find(
-      (u) => u.email === credentials.email && u.password === credentials.password
-    );
+    return { data };
+  } catch (error) {
+    const errorObj = error as Error & { code?: string; status?: number };
+    let errorCode = errorObj?.code || 'LOGIN_ERROR';
+    let errorMessage = error instanceof Error ? error.message : 'Failed to login';
 
-    if (!foundUser) {
-      throw new Error('Invalid email or password');
+    // Map backend error codes to user-friendly messages
+    if (errorCode === 'EMAIL_NOT_VERIFIED') {
+      errorMessage = 'Please verify your email';
+    } else if (errorObj?.status === 0 || errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+      errorCode = 'NETWORK_ERROR';
+      errorMessage = 'Server not responding';
     }
-
-    // Generate expiration (24 hours from now)
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
-
-    return {
-      user: {
-        id: foundUser.id,
-        email: foundUser.email,
-        firstName: foundUser.firstName,
-        lastName: foundUser.lastName,
-        role: foundUser.role,
-        isActive: true,
-      },
-      token: foundUser.token,
-      expiresAt: expiresAt.toISOString(),
-    };
-  });
+    
+    return createApiError(
+      errorCode,
+      errorMessage
+    );
+  }
 };
 
 /**
- * POST /auth/logout
+ * POST /api/auth/register
+ * Register a new user account (does not auto-login)
+ * Backend returns 201 on success, 409 for EMAIL_ALREADY_EXISTS, 400 for validation errors
+ */
+export const register = async (request: RegisterRequest): Promise<ApiResponse<RegisterResponse>> => {
+  try {
+    // Ensure request payload matches backend exactly: firstName, lastName, email, password
+    const payload = {
+      firstName: request.firstName,
+      lastName: request.lastName,
+      email: request.email,
+      password: request.password,
+    };
+
+    const data = await apiFetch<RegisterResponse>('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    return { data };
+  } catch (error) {
+    // Extract error code from error object
+    const errorObj = error as Error & { code?: string; status?: number };
+    let errorCode = errorObj?.code || 'REGISTER_ERROR';
+    let errorMessage = error instanceof Error ? error.message : 'Failed to create account';
+
+    // Handle specific HTTP status codes
+    if (errorObj?.status === 409 || errorCode === 'EMAIL_ALREADY_EXISTS') {
+      errorCode = 'EMAIL_ALREADY_EXISTS';
+      errorMessage = 'Email already exists';
+    } else if (errorObj?.status === 400) {
+      errorCode = 'VALIDATION_ERROR';
+      // Keep the backend error message for validation errors
+    } else if (errorObj?.status === 0 || errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+      errorCode = 'NETWORK_ERROR';
+      errorMessage = 'Server not responding';
+    }
+    
+    return createApiError(
+      errorCode,
+      errorMessage
+    );
+  }
+};
+
+/**
+ * POST /api/auth/logout
  * Invalidate current session token
  */
 export const logout = async (): Promise<ApiResponse<void>> => {
-  return apiRequest(async () => {
-    // In real implementation, this would invalidate the token on the server
-    // For mock, we just return success
-    return undefined;
-  });
+  try {
+    await apiFetch<void>('/api/auth/logout', {
+      method: 'POST',
+    });
+
+    return { data: undefined };
+  } catch (error) {
+    return createApiError(
+      'LOGOUT_ERROR',
+      error instanceof Error ? error.message : 'Failed to logout'
+    );
+  }
 };
 
 /**
- * GET /auth/me
+ * GET /api/auth/me
  * Get current authenticated user information
  */
 export const getCurrentUser = async (token: string): Promise<ApiResponse<{ user: User }>> => {
-  return apiRequest(async () => {
-    // Find user by token
-    const foundUser = usersData.users.find((u) => u.token === token);
-
-    if (!foundUser) {
-      throw new Error('Unauthorized');
-    }
-
-    return {
-      user: {
-        id: foundUser.id,
-        email: foundUser.email,
-        firstName: foundUser.firstName,
-        lastName: foundUser.lastName,
-        role: foundUser.role,
-        isActive: true,
+  try {
+    const data = await apiFetch<{ user: User }>('/api/auth/me', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
       },
-    };
-  });
+    });
+
+    return { data };
+  } catch (error) {
+    return createApiError(
+      'AUTH_ERROR',
+      error instanceof Error ? error.message : 'Failed to get current user'
+    );
+  }
 };
 
 /**
- * POST /auth/refresh
+ * POST /api/auth/refresh
  * Refresh JWT token before expiration
  */
 export const refreshToken = async (
   request: RefreshTokenRequest
 ): Promise<ApiResponse<RefreshTokenResponse>> => {
-  return apiRequest(async () => {
-    // In real implementation, validate refresh token
-    // For mock, generate new token
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
+  try {
+    const data = await apiFetch<RefreshTokenResponse>('/api/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
 
-    return {
-      token: `refreshed_token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      expiresAt: expiresAt.toISOString(),
-    };
-  });
+    return { data };
+  } catch (error) {
+    return createApiError(
+      'REFRESH_ERROR',
+      error instanceof Error ? error.message : 'Failed to refresh token'
+    );
+  }
 };

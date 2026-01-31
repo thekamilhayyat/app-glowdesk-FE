@@ -7,7 +7,8 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "localhost",
-    port: 5000,
+    port: 3000,
+    strictPort: true, // Fail if port is already in use instead of trying another port
     allowedHosts: [".replit.dev", ".repl.co"],
     // Headers for iframe embedding
     headers: {

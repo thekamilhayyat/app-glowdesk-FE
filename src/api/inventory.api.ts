@@ -3,10 +3,9 @@
  * Real backend API implementation
  */
 
-import { ApiResponse, PaginatedResponse, PaginationParams, getAuthToken, createApiError } from './client';
+import { ApiResponse, PaginatedResponse, PaginationParams, createApiError } from './client';
 import { InventoryItem, StockAdjustment, LowStockAlert, StockAdjustmentReason } from '@/types/inventory';
-
-const API_BASE_URL = '/api/inventory';
+import { apiFetch } from './http';
 
 /**
  * Map frontend StockAdjustmentReason to backend type
@@ -69,32 +68,6 @@ const mapBackendProductToInventoryItem = (backendProduct: any): InventoryItem =>
   };
 };
 
-/**
- * Make authenticated HTTP request
- */
-const makeRequest = async <T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> => {
-  const token = getAuthToken();
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : '',
-      ...options.headers,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`);
-  }
-
-  return response.json();
-};
 
 export interface ProductFilters extends PaginationParams {
   search?: string;
@@ -172,8 +145,8 @@ export const getProducts = async (
     if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder);
 
     const queryString = params.toString();
-    const endpoint = `/products${queryString ? `?${queryString}` : ''}`;
-    const response = await makeRequest<{ data: any[]; pagination: any }>(endpoint);
+    const endpoint = `/api/inventory/products${queryString ? `?${queryString}` : ''}`;
+    const response = await apiFetch<{ data: any[]; pagination: any }>(endpoint);
 
     return {
       data: {
@@ -197,7 +170,7 @@ export const getProductById = async (
   id: string
 ): Promise<ApiResponse<{ product: InventoryItem }>> => {
   try {
-    const response = await makeRequest<{ product: any }>(`/products/${id}`);
+    const data = await apiFetch<{ product: any }>(`/api/inventory/products/${id}`);
     return {
       data: {
         product: mapBackendProductToInventoryItem(response.product),
@@ -222,7 +195,7 @@ export const createProduct = async (
   request: CreateProductRequest
 ): Promise<ApiResponse<{ product: InventoryItem }>> => {
   try {
-    const response = await makeRequest<{ product: any }>('/products', {
+    const response = await apiFetch<{ product: any }>('/api/inventory/products', {
       method: 'POST',
       body: JSON.stringify(request),
     });
@@ -254,7 +227,7 @@ export const updateProduct = async (
   request: UpdateProductRequest
 ): Promise<ApiResponse<{ product: InventoryItem }>> => {
   try {
-    const response = await makeRequest<{ product: any }>(`/products/${id}`, {
+    const data = await apiFetch<{ product: any }>(`/api/inventory/products/${id}`, {
       method: 'PUT',
       body: JSON.stringify(request),
     });
@@ -283,7 +256,7 @@ export const updateProduct = async (
  */
 export const deleteProduct = async (id: string): Promise<ApiResponse<void>> => {
   try {
-    await makeRequest(`/products/${id}`, {
+    await apiFetch(`/api/inventory/products/${id}`, {
       method: 'DELETE',
     });
     return { data: undefined };
@@ -310,7 +283,7 @@ export const adjustStock = async (
   request: StockAdjustmentRequest
 ): Promise<ApiResponse<{ product: InventoryItem; transaction: StockAdjustment }>> => {
   try {
-    const response = await makeRequest<{ product: any; transaction: any }>(`/products/${id}/adjust-stock`, {
+    const response = await apiFetch<{ product: any; transaction: any }>(`/api/inventory/products/${id}/adjust-stock`, {
       method: 'POST',
       body: JSON.stringify(request),
     });
@@ -357,7 +330,7 @@ export const adjustStock = async (
  */
 export const getLowStockAlerts = async (): Promise<ApiResponse<{ alerts: LowStockAlert[] }>> => {
   try {
-    const response = await makeRequest<{ alerts: any[] }>('/products/low-stock');
+    const data = await apiFetch<{ alerts: any[] }>('/api/inventory/products/low-stock');
     return {
       data: {
         alerts: response.alerts.map((alert: any) => ({
@@ -391,8 +364,8 @@ export const getLowStockAlerts = async (): Promise<ApiResponse<{ alerts: LowStoc
  */
 export const getManufacturers = async (): Promise<ApiResponse<{ data: any[] }>> => {
   try {
-    const response = await makeRequest<{ data: any[] }>('/manufacturers');
-    return { data: response };
+    const data = await apiFetch<{ data: any[] }>('/api/inventory/manufacturers');
+    return { data };
   } catch (error) {
     return createApiError(
       'FETCH_ERROR',
@@ -407,8 +380,8 @@ export const getManufacturers = async (): Promise<ApiResponse<{ data: any[] }>> 
  */
 export const getProductTypes = async (): Promise<ApiResponse<{ data: any[] }>> => {
   try {
-    const response = await makeRequest<{ data: any[] }>('/product-types');
-    return { data: response };
+    const data = await apiFetch<{ data: any[] }>('/api/inventory/product-types');
+    return { data };
   } catch (error) {
     return createApiError(
       'FETCH_ERROR',

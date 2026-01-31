@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Auth } from "@/pages/Auth";
+import { VerifyEmail } from "@/pages/VerifyEmail";
 import Index from "./pages/Index";
 import Calendar from "./pages/Calendar";
 import { Clients } from "@/pages/Clients";
@@ -36,23 +37,6 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 30000,
-      onError: (error) => {
-        // Global error handler for React Query
-        // Errors are handled per-query, but this catches unhandled ones
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.error('React Query error:', error);
-        }
-      },
-    },
-    mutations: {
-      onError: (error) => {
-        // Global mutation error handler
-        if (process.env.NODE_ENV === 'development') {
-          // eslint-disable-next-line no-console
-          console.error('React Query mutation error:', error);
-        }
-      },
     },
   },
 });
@@ -117,6 +101,7 @@ const AppContent = () => {
                     
                     {/* Dashboard routes (auth required) */}
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/verify-email" element={<VerifyEmail />} />
                     <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                     <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
                     <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />

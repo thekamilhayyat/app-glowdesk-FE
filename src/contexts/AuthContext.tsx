@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { QueryClient } from '@tanstack/react-query';
-import { login as apiLogin, logout as apiLogout, getCurrentUser, LoginResponse } from '@/api/auth.api';
+import { login as apiLogin, logout as apiLogout, getCurrentUser, register as apiRegister, LoginResponse } from '@/api/auth.api';
 import { getAuthToken, setAuthToken, removeAuthToken, extractData, hasError } from '@/api/client';
 
 interface User {
@@ -15,8 +15,8 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, password: string, firstName: string, lastName: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; errorCode?: string }>;
+  register: (email: string, password: string, firstName: string, lastName: string) => Promise<{ success: boolean; errorCode?: string }>;
   logout: (queryClient?: QueryClient) => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -86,12 +86,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; errorCode?: string }> => {
     try {
       const response = await apiLogin({ email, password });
       
       if (hasError(response)) {
-        return false;
+        return {
+          success: false,
+          errorCode: response.error?.code,
+        };
       }
 
       const data = extractData(response);
@@ -102,7 +105,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         lastName: data.user.lastName,
         role: data.user.role,
         token: data.token,
-        isActive: data.user.isActive,
+        isActive: data.user.isActive ?? true,
       };
 
       setUser(userData);
@@ -113,57 +116,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Store user in localStorage
       localStorage.setItem('authUser', JSON.stringify(userData));
       
-      return true;
+      return { success: true };
     } catch (error) {
       // Error already handled by API layer
-      return false;
+      return {
+        success: false,
+        errorCode: 'LOGIN_ERROR',
+      };
     }
   };
 
-  const signup = async (
+  const register = async (
     email: string, 
     password: string, 
     firstName: string, 
     lastName: string
-  ): Promise<boolean> => {
+  ): Promise<{ success: boolean; errorCode?: string }> => {
     try {
-      // For MVP, signup uses login endpoint after creating account
-      // In real app, there would be a separate signup endpoint
-      // For now, we'll simulate by checking if user exists
-      const response = await apiLogin({ email, password });
+      const response = await apiRegister({
+        email,
+        password,
+        firstName,
+        lastName,
+      });
       
       if (hasError(response)) {
-        // User doesn't exist, create account (mock)
-        // In real app, call POST /auth/signup
-        const mockToken = `new_user_token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + 24);
-
-        const userData: User = {
-          id: `user-${Date.now()}`,
-          email,
-          firstName,
-          lastName,
-          role: 'user',
-          token: mockToken,
-          isActive: true,
+        return {
+          success: false,
+          errorCode: response.error?.code,
         };
-
-        setUser(userData);
-        setIsAuthenticated(true);
-        setAuthToken(mockToken);
-        setSalonId('salon-1');
-        
-        localStorage.setItem('authUser', JSON.stringify(userData));
-        
-        return true;
       }
 
-      // User already exists
-      return false;
+      // Registration successful - do NOT auto-login
+      // User must verify email first
+      return { success: true };
     } catch (error) {
       // Error already handled by API layer
-      return false;
+      return {
+        success: false,
+        errorCode: 'REGISTER_ERROR',
+      };
     }
   };
 
@@ -193,7 +185,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value = {
     user,
     login,
-    signup,
+    register,
     logout,
     isAuthenticated,
     isLoading,

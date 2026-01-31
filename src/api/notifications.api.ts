@@ -3,9 +3,8 @@
  * Real backend API implementation
  */
 
-import { ApiResponse, getAuthToken, createApiError } from './client';
-
-const API_BASE_URL = '/api/notifications';
+import { ApiResponse, createApiError } from './client';
+import { apiFetch } from './http';
 
 /**
  * Notification type
@@ -29,32 +28,6 @@ export interface NotificationsResponse {
   unreadCount: number;
 }
 
-/**
- * Make authenticated HTTP request
- */
-const makeRequest = async <T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> => {
-  const token = getAuthToken();
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : '',
-      ...options.headers,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`);
-  }
-
-  return response.json();
-};
 
 /**
  * GET /api/notifications
@@ -62,9 +35,9 @@ const makeRequest = async <T>(
  */
 export const getNotifications = async (): Promise<ApiResponse<NotificationsResponse>> => {
   try {
-    const response = await makeRequest<NotificationsResponse>('');
+    const data = await apiFetch<NotificationsResponse>('/api/notifications');
 
-    return { data: response };
+    return { data };
   } catch (error) {
     return createApiError(
       'FETCH_ERROR',
@@ -81,11 +54,11 @@ export const markNotificationAsRead = async (
   id: string
 ): Promise<ApiResponse<{ notification: Notification }>> => {
   try {
-    const response = await makeRequest<{ notification: Notification }>(`/${id}/read`, {
+    const data = await apiFetch<{ notification: Notification }>(`/api/notifications/${id}/read`, {
       method: 'PATCH',
     });
 
-    return { data: response };
+    return { data };
   } catch (error) {
     return createApiError(
       'FETCH_ERROR',
@@ -100,11 +73,11 @@ export const markNotificationAsRead = async (
  */
 export const markAllNotificationsAsRead = async (): Promise<ApiResponse<{ count: number }>> => {
   try {
-    const response = await makeRequest<{ count: number }>('/read-all', {
+    const data = await apiFetch<{ count: number }>('/api/notifications/read-all', {
       method: 'PATCH',
     });
 
-    return { data: response };
+    return { data };
   } catch (error) {
     return createApiError(
       'FETCH_ERROR',
