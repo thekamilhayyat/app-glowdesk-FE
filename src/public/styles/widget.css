@@ -1,0 +1,52 @@
+/**
+ * Widget-specific styles for iframe embedding
+ * Ensures CSS isolation and responsive behavior
+ * 
+ * IMPORTANT: This widget is designed to be embedded in iframes on salon websites.
+ * When customers book through the widget, bookings automatically appear in the Glowdesk dashboard.
+ */
+
+.booking-widget {
+  /* Widget container - works in iframe */
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  
+  /* Ensure proper rendering in iframe */
+  position: relative;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  
+  /* Prevent style leakage */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+/* Ensure widget works in iframe */
+.booking-widget iframe {
+  border: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .booking-widget {
+    font-size: 14px;
+  }
+}
+
+/* Prevent text selection issues in iframe */
+.booking-widget {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: text; /* Allow text selection for forms */
+}
+
+/* Ensure proper scrolling in iframe */
+.booking-widget {
+  overflow-x: hidden;
+  overflow-y: auto;
+}

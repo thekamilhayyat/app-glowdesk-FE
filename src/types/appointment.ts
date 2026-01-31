@@ -21,6 +21,9 @@ export interface Appointment {
   isRecurring: boolean;
   depositPaid: boolean;
   totalPrice: number;
+  // Payment status from backend (trust backend response)
+  // Backend returns uppercase: 'PENDING', 'PROCESSING', 'SUCCEEDED', 'FAILED', 'CANCELED'
+  paymentStatus?: 'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'CANCELED';
   createdAt: Date;
   updatedAt: Date;
 }

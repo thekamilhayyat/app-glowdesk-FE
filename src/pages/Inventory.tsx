@@ -10,6 +10,7 @@ import { Container } from '@/components/ui/Container';
 import { toast } from 'sonner';
 import { useInventoryStore } from '@/stores/inventoryStore';
 import { InventoryItem, Stocktake, PurchaseOrder } from '@/types/inventory';
+import { useProducts, useDeleteProduct, useLowStockAlerts } from '@/hooks/api/useInventory';
 import {
   AddEditInventoryDrawer,
   ViewTypesDrawer,
@@ -57,22 +58,44 @@ import {
 
 const Inventory: React.FC = () => {
   const { 
-    items, 
     types,
     manufacturers,
     suppliers,
     purchaseOrders,
     stocktakes,
-    deleteItem,
     addType,
     addManufacturer,
     reorderTypes,
     reorderManufacturers,
-    getActiveAlerts,
-    getLowStockItems,
-    getOutOfStockItems,
-    getInventoryStats
   } = useInventoryStore();
+
+  // React Query hooks for inventory data
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(100); // Fetch all items for now
+  const { data: productsData, isLoading: isLoadingProducts, error: productsError } = useProducts({
+    page: currentPage,
+    limit: itemsPerPage,
+  });
+  const { data: lowStockAlertsData } = useLowStockAlerts();
+  const deleteProductMutation = useDeleteProduct();
+
+  const items = productsData?.data || [];
+  const activeAlerts = lowStockAlertsData?.alerts || [];
+  
+  // Compute stats from query data
+  const stats = useMemo(() => {
+    const totalProducts = items.length;
+    const lowStockCount = items.filter(item => item.currentStock > 0 && item.currentStock <= item.lowStockThreshold).length;
+    const outOfStockCount = items.filter(item => item.currentStock <= 0).length;
+    const totalValue = items.reduce((sum, item) => sum + (item.costPrice * item.currentStock), 0);
+    
+    return {
+      totalProducts,
+      lowStockCount,
+      outOfStockCount,
+      totalValue,
+    };
+  }, [items]);
 
   const [isAddInventoryOpen, setIsAddInventoryOpen] = useState(false);
   const [isViewTypesOpen, setIsViewTypesOpen] = useState(false);
@@ -117,9 +140,6 @@ const Inventory: React.FC = () => {
     field: string;
     direction: 'asc' | 'desc';
   } | null>(null);
-
-  const stats = getInventoryStats();
-  const activeAlerts = getActiveAlerts();
 
   const filteredItems = useMemo(() => {
     let filtered = items;
@@ -166,9 +186,12 @@ const Inventory: React.FC = () => {
     setIsAddInventoryOpen(true);
   };
 
-  const handleDeleteInventory = (itemId: string) => {
-    deleteItem(itemId);
-    toast.success('Inventory item deleted successfully');
+  const handleDeleteInventory = async (itemId: string) => {
+    try {
+      await deleteProductMutation.mutateAsync(itemId);
+    } catch (error) {
+      // Error handling is done in the hook
+    }
   };
 
   const handleAdjustStock = (item: InventoryItem, type: 'add' | 'remove') => {
@@ -300,6 +323,7 @@ const Inventory: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={() => handleDeleteInventory(item.id)}
+              disabled={deleteProductMutation.isPending}
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -311,16 +335,40 @@ const Inventory: React.FC = () => {
     }
   ];
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [tablePage, setTablePage] = useState(1);
+  const [tableItemsPerPage, setTableItemsPerPage] = useState(10);
 
   const pagination = {
-    currentPage,
-    itemsPerPage,
+    currentPage: tablePage,
+    itemsPerPage: tableItemsPerPage,
     totalItems: filteredItems.length,
-    onPageChange: setCurrentPage,
-    onItemsPerPageChange: setItemsPerPage
+    onPageChange: setTablePage,
+    onItemsPerPageChange: setTableItemsPerPage
   };
+
+  if (isLoadingProducts) {
+    return (
+      <AppLayout>
+        <Container className="py-4">
+          <div className="flex items-center justify-center h-64">
+            <p className="text-muted-foreground">Loading inventory...</p>
+          </div>
+        </Container>
+      </AppLayout>
+    );
+  }
+
+  if (productsError) {
+    return (
+      <AppLayout>
+        <Container className="py-4">
+          <div className="flex items-center justify-center h-64">
+            <p className="text-red-600">Error loading inventory: {productsError.message}</p>
+          </div>
+        </Container>
+      </AppLayout>
+    );
+  }
 
   if (items.length === 0) {
     return (

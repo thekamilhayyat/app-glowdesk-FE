@@ -8,12 +8,16 @@ import { BaseLabel } from "@/components/base/BaseLabel";
 import { Logo } from "@/components/ui/Logo";
 import { Container } from "@/components/ui/Container";
 import { toast } from "@/components/ui/sonner";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: "admin@glowflowapp.com",
     password: "admin123",
@@ -21,7 +25,7 @@ export function Auth() {
     lastName: "",
   });
 
-  const { login, signup, isAuthenticated } = useAuth();
+  const { login, register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // Redirect to dashboard if already authenticated
@@ -37,53 +41,110 @@ export function Auth() {
       ...prev,
       [name]: value
     }));
+    
+    // Clear email error when user types
+    if (name === 'email') {
+      setEmailError(null);
+    }
+    // Clear login error when user types
+    if (!isSignUp) {
+      setLoginError(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent double-submit
+    if (isSubmitting || isLoading) {
+      return;
+    }
+
+    setIsSubmitting(true);
     setIsLoading(true);
+    setEmailError(null);
+    setLoginError(null);
 
     try {
-      let success = false;
-      
       if (isSignUp) {
+        // Client-side validation
         if (!formData.firstName || !formData.lastName) {
           toast.error("Please fill in all fields");
           return;
         }
-        success = await signup(formData.email, formData.password, formData.firstName, formData.lastName);
         
-        if (success) {
-          toast.success("Account created successfully!");
-          // Redirect to dashboard after successful signup
-          setTimeout(() => {
-            navigate('/', { replace: true });
-          }, 1000); // Wait 1 second for the toast to show
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+          toast.error("Please enter a valid email address");
+          return;
+        }
+        
+        // Validate password length
+        if (formData.password.length < 6) {
+          toast.error("Password must be at least 6 characters long");
+          return;
+        }
+        
+        const result = await register(
+          formData.email,
+          formData.password,
+          formData.firstName,
+          formData.lastName
+        );
+        
+        if (result.success) {
+          // Redirect to verify email page on success
+          navigate('/verify-email', { replace: true });
+          return; // Exit early on success
         } else {
-          toast.error("User already exists with this email");
+          // Handle specific error codes with inline errors
+          if (result.errorCode === 'EMAIL_ALREADY_EXISTS') {
+            setEmailError("Email already exists");
+          } else if (result.errorCode === 'NETWORK_ERROR') {
+            toast.error("Server not responding. Please check your connection.");
+          } else if (result.errorCode === 'VALIDATION_ERROR') {
+            // Show backend validation error message
+            toast.error(result.error?.message || "Please check your input and try again.");
+          } else {
+            toast.error(result.error?.message || "Failed to create account. Please try again.");
+          }
         }
       } else {
-        success = await login(formData.email, formData.password);
+        const result = await login(formData.email, formData.password);
         
-        if (success) {
+        if (result.success) {
           toast.success("Welcome back!");
           // Redirect to dashboard after successful login
           setTimeout(() => {
             navigate('/', { replace: true });
-          }, 1000); // Wait 1 second for the toast to show
+          }, 1000);
+          return; // Exit early on success
         } else {
-          toast.error("Invalid email or password");
+          // Handle specific error codes
+          if (result.errorCode === 'EMAIL_NOT_VERIFIED') {
+            setLoginError("Please verify your email");
+          } else if (result.errorCode === 'NETWORK_ERROR') {
+            toast.error("Server not responding. Please check your connection.");
+          } else {
+            toast.error(result.error?.message || "Invalid email or password");
+          }
         }
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again.");
+      // Catch any unexpected errors
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
+      // ALWAYS reset loading state, even on early returns
+      setIsSubmitting(false);
       setIsLoading(false);
     }
   };
 
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
+    setEmailError(null);
+    setLoginError(null);
     setFormData({
       email: isSignUp ? "admin@glowflowapp.com" : "",
       password: isSignUp ? "admin123" : "",
@@ -126,7 +187,7 @@ export function Auth() {
                         value={formData.firstName}
                         onChange={handleInputChange}
                         required={isSignUp}
-                        disabled={isLoading}
+                        disabled={isLoading || isSubmitting}
                       />
                     </div>
                     <div className="space-y-2">
@@ -139,7 +200,7 @@ export function Auth() {
                         value={formData.lastName}
                         onChange={handleInputChange}
                         required={isSignUp}
-                        disabled={isLoading}
+                        disabled={isLoading || isSubmitting}
                       />
                     </div>
                   </div>
@@ -155,8 +216,15 @@ export function Auth() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    disabled={isLoading}
+                    disabled={isLoading || isSubmitting}
+                    className={cn(emailError && "border-destructive focus-visible:ring-destructive")}
                   />
+                  {emailError && (
+                    <div className="flex items-center gap-2 text-sm text-destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <span>{emailError}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -170,14 +238,14 @@ export function Auth() {
                       value={formData.password}
                       onChange={handleInputChange}
                       required
-                      disabled={isLoading}
+                      disabled={isLoading || isSubmitting}
                       className="pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      disabled={isLoading}
+                      disabled={isLoading || isSubmitting}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -188,13 +256,23 @@ export function Auth() {
                   </div>
                 </div>
 
+                {/* Login Error Message */}
+                {!isSignUp && loginError && (
+                  <div className="rounded-md border border-destructive bg-destructive/10 p-4">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-destructive">{loginError}</p>
+                    </div>
+                  </div>
+                )}
+
                 <BaseButton
                   type="submit"
                   className="w-full"
-                  disabled={isLoading}
+                  disabled={isLoading || isSubmitting}
                   variant="gradient"
                 >
-                  {isLoading ? (
+                  {isLoading || isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       {isSignUp ? "Creating Account..." : "Signing In..."}
@@ -212,7 +290,7 @@ export function Auth() {
                     type="button"
                     onClick={toggleMode}
                     className="ml-1 text-primary hover:text-primary-hover font-medium transition-colors"
-                    disabled={isLoading}
+                    disabled={isLoading || isSubmitting}
                   >
                     {isSignUp ? "Sign In" : "Sign Up"}
                   </button>

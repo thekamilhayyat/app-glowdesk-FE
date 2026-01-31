@@ -9,13 +9,18 @@ import { BaseTimePicker } from '@/components/base/BaseTimePicker';
 import { BaseCombobox } from '@/components/base/BaseCombobox';
 import { BaseMultiSelect } from '@/components/base/BaseMultiSelect';
 import { ClientQuickAdd } from './ClientQuickAdd';
+import { PaymentModal } from '@/components/payment';
 import { Client } from '@/types/client';
 import { Service } from '@/types/service';
 import { StaffMember } from '@/types/staff';
 import { Appointment, AppointmentStatus } from '@/types/appointment';
 import { useCalendarStore } from '@/stores/calendarStore';
+import { useAppointment } from '@/hooks/api/useAppointments';
+import { PaymentResponse } from '@/api/payments.api';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { toast as sonnerToast } from '@/components/ui/sonner';
+import { CreditCard, CheckCircle2 } from 'lucide-react';
 
 interface AppointmentDialogProps {
   open: boolean;
@@ -47,8 +52,22 @@ export function AppointmentDialog({
     canSchedule,
   } = useCalendarStore();
 
+  // Fetch appointment data for payment status (trust backend response)
+  const { data: appointmentData, refetch: refetchAppointment } = useAppointment(
+    mode === 'edit' && appointment ? appointment.id : null
+  );
+
+  // Use appointment data from backend if available, otherwise use prop
+  const currentAppointment = appointmentData?.appointment || appointment;
+
   // Client quick add dialog state
   const [clientQuickAddOpen, setClientQuickAddOpen] = useState(false);
+  
+  // Payment modal state
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+
+  // Form submission state (prevent double-submit)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -157,8 +176,15 @@ export function AppointmentDialog({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent double-submit
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
 
     // Validation
     if (!formData.clientId) {
@@ -185,6 +211,7 @@ export function AppointmentDialog({
         description: 'Please select at least one service',
         variant: 'destructive',
       });
+      setIsSubmitting(false);
       return;
     }
 
@@ -195,6 +222,7 @@ export function AppointmentDialog({
         description: 'Invalid time format',
         variant: 'destructive',
       });
+      setIsSubmitting(false);
       return;
     }
 
@@ -215,6 +243,7 @@ export function AppointmentDialog({
         description: `This time conflicts with ${conflictClient?.name || 'another appointment'} (${format(conflicts[0]?.startTime, 'h:mm a')} - ${format(conflicts[0]?.endTime, 'h:mm a')})`,
         variant: 'destructive',
       });
+      setIsSubmitting(false);
       return;
     }
 
@@ -224,8 +253,9 @@ export function AppointmentDialog({
       return total + (service?.price || 0);
     }, 0);
 
-    if (mode === 'edit' && appointment) {
-      const result = updateAppointment(appointment.id, {
+    try {
+      if (mode === 'edit' && appointment) {
+        const result = updateAppointment(appointment.id, {
         clientId: formData.clientId,
         staffId: formData.staffId,
         serviceIds: formData.serviceIds,
@@ -242,24 +272,30 @@ export function AppointmentDialog({
           description: 'The appointment has been successfully updated',
         });
         onOpenChange(false);
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to update appointment',
+          variant: 'destructive',
+        });
       }
     } else {
       const newAppointment: Appointment = {
-        id: `apt-${Date.now()}`,
-        clientId: formData.clientId,
-        staffId: formData.staffId,
-        serviceIds: formData.serviceIds,
-        startTime,
-        endTime,
-        status: formData.status,
-        notes: formData.notes,
-        hasUnreadMessages: false,
-        isRecurring: false,
-        depositPaid: false,
-        totalPrice,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+          id: `apt-${Date.now()}`,
+          clientId: formData.clientId,
+          staffId: formData.staffId,
+          serviceIds: formData.serviceIds,
+          startTime,
+          endTime,
+          status: formData.status,
+          notes: formData.notes,
+          hasUnreadMessages: false,
+          isRecurring: false,
+          depositPaid: false,
+          totalPrice,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
 
       const result = addAppointment(newAppointment);
 
@@ -269,7 +305,22 @@ export function AppointmentDialog({
           description: 'The appointment has been successfully created',
         });
         onOpenChange(false);
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to create appointment',
+          variant: 'destructive',
+        });
       }
+    }
+  } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -302,6 +353,34 @@ export function AppointmentDialog({
     sublabel: `${service.duration} min - $${service.price}`,
   }));
 
+  // Payment status check (trust backend response)
+  // Backend returns uppercase status: 'SUCCEEDED', 'PENDING', 'PROCESSING', etc.
+  const isPaymentSucceeded = currentAppointment?.paymentStatus === 'SUCCEEDED';
+  const isPaymentPending = currentAppointment?.paymentStatus === 'PENDING' || currentAppointment?.paymentStatus === 'PROCESSING';
+  const canMakePayment = currentAppointment && currentAppointment.totalPrice > 0 && !isPaymentSucceeded && mode === 'edit';
+
+  // Handle payment success
+  const handlePaymentSuccess = async (payment: PaymentResponse) => {
+    // Refresh appointment data to get updated payment status
+    await refetchAppointment();
+    
+    // Show success toast
+    // Payment amount is already in decimal format from backend
+    sonnerToast.success('Payment successful!', {
+      description: `Payment of $${payment.amount.toFixed(2)} has been processed.`,
+    });
+
+    // Close payment modal
+    setPaymentModalOpen(false);
+  };
+
+  // Handle payment failure
+  const handlePaymentFailure = (error: Error) => {
+    // Error toast is already shown by PaymentModal
+    // Just close the modal
+    setPaymentModalOpen(false);
+  };
+
   return (
     <>
       <BaseDrawer
@@ -309,47 +388,66 @@ export function AppointmentDialog({
         onOpenChange={onOpenChange}
         title={mode === 'edit' ? 'Edit Appointment' : 'New Appointment'}
         footer={
-          <div className="flex gap-3 w-full">
-            {mode === 'edit' && appointment && (
+          <div className="space-y-3">
+            {/* Pay Now Button - Only show in edit mode when payment is needed */}
+            {canMakePayment && (
               <BaseButton
                 type="button"
-                variant="destructive"
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to delete this appointment?')) {
-                    deleteAppointment(appointment.id);
-                    toast({
-                      title: 'Appointment Deleted',
-                      description: 'The appointment has been removed from the calendar.',
-                    });
-                    onOpenChange(false);
-                  }
-                }}
-                className="flex-1"
-                data-testid="button-delete-appointment"
+                variant="gradient"
+                onClick={() => setPaymentModalOpen(true)}
+                disabled={isPaymentSucceeded}
+                className="w-full"
+                data-testid="button-pay-now"
               >
-                Delete
+                <CreditCard className="mr-2 h-4 w-4" />
+                {isPaymentSucceeded ? 'Already Paid' : 'Pay Now'}
               </BaseButton>
             )}
-            {mode !== 'edit' && (
+            
+            {/* Existing footer buttons */}
+            <div className="flex gap-3 w-full">
+              {mode === 'edit' && appointment && (
+                <BaseButton
+                  type="button"
+                  variant="destructive"
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this appointment?')) {
+                      deleteAppointment(appointment.id);
+                      toast({
+                        title: 'Appointment Deleted',
+                        description: 'The appointment has been removed from the calendar.',
+                      });
+                      onOpenChange(false);
+                    }
+                  }}
+                  className="flex-1"
+                  data-testid="button-delete-appointment"
+                >
+                  Delete
+                </BaseButton>
+              )}
+              {mode !== 'edit' && (
+                <BaseButton
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="flex-1"
+                  data-testid="button-cancel-appointment"
+                >
+                  Cancel
+                </BaseButton>
+              )}
               <BaseButton
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
+                type="submit"
+                variant="gradient"
+                onClick={handleSubmit}
                 className="flex-1"
-                data-testid="button-cancel-appointment"
+                disabled={isSubmitting}
+                data-testid="button-save-appointment"
               >
-                Cancel
+                {isSubmitting ? 'Saving...' : (mode === 'edit' ? 'Update' : 'Create') + ' Appointment'}
               </BaseButton>
-            )}
-            <BaseButton
-              type="submit"
-              variant="gradient"
-              onClick={handleSubmit}
-              className="flex-1"
-              data-testid="button-save-appointment"
-            >
-              {mode === 'edit' ? 'Update' : 'Create'} Appointment
-            </BaseButton>
+            </div>
           </div>
         }
       >
@@ -469,6 +567,36 @@ export function AppointmentDialog({
             </BaseSelect>
           </div>
 
+          {/* Payment Status Display */}
+          {mode === 'edit' && currentAppointment && currentAppointment.totalPrice > 0 && (
+            <div className="space-y-2">
+              <BaseLabel>Payment Status</BaseLabel>
+              <div className="flex items-center justify-between rounded-lg border bg-muted/50 p-3">
+                <div className="flex items-center gap-2">
+                  {isPaymentSucceeded ? (
+                    <>
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-600">Paid</span>
+                    </>
+                  ) : isPaymentPending ? (
+                    <>
+                      <CreditCard className="h-4 w-4 text-yellow-600" />
+                      <span className="text-sm font-medium text-yellow-600">Payment Pending</span>
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium text-muted-foreground">Not Paid</span>
+                    </>
+                  )}
+                </div>
+                <span className="text-sm font-semibold">
+                  ${currentAppointment.totalPrice.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <BaseLabel htmlFor="notes">Notes</BaseLabel>
             <textarea
@@ -483,6 +611,19 @@ export function AppointmentDialog({
           </div>
         </form>
       </BaseDrawer>
+
+      {/* Payment Modal */}
+      {currentAppointment && (
+        <PaymentModal
+          open={paymentModalOpen}
+          onOpenChange={setPaymentModalOpen}
+          appointmentId={currentAppointment.id}
+          amount={currentAppointment.totalPrice} // Decimal amount (e.g., 50.00)
+          currency="usd"
+          onSuccess={handlePaymentSuccess}
+          onFailure={handlePaymentFailure}
+        />
+      )}
 
       <ClientQuickAdd
         open={clientQuickAddOpen}
